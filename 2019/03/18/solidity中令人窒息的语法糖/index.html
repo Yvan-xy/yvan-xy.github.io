@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <link rel="stylesheet" href="/style/style.css">
+<script>
+  var nlviconfig = {
+    title: "dyf",
+    author: "dyf",
+    baseUrl: "/",
+    theme: {
+      scheme: "banderole",
+      lightbox: true,
+      animate: true,
+      search: true,
+      friends: false,
+      reward: false,
+      lazy: false
+    }
+  }
+</script>
+
+
+
+
+    <link rel="stylesheet" href="/script/lib/lightbox/css/lightbox.min.css">
+
+
+
+
+    <link rel="stylesheet" href="/syuanpi/syuanpi.min.css">
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="browsermode" content="application">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="dyf">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="msapplication-navbutton-color" content="#666666">
+<meta name="format-detection" content="telephone=no">
+<meta name="keywords" content="nlvi, Nlvi">
+
+
+
+
+
+  <meta name="keywords" content="tutorial, Nlvi">
+
+  <title> solidity中令人窒息的语法糖 · dyf </title>
+</head>
+<body>
+  <div class="progress">
+  <div class="progress-inner"></div>
+</div>
+
+  
+    <div class="tagcloud-mask"></div>  
+<div class="tagcloud" id="tagcloud">
+  <div class="tagcloud-inner">
+    <a href="/tags/solo/" style="font-size: 14px;">solo</a> <a href="/tags/thinking/" style="font-size: 14px;">thinking</a> <a href="/tags/tutorial/" style="font-size: 14px;">tutorial</a>
+  </div>
+</div>
+  
+
+  <div class="container" style="display:none;">
+
+    <header class="header" id="header">
+  <div class="header-wrapper">
+    <div class="logo">
+  <div class="logo-inner syuanpi tvIn">
+    <span><a href="/">dyf</a></span>
+    
+  </div>
+</div>
+    <nav class="main-nav">
+  
+  <ul class="main-nav-list syuanpi tvIn">
+  
+    <li class="menu-item">
+      <a href="javascript:;" id="search">
+        <span>Search</span>
+        
+          <span class="menu-item-label">search</span>
+        
+      </a>
+    </li>
+  
+  
+    
+      
+    
+    <li class="menu-item">
+      <a href="/" id="article">
+        <span class="base-name">Articles</span>
+        
+          <span class="menu-item-label">article</span>
+        
+      </a>
+    </li>
+  
+    
+      
+    
+    <li class="menu-item">
+      <a href="/archives" id="archives">
+        <span class="base-name">Archives</span>
+        
+          <span class="menu-item-label">archives</span>
+        
+      </a>
+    </li>
+  
+    
+      
+    
+    <li class="menu-item">
+      <a href="javascript:;" id="tags">
+        <span class="base-name">Tags</span>
+        
+          <span class="menu-item-label">tags</span>
+        
+      </a>
+    </li>
+  
+    
+      
+    
+    <li class="menu-item">
+      <a href="/about" id="about">
+        <span class="base-name">About</span>
+        
+          <span class="menu-item-label">about</span>
+        
+      </a>
+    </li>
+  
+  </ul>
+  
+</nav>
+
+    
+    
+  </div>
+</header>
+<div class="mobile-header">
+  <div class="mobile-header-body">
+    <div class="mobile-header-list">
+      
+        
+            <div class="mobile-nav-item">
+                <a href="/">
+                    <span>Articles</span>
+                    
+                    
+                </a>
+            </div>
+        
+      
+        
+            <div class="mobile-nav-item">
+                <a href="/archives">
+                    <span>Archives</span>
+                    
+                    
+                </a>
+            </div>
+        
+      
+        
+          <div class="mobile-nav-item inner-cloud">
+            <div class="mobile-nav-tag">
+              <a href="javascript:;" id="mobile-tags">
+                <span>Tags</span>
+                
+                
+              </a>
+            </div>
+            <div class="mobile-nav-tagcloud">
+              <div class="mobile-tagcloud-inner">
+                <a href="/tags/solo/" style="font-size: 14px;">solo</a> <a href="/tags/thinking/" style="font-size: 14px;">thinking</a> <a href="/tags/tutorial/" style="font-size: 14px;">tutorial</a>
+              </div>
+            </div>
+          </div>
+        
+      
+        
+            <div class="mobile-nav-item">
+                <a href="/about">
+                    <span>About</span>
+                    
+                    
+                </a>
+            </div>
+        
+      
+    </div>
+  </div>
+  <div class="mobile-header-nav">
+    <div class="mobile-header-item" id="mobile-left">
+      <div class="header-menu-item">
+        <span class="header-menu-line"></span>
+      </div>
+    </div>
+    <h1 class="mobile-header-title">
+      <a href="/">dyf</a>
+    </h1>
+    <div class="mobile-header-item"></div>
+  </div>
+</div>
+    <div class="container-inner">
+
+    <h1 style="
+    text-align:center;
+    font-family:cathsgbr;
+    color: #FC5185;
+    font-weight:500;
+    font-size:30px;
+    ">The dyf's blog</h1>
+
+      <main class="main" id="main">
+        <div class="main-wrapper">
+          
+    
+  
+
+
+  <article class="
+  post
+   is_post 
+  ">
+    <header class="post-header">
+      <div class="post-time syuanpi fadeInUpShort back-1">
+        <div class="post-time-wrapper">
+          <span>2019-03-18</span>
+          
+          
+            
+              <aside class="post-tags syuanpi fadeInUpShort back-3">
+              
+                <a href="/tags/tutorial/">tutorial</a>
+              
+              </aside>
+            
+          
+        </div>
+      </div>
+      <h1 class="post-title syuanpi fadeInUpShort back-2">
+        
+          solidity中令人窒息的语法糖
+        
+      </h1>
+    </header>
+    <div class="post-content syuanpi fadeInUpShort back-3">
+      
+        <h3 id="Solidity函数的困惑"><a href="#Solidity函数的困惑" class="headerlink" title="Solidity函数的困惑"></a>Solidity函数的困惑</h3><hr>
+<p>&emsp;&emsp;关于Solidity我看的是不明不白，主要是web3的api几乎一无所知，而且对区块链的理解也不够深刻，在此记录一下一些令我窒息的语法糖。  </p>
+<h4 id="1-关于函数的可见型与访问控制"><a href="#1-关于函数的可见型与访问控制" class="headerlink" title="1. 关于函数的可见型与访问控制"></a>1. 关于函数的可见型与访问控制</h4><p>&emsp;&emsp;Solidity封装了两种函数调用方式 <strong><code>internal</code></strong> 与 <strong><code>external</code></strong>   </p>
+<ul>
+<li><strong>internal</strong> </li>
+</ul>
+<p>&emsp;&emsp;internal调用，实现时转为简单的EVM跳转，所以他能够直接访问上下文的数据，对于引用传递是十分高效，例如memory之间的值传递，实际上是引用的传递(妈耶，storage和memory又是坑，不同版本真是令人窒息)。  </p>
+<p>&emsp;&emsp;当前代码单元内，比如同一个合约内的函数，引入的library库，以及父类函数的直接调用即为internal调用，比如：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity &gt;=0.4.0 &lt; 0.6.0;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    function a() internal &#123;&#125;</span><br><span class="line"></span><br><span class="line">    function b() internal &#123;</span><br><span class="line">        a();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;在上述代码中的b()对a()的调用即为internal方式调用，函数在不显式声明访问类型时,以目前的版本来看会报错。</p>
+<ul>
+<li><strong>external</strong>  </li>
+</ul>
+<p>&emsp;&emsp;external调用实现了合约的外部消息调用。所以合约在初始化时不能以external的方式调用自身函数，因为此时合约仍未构造完成，此处可类比struct类型，一个结构体不能包含自身对象。但是可以以this的方式强制进行external调用。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity &gt;= 0.4.0 &lt; 0.6.0;</span><br><span class="line">contract test&#123;</span><br><span class="line">    function  a() external &#123;&#125;</span><br><span class="line"></span><br><span class="line">    function b() public &#123;</span><br><span class="line">        a();  //此时会报错</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    contract ext&#123;</span><br><span class="line">        function callA(test tmp) public &#123;</span><br><span class="line">            tmp.a();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>public</strong>  </li>
+</ul>
+<p>&emsp;&emsp;public的特点是，函数既可以以internal方式调用，也可以用internal方式调用。public函数可以被外部接口访问，是合约对外接口的一部分。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity &gt;= 0.4.0 &lt; 0.6.0</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    function fun1() public&#123;&#125;</span><br><span class="line"></span><br><span class="line">    funciton fun2() public &#123;</span><br><span class="line">        fun1();</span><br><span class="line">        this.fun2();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;可以看到没有报错，既然public这么舒服，那为啥我还要用external？？？  </p>
+<p>&emsp;&emsp;经过对比后我们可以发现，external方法消耗的gas要比public少，因为Solidity在调用public函数时会将代码复制到EVM的内存中，而external则是以calldata的方式进行调用的。内存分配在EVM中是十分宝贵的，而读取calldata则十分廉价，因此在处理大量外部数据，并反复调用函数时，应当考虑用external方法。  </p>
+<p>&emsp;&emsp;这里应当注意的是，public属于可见性。函数的可见性分为四种：<strong>public private internal external</strong> .  </p>
+<ul>
+<li><strong>private</strong>  </li>
+</ul>
+<p>&emsp;&emsp;对于private，与internal的区别是，private的方法在子类中无法调用，即使被声明为private也不能阻止数据的查看。访问权限仅仅是限制其他合约对函数的访问和数据修改的权限。而private方法也默认以internal的方式调用。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity &gt;= 0.4.0 &lt; 0.6.0;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    function fun1() private&#123;&#125;</span><br><span class="line"></span><br><span class="line">    function fun2() public&#123;</span><br><span class="line">        fun1();</span><br><span class="line">        //this.fun1()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//合约的继承为is，这一点很容易理解，如果你明白设计模式的话，实际上继承是A is B 的关系,我很喜欢这种写法。</span><br><span class="line"></span><br><span class="line">contract ext is test&#123;   </span><br><span class="line">    function callFun() public &#123;</span><br><span class="line">        //fun1();   </span><br><span class="line">        fun2();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这里我们可以明确的看到private的效果，和internal类似，但是代价会更大。  </p>
+<p>&emsp;&emsp;然而 <strong>public</strong> 与 <strong>private</strong> 还可以被作用于其他的变量，用于设置外部访问权限。  </p>
+<p>&emsp;&emsp;请大家务必不要弄混 <strong>调用方式</strong> 与 <strong>可见性(visable)</strong> 。  </p>
+<ul>
+<li><strong>this</strong> </li>
+</ul>
+<p>&emsp;&emsp;在Solidity中，this与其他高级语言意义不同，这里的this指的是当前合约的一个实例化对象，而并不是只的合约本身，this可以理解为实现external调用的一种方式，在初始化未完成时强制调用external类型方法。而并不能指代当前合约类型。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pragma solidity &gt;= 0.4.0 &lt; 0.6.0;</span><br><span class="line"></span><br><span class="line">contract test&#123;</span><br><span class="line">    function fun1() external&#123;&#125;</span><br><span class="line"></span><br><span class="line">    function fun2() public&#123;</span><br><span class="line">        this.fun1();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><strong>getter</strong>  </li>
+</ul>
+<p>&emsp;&emsp;编译器会为公共状态变量提供一个getter(访问器)函数，对mapping和数组以及枚举类型也提供了对应的getter，mapping的key 数组的下标 枚举的名都具有getter，访问器的visable为external。  </p>
+<hr>
+<h4 id="2-关于-view-pure-constant"><a href="#2-关于-view-pure-constant" class="headerlink" title="2. 关于 view pure constant"></a>2. 关于 view pure constant</h4><p>&emsp;&emsp;在0.4.1之前只有constant这一种可爱的语法，就是有一些屁事很多的人觉得constant指的是变量，作用于函数不太合适，所以就把constant拆成了view和pure。  </p>
+<p>&emsp;&emsp;在Solidity中，<strong>constant view pure</strong> 的作用是告诉编译器，函数 <strong>不改变</strong>，<strong>不读取</strong>状态变量，这样一来函数的执行就不再消耗gas了，因为不再需要矿工去验证。  </p>
+<p>&emsp;&emsp;然而这三个东西有点有意思，在官方文档中用 <strong>restrictive</strong> 这一词来对函数的严格性进行描述，在函数类型转换时对严格行有一定的要求，高严格性函数可以被转化为低严格性函数：  </p>
+<ul>
+<li><p><strong> pure </strong> 类型可被转化为 <strong>view</strong> 和 <strong>non-payable</strong> 函数  </p>
+</li>
+<li><p><strong>view</strong> 类型可被转化为 <strong>non-payable</strong> 函数  </p>
+</li>
+<li><p><strong>payable</strong> 类型可被转化为 <strong>non-payable</strong> 函数  </p>
+</li>
+</ul>
+<p>&emsp;&emsp;真是令人头秃！</p>
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/toutu.jpg?raw=true" alt="toutu">  </p>
+
+      
+    
+    </div>
+    
+      
+
+      
+  <hr class="copy-line">
+  <div class="post-copyright">
+    <div class="copy-author">
+      <span>Author :</span>
+      <span>dyf</span>
+    </div>
+    <div class="copy-url">
+      <span>Url :</span>
+      <a href="http://blog.dyf.ink/2019/03/18/solidity中令人窒息的语法糖/">http://blog.dyf.ink/2019/03/18/solidity中令人窒息的语法糖/</a>
+    </div>
+    <div class="copy-origin">
+      <span>Origin :</span>
+      <a href="http://blog.dyf.ink">http://blog.dyf.ink</a>
+    </div>
+    <div class="copy-license">
+      
+      著作权归作者所有，转载请联系作者获得授权。
+    </div>
+  </div>
+
+    
+  </article>
+  
+    
+  <nav class="article-page">
+    
+      <a href="/2019/03/19/DAPP开发记录/" id="art-left" class="art-left">
+        <span class="next-title">
+          <i class="iconfont icon-left"></i>DAPP开发记录
+        </span>
+      </a>
+    
+    
+      <a href="/2019/02/13/pwn-write-up/" id="art-right" class="art-right">
+        <span class="prev-title"> 
+          pwn_write_up<i class="iconfont icon-right"></i>  
+        </span>
+      </a>
+    
+  </nav>
+
+    
+  <i id="com-switch" class="iconfont icon-more jumping-in long infinite" style="font-size:24px;display:block;text-align:center;transform:rotate(180deg);"></i>
+  <div class="post-comments" id="post-comments" style="display: block;margin: auto 16px;">
+    
+    
+    
+
+    
+
+  </div>
+
+
+
+  
+  
+    
+  
+
+  <aside class="post-toc">
+    <span class="title" id="toc-switch"><span>Index</span></span>
+    <div class="toc-inner syuanpi back-1" style="display:none;">
+      <li class="title-link"><a href="javascript:;" class="toTop">solidity中令人窒息的语法糖</a></li>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Solidity函数的困惑"><span class="toc-text">Solidity函数的困惑</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-关于函数的可见型与访问控制"><span class="toc-text">1. 关于函数的可见型与访问控制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-关于-view-pure-constant"><span class="toc-text">2. 关于 view pure constant</span></a></li></ol></li></ol>
+    </div>
+  </aside>
+
+
+
+  
+
+
+        </div>
+      </main>
+
+      <footer class="footer syuanpi fadeIn" id="footer">
+  <hr>
+  <div class="footer-wrapper">
+    <div class="left">
+      <div class="contact-icon">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+            <a href="https://www.facebook.com/dong.yifan.1" class="iconfont icon-social-facebook" title="facebook"></a>
+        
+        
+        
+        
+    
+        
+        
+        
+            <a href="https://twitter.com/dong_yifan" class="iconfont icon-social-twitter" title="twitter"></a>
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+            <a href="https://www.zhihu.com/people/aurora-56-20/activities" class="iconfont icon-zhihu" title="zhihu"></a>
+        
+        
+        
+        
+        
+    
+        
+            <a href="https://github.com/Explainaur" class="iconfont icon-social-github" title="github"></a>
+        
+        
+        
+        
+        
+        
+        
+        
+    
+</div>
+
+    </div>
+    <div class="right">
+      <div class="copyright">
+    <div class="info">
+        <span>&copy;</span>
+        <span>2016 ~ 2020</span>
+        <span>❤</span>
+        <span>dyf</span>
+    </div>
+    <div class="theme">
+        <span>
+            Powered by
+            <a href="http://hexo.io/" target="_blank">Hexo </a>
+        </span>
+        <span>
+            Theme
+            <a href="https://github.com/ColMugX/hexo-theme-Nlvi"> Nlvi </a>
+        </span>
+    </div>
+    
+</div>
+
+    </div>
+  </div>
+</footer>
+    </div>
+  </div>
+  <script src="/script/lib/jquery/jquery-3.2.1.min.js"></script>
+
+
+  <script src="/script/lib/lightbox/js/lightbox.min.js"></script>
+
+
+
+
+
+
+
+
+<script src="/script/src/nlvi.js"></script>
+
+  <script src="/script/scheme/banderole.js"></script>
+
+<script src="/script/bootstarp.js"></script>
+
+
+<div class="backtop syuanpi melt toTop" id="backtop">
+    <i class="iconfont icon-up"></i>
+    <span style="text-align:center;font-family:Georgia;"><span style="font-family:Georgia;" id="scrollpercent">1</span>%</span>
+</div>
+
+
+  <div class="search" id="search">
+    <div class="mask" id="mask"></div>
+    <div class="search-wrapper syuanpi">
+      <h2 id="search-header" class="syuanpi">Search？</h2>
+      <div class="input">
+        <input type="text" id="local-search-input" results="0" name>
+      </div>
+      <div id="local-search-result"></div>
+    </div>
+  </div>
+
+
+</body>
+</html>

