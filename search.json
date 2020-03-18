@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "ELF相关知识",
+      "category" : "",
+      "tags"     : "ELF, C",
+      "url"      : "/blog/ELF%E6%80%BB%E7%BB%93",
+      "date"     : "2020-03-18 00:00:00 +0800"
+    } ,
+  
+    {
       "title"    : "Arbitrary Alloc",
       "category" : "",
       "tags"     : "HeapExploit, pwn",

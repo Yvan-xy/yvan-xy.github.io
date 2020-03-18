@@ -1,4 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-02-19T23:30:42+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">Arbitrary Alloc</title><link href="http://localhost:4000/blog/Arbitrary-alloc" rel="alternate" type="text/html" title="Arbitrary Alloc" /><published>2020-02-18T00:00:00+08:00</published><updated>2020-02-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/Arbitrary-alloc</id><content type="html" xml:base="http://localhost:4000/blog/Arbitrary-alloc">&lt;h3 id=&quot;arbitrary-alloc&quot;&gt;Arbitrary Alloc&lt;/h3&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-03-18T22:54:30+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">ELF相关知识</title><link href="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93" rel="alternate" type="text/html" title="ELF相关知识" /><published>2020-03-18T00:00:00+08:00</published><updated>2020-03-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93</id><content type="html" xml:base="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93">&lt;p&gt;最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。
+然后zxy同学拉我去搞个比赛，要求实现一个对ELF签名的工具，最后要写一个内核模块去hook系统调用，如果签名验证通过就可以执行，否则
+不能执行。我的思路大致是这样的：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;熟悉openssl,实现基本RSA签名&lt;/li&gt;
+  &lt;li&gt;完成ELF文件读写模块，能够新建一个section，并将sign插入其中&lt;/li&gt;
+  &lt;li&gt;能读.text section,并对其签名&lt;/li&gt;
+  &lt;li&gt;完成证书相关的签名&lt;/li&gt;
+  &lt;li&gt;内核模块的开发&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;目前我已经基本完成了第三步，遇到的主要困难有：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;openssl的文档过于垃圾，不知道怎么用&lt;/li&gt;
+  &lt;li&gt;ELF文件的解析，需要十分熟悉其结构&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;当然可以预知内核模块肯定也不好办，我之前都没有接触过。下面主要整理一下ELF相关的知识，以及给ELF文件添加一个section的方法。&lt;/p&gt;
+
+&lt;h3 id=&quot;elf相关&quot;&gt;ELF相关&lt;/h3&gt;
+
+&lt;p&gt;首先给一个ELF文件的结构图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/object_file_format.png&quot; alt=&quot;object_file_format.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;ELF文件有两种视图，一种是链接版，一种是执行版。链接版主要由section构成，运行版则主要有segment构成。那么section和segment的区别是什么？
+实际上segment由section构成，在映射到虚拟内存中后，就是我们常说的data segment，code segment之类的。所以我们主要关心section相关的结构。&lt;/p&gt;
+
+&lt;p&gt;首先，我们可以看到，ELF文件由ELF Header，program Header，section，section Header构成。当然链接视图中，program header是可选的，因为他主要用于告诉系统如何创建进程。用于生成进程的目标文件必须具有程序头部表，但是重定位文件不需要这个表。下面给一个比较形象的图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/elf-layout.png&quot; alt=&quot;elf-layout.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到program header主要和segment有关，section header则存储了每个section相关的表项。而ELF header则存储了ELF的相关信息，比如代码段入口，section的数目，section header的offset之类的。&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;#define EI_NIDENT   16
+&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;e_ident&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EI_NIDENT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 标志符&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_machine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_version&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Addr&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Off&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;e_phoff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Off&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;e_shoff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_ehsize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_phentsize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_phnum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_shentsize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_shnum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_shstrndx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Elf32_Ehdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这个是ELF Header的结构体&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="ELF" /><category term="C" /><summary type="html">最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。 然后zxy同学拉我去搞个比赛，要求实现一个对ELF签名的工具，最后要写一个内核模块去hook系统调用，如果签名验证通过就可以执行，否则 不能执行。我的思路大致是这样的：</summary></entry><entry><title type="html">Arbitrary Alloc</title><link href="http://localhost:4000/blog/Arbitrary-alloc" rel="alternate" type="text/html" title="Arbitrary Alloc" /><published>2020-02-18T00:00:00+08:00</published><updated>2020-02-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/Arbitrary-alloc</id><content type="html" xml:base="http://localhost:4000/blog/Arbitrary-alloc">&lt;h3 id=&quot;arbitrary-alloc&quot;&gt;Arbitrary Alloc&lt;/h3&gt;
 &lt;hr /&gt;
 &lt;p&gt;  这种利用方式就是在目标位置伪造一个chunk，然后overwrite当前fastbin中chunk的fd指针，指向该chunk，进而实现任意写。这种漏洞往往伴随着double free，我们可以通过构造循环链表来控制fd指针。其中，最重要的步骤就是构造fake_chunk的size字段，通常我们可能会覆盖__malloc_hook，于是在其周围伪造fastbin时往往需要错位来满足size，这里可以手算，我比较习惯用&lt;code class=&quot;highlighter-rouge&quot;&gt;find_fake_fast &amp;lt;addr&amp;gt; size&lt;/code&gt;来快速查找合适的位置:&lt;/p&gt;
 
@@ -4544,31 +4599,4 @@ http://url/to/thinkphp5.1.29/?s=index/\think\Container/invokefunction&amp;amp;fu
 &lt;span class=&quot;nx&quot;&gt;_method&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;__construct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;system&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;method&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;server&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;REQUEST_METHOD&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;al&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;分析文章来自&lt;a href=&quot;http://www.lmxspace.com/2019/01/13/ThinkPHP-request%E5%87%BD%E6%95%B0%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/&quot;&gt;这里&lt;/a&gt;&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="web" /><summary type="html">  最近一直在写CPU,好久没有看web相关的东西了,发现之前刷的题全忘了qaq…本文记录遇到的相关知识点.</summary></entry><entry><title type="html">大二上的flag</title><link href="http://localhost:4000/blog/%E6%96%B0%E5%AD%A6%E6%9C%9F%E8%AE%A1%E5%88%92" rel="alternate" type="text/html" title="大二上的flag" /><published>2019-08-26T00:00:00+08:00</published><updated>2019-08-26T00:00:00+08:00</updated><id>http://localhost:4000/blog/%E6%96%B0%E5%AD%A6%E6%9C%9F%E8%AE%A1%E5%88%92</id><content type="html" xml:base="http://localhost:4000/blog/%E6%96%B0%E5%AD%A6%E6%9C%9F%E8%AE%A1%E5%88%92">&lt;h5 id=&quot;2019826&quot;&gt;2019.8.26&lt;/h5&gt;
-
-&lt;p&gt;  新学期要开始了,本学期计划:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;学英语,准备Toelf ! (感觉要咕咕咕qaq&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;读完 &lt;em&gt;Computer Systems&lt;/em&gt; 并完成实验&lt;/li&gt;
-  &lt;li&gt;实现一个shell&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;实现一个malloc (这个好难qaq)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;阅读 &lt;em&gt;自己动手写CPU&lt;/em&gt; 并动手实现&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;阅读ptmalloc源码&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;  最近身体也不太好,坚决不再熬夜,每天要去操场上玩一会&lt;/p&gt;
-
-&lt;p&gt;  不要再过分紧张,脚踏实地学底层,终有一天会成为&lt;strong&gt;&lt;em&gt;Computer Artist&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;呜呜…想学的东西好多qaq 只能有所取舍了&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;strong&gt;加油!&lt;/strong&gt;&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">2019.8.26</summary></entry></feed>
+&lt;p&gt;分析文章来自&lt;a href=&quot;http://www.lmxspace.com/2019/01/13/ThinkPHP-request%E5%87%BD%E6%95%B0%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/&quot;&gt;这里&lt;/a&gt;&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="web" /><summary type="html">  最近一直在写CPU,好久没有看web相关的东西了,发现之前刷的题全忘了qaq…本文记录遇到的相关知识点.</summary></entry></feed>
