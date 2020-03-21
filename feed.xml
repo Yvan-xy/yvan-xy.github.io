@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-03-18T22:54:30+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">ELF相关知识</title><link href="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93" rel="alternate" type="text/html" title="ELF相关知识" /><published>2020-03-18T00:00:00+08:00</published><updated>2020-03-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93</id><content type="html" xml:base="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93">&lt;p&gt;最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-03-21T18:28:32+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">ELF相关知识</title><link href="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93" rel="alternate" type="text/html" title="ELF相关知识" /><published>2020-03-18T00:00:00+08:00</published><updated>2020-03-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93</id><content type="html" xml:base="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93">&lt;p&gt;最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。
 然后zxy同学拉我去搞个比赛，要求实现一个对ELF签名的工具，最后要写一个内核模块去hook系统调用，如果签名验证通过就可以执行，否则
 不能执行。我的思路大致是这样的：&lt;/p&gt;
 
@@ -53,7 +53,131 @@
     &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_shstrndx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Elf32_Ehdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;这个是ELF Header的结构体&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="ELF" /><category term="C" /><summary type="html">最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。 然后zxy同学拉我去搞个比赛，要求实现一个对ELF签名的工具，最后要写一个内核模块去hook系统调用，如果签名验证通过就可以执行，否则 不能执行。我的思路大致是这样的：</summary></entry><entry><title type="html">Arbitrary Alloc</title><link href="http://localhost:4000/blog/Arbitrary-alloc" rel="alternate" type="text/html" title="Arbitrary Alloc" /><published>2020-02-18T00:00:00+08:00</published><updated>2020-02-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/Arbitrary-alloc</id><content type="html" xml:base="http://localhost:4000/blog/Arbitrary-alloc">&lt;h3 id=&quot;arbitrary-alloc&quot;&gt;Arbitrary Alloc&lt;/h3&gt;
+&lt;p&gt;这个是ELF Header的结构体,这个结构体一般存储了ELF文件的关键信息，通常情况下，我们可以通过&lt;code class=&quot;highlighter-rouge&quot;&gt;readelf -h a&lt;/code&gt;来查看一个ELF文件的头，其实熟悉之后直接&lt;code class=&quot;highlighter-rouge&quot;&gt;xxd a&lt;/code&gt;手撕16进制就行了（逃…那么我们接下来随便举个栗子：&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@Aurora:/home/code/solo/rubbish/hardwork/casual&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;master⚡&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# readelf -h a   &lt;/span&gt;
+ELF 头：
+  Magic：  7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  类别:                              ELF32
+  数据:                              2 补码，小端序 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;little endian&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  Version:                           1 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;current&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  OS/ABI:                            UNIX - System V
+  ABI 版本:                          0
+  类型:                              DYN &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;共享目标文件&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  系统架构:                          Intel 80386
+  版本:                              0x1
+  入口点地址：              0x1060
+  程序头起点：              52 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;bytes into file&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  Start of section headers:          14328 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;bytes into file&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  标志：             0x0
+  Size of this header:               52 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  Size of program headers:           32 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  Number of program headers:         11
+  Size of section headers:           40 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  Number of section headers:         30
+  Section header string table index: 29
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这是一个十分简单的hello world程序，再接下来给出前0x80个字节的hexdump：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-hex&quot;&gt;00000000: 7f45 4c46 0101 0100 0000 0000 0000 0000  .ELF............
+00000010: 0300 0300 0100 0000 6010 0000 3400 0000  ........`...4...
+00000020: f837 0000 0000 0000 3400 2000 0b00 2800  .7......4. ...(.
+00000030: 1e00 1d00 0600 0000 3400 0000 3400 0000  ........4...4...         // 其实ELF Header到0x33即(1d00)的时候就结束了
+00000040: 3400 0000 6001 0000 6001 0000 0400 0000  4...`...`.......
+00000050: 0400 0000 0300 0000 9401 0000 9401 0000  ................
+00000060: 9401 0000 1300 0000 1300 0000 0400 0000  ................
+00000070: 0100 0000 0100 0000 0000 0000 0000 0000  ................
+00000080: 0000 0000 bc03 0000 bc03 0000 0400 0000  ................
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里是&lt;code class=&quot;highlighter-rouge&quot;&gt;readelf -S -W a&lt;/code&gt;的末尾结果：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[24] .data             PROGBITS        00004014 003014 000008 00  WA  0   0  4
+[25] .bss              NOBITS          0000401c 00301c 000004 00  WA  0   0  1
+[26] .comment          PROGBITS        00000000 00301c 000026 01  MS  0   0  1
+[27] .symtab           SYMTAB          00000000 003044 000450 10     28  45  4
+[28] .strtab           STRTAB          00000000 003494 00025c 00      0   0  1
+[29] .shstrtab         STRTAB          00000000 0036f0 000105 00      0   0  1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在这里不想太深入的介绍每个字段代表的详细意义，具体请参考&lt;a href=&quot;https://ctf-wiki.github.io/ctf-wiki/executable/elf/elf-structure-zh/&quot;&gt;ctf-wiki&lt;/a&gt;或者阅读《程序员的自我修养》这本书，内容十分详细，我们这里只带大家复习一些比较重要的字段。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;e_shoff&lt;/strong&gt;&lt;br /&gt;
+  这一项给出节头表在文件中的字节偏移（ Section Header table OFFset ）如果文件中没有节头表，则为 0&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;e_shentsize&lt;/strong&gt;&lt;br /&gt;
+  这一项给出节头的字节长度（Section Header ENTry SIZE）。一个节头是节头表中的一项；节头表中所有项占据的空间大小相同。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;e_shnum&lt;/strong&gt; &lt;br /&gt;
+  这一项给出节头表中的项数（Section Header NUMber）。因此， e_shnum 与 e_shentsize 的乘积即为节头表的字节长度。如果文件中没有节头表，则该项值为 0。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;e_shstrndx&lt;/strong&gt; &lt;br /&gt;
+  这一项给出节头表中与节名字符串表相关的表项的索引值（Section Header table InDeX related with section name STRing table）。如果文件中没有节名字符串表，则该项值为SHN_UNDEF。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我们的目标是向ELF中插入一个section，那么首先要清楚ELF是怎么存储并识别section的，按照开发者的思路，我们很容易想到我们可以把每个section的信息和特征抽象成一个struct，然后把所有的struct存入一个数组，最后把数组的地址放入ELF Header就可以了。这样我们就可以直接通过ELF Header来获得section struct数组，进而间接获得section的信息。其实上面这几个字段的作用便是如此。存储struct的数组就是上面提到的Section Header Table，在ELF文件的末尾。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;是一个字符串section，他存储了所有section的名字，ELF Header中的&lt;code class=&quot;highlighter-rouge&quot;&gt;e_shstrndx&lt;/code&gt;便是其在Section Header Table中的索引，因此想要获得&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;的真是偏移我们只需要按如下公式计算:&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;shstrtabOff&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e_shoff&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e_shstrndx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e_shentsize&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// 基址 + 索引 × 大小&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;那怎么获得section name在&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;中的具体偏移呀？其实section struct的真是名字叫Elf32_Shdr(32位)&lt;/p&gt;
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Addr&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Off&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;sh_offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_link&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_addralign&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_entsize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Elf32_Shdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这个结构提存储了每个section的详细信息，第一个字段&lt;code class=&quot;highlighter-rouge&quot;&gt;sh_name&lt;/code&gt;是section name在&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;中的偏移。&lt;/p&gt;
+
+&lt;p&gt;那么我们究竟要怎样才能插入一个section呢？步骤大致如下：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;想Section Header Table中插入new section Header&lt;/li&gt;
+  &lt;li&gt;向&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;section中插入new section的section name&lt;/li&gt;
+  &lt;li&gt;修改&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;sh_size&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;修改ELF Header中的&lt;code class=&quot;highlighter-rouge&quot;&gt;e_shnum&lt;/code&gt;字段&lt;/li&gt;
+  &lt;li&gt;向目标位置写入section内容&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;那么我们似乎遇到了一些困惑，&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;section在ELF文件的中间，万一空间不够添加section name了咋整。不如我们直接添加到文件的末尾吧，然后修改一下sh_name不就可以了吗。
+似乎想法不错，但是这里需要注意的是，我们&lt;strong&gt;要记得修改&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;sh_size&lt;/code&gt;&lt;/strong&gt;,否则还没查到文件末尾就终止了。&lt;/p&gt;
+
+&lt;p&gt;修改后的ELF尾应该长这样：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;|------------------------|
+|  section Header Table  |-----&amp;gt;这里已经插入了new section header
+|------------------------|
+|  new  section  name    |
+|------------------------|
+|  section      contain  |
+|------------------------|----&amp;gt; end
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;插入new section Header难点在计算shstrtab的偏移，首先你需要用&lt;code class=&quot;highlighter-rouge&quot;&gt;filesize - shstrtab.sh_offset&lt;/code&gt;来获得字符串在&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;中的偏移，至于怎么获得&lt;code class=&quot;highlighter-rouge&quot;&gt;shstrtab.sh_offset&lt;/code&gt;…你需要先根据ELF Header中的相关字段找到&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;的section Header，获取对应字段就ok了。这里需要注意要将section header的其他字段设置正确就可以了。&lt;/p&gt;
+
+&lt;p&gt;接下来，我们需要修改&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;sh_size&lt;/code&gt;，用&lt;code class=&quot;highlighter-rouge&quot;&gt;filesize - shstrtab.sh_offset&lt;/code&gt;就ok了，然后去修改ELF Header里的&lt;code class=&quot;highlighter-rouge&quot;&gt;e_shnum&lt;/code&gt;字段，加1即可。最后向文件尾插入对应size的内容就ok了，最后我们看一下程序运行的demo：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  [25] .bss              NOBITS          0000000000004078 003078 000008 00  WA  0   0  1
+  [26] .comment          PROGBITS        0000000000000000 003078 000026 01  MS  0   0  1
+  [27] .symtab           SYMTAB          0000000000000000 0030a0 0006d8 18     28  45  8
+  [28] .strtab           STRTAB          0000000000000000 003778 0002af 00      0   0  1
+  [29] .shstrtab         STRTAB          0000000000000000 003a27 0008cf 00      0   0  1
+  [30] .sign             NOTE            00000000000042f8 0042f8 000100 00   A  0   0  1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;可以看到我们成功多加了一个&lt;code class=&quot;highlighter-rouge&quot;&gt;.sign&lt;/code&gt;section，再来看看文件尾：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;000042f0: 2e73 6967 6e00 0000 24e4 639b 5a57 60ec  .sign...$.c.ZW`.
+00004300: 1aa4 e313 cb4d 3fb9 9177 0539 2551 a21d  .....M?..w.9%Q..
+...
+000043f0: be18 7eb1 25af f246                      ..~.%..F
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;确实符合section name + section contain的结构，看来原理是没问题的，经测试可以通过readelf和objdump的检测。最后附上源码地址&lt;a href=&quot;https://github.com/Explainaur/ELFSign&quot;&gt;ELFSign&lt;/a&gt;，大家可以自己试一下。&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="ELF" /><category term="C" /><summary type="html">最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。 然后zxy同学拉我去搞个比赛，要求实现一个对ELF签名的工具，最后要写一个内核模块去hook系统调用，如果签名验证通过就可以执行，否则 不能执行。我的思路大致是这样的：</summary></entry><entry><title type="html">Arbitrary Alloc</title><link href="http://localhost:4000/blog/Arbitrary-alloc" rel="alternate" type="text/html" title="Arbitrary Alloc" /><published>2020-02-18T00:00:00+08:00</published><updated>2020-02-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/Arbitrary-alloc</id><content type="html" xml:base="http://localhost:4000/blog/Arbitrary-alloc">&lt;h3 id=&quot;arbitrary-alloc&quot;&gt;Arbitrary Alloc&lt;/h3&gt;
 &lt;hr /&gt;
 &lt;p&gt;  这种利用方式就是在目标位置伪造一个chunk，然后overwrite当前fastbin中chunk的fd指针，指向该chunk，进而实现任意写。这种漏洞往往伴随着double free，我们可以通过构造循环链表来控制fd指针。其中，最重要的步骤就是构造fake_chunk的size字段，通常我们可能会覆盖__malloc_hook，于是在其周围伪造fastbin时往往需要错位来满足size，这里可以手算，我比较习惯用&lt;code class=&quot;highlighter-rouge&quot;&gt;find_fake_fast &amp;lt;addr&amp;gt; size&lt;/code&gt;来快速查找合适的位置:&lt;/p&gt;
 
