@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "高校战役easyheap",
+      "category" : "",
+      "tags"     : "pwn, HeapExploit",
+      "url"      : "/blog/easyheap",
+      "date"     : "2020-04-06 00:00:00 +0800"
+    } ,
+  
+    {
       "title"    : "一些杂念",
       "category" : "",
       "tags"     : "feelings",
