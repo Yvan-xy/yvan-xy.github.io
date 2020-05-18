@@ -1,14 +1,6 @@
 [
   
     {
-      "title"    : "某物理平台渗透日志",
-      "category" : "",
-      "tags"     : "渗透测试",
-      "url"      : "/blog/%E6%B8%97%E9%80%8F%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C",
-      "date"     : "2020-05-18 00:00:00 +0800"
-    } ,
-  
-    {
       "title"    : "高校战役easyheap",
       "category" : "",
       "tags"     : "pwn, HeapExploit",
