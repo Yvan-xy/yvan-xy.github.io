@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-05-18T21:42:25+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">某物理平台渗透日志</title><link href="http://localhost:4000/blog/%E6%B8%97%E9%80%8F%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C" rel="alternate" type="text/html" title="某物理平台渗透日志" /><published>2020-05-18T00:00:00+08:00</published><updated>2020-05-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/%E6%B8%97%E9%80%8F%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C</id><content type="html" xml:base="http://localhost:4000/blog/%E6%B8%97%E9%80%8F%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C">&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-05-18T21:46:32+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">某物理平台渗透日志</title><link href="http://localhost:4000/blog/%E6%B8%97%E9%80%8F%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C" rel="alternate" type="text/html" title="某物理平台渗透日志" /><published>2020-05-18T00:00:00+08:00</published><updated>2020-05-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/%E6%B8%97%E9%80%8F%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C</id><content type="html" xml:base="http://localhost:4000/blog/%E6%B8%97%E9%80%8F%E7%89%A9%E7%90%86%E5%AE%9E%E9%AA%8C">&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
 
 &lt;p&gt;最近一直没有更新博客，实际上还是做了很多事情，比如：&lt;/p&gt;
 
@@ -119,7 +119,7 @@
 
 &lt;p&gt;我们并没有发现数据库的Host地址，应该是在别的目录下的web.config里写过了，这里直接&lt;code class=&quot;highlighter-rouge&quot;&gt;metadata=res://*/USTCOri_Models.csdl|res://*/USTCOri_Models.ssdl|res://*/USTCOri_Models.msl&lt;/code&gt;像是直接调用了这个对象。这个&lt;strong&gt;catalog&lt;/strong&gt;就是数据库的库名。然后试了一下，果然连上了。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;./http://pic.dyf.ink/5-2020-5-18.png&quot; alt=&quot;data&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/http://pic.dyf.ink/5-2020-5-18.png&quot; alt=&quot;data&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;0x04-权限维持&quot;&gt;0x04 权限维持&lt;/h3&gt;
 
