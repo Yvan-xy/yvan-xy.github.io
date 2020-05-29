@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-05-28T23:13:23+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">帆帆日记</title><link href="http://localhost:4000/blog/diary" rel="alternate" type="text/html" title="帆帆日记" /><published>2020-05-28T00:00:00+08:00</published><updated>2020-05-28T00:00:00+08:00</updated><id>http://localhost:4000/blog/diary</id><content type="html" xml:base="http://localhost:4000/blog/diary">&lt;p&gt;记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-05-29T23:39:43+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">帆帆日记</title><link href="http://localhost:4000/blog/diary" rel="alternate" type="text/html" title="帆帆日记" /><published>2020-05-28T00:00:00+08:00</published><updated>2020-05-28T00:00:00+08:00</updated><id>http://localhost:4000/blog/diary</id><content type="html" xml:base="http://localhost:4000/blog/diary">&lt;p&gt;记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.&lt;/p&gt;
 
 &lt;h4 id=&quot;2020-528&quot;&gt;2020 5.28&lt;/h4&gt;
 
@@ -6,7 +6,14 @@
   &lt;li&gt;整理了php-decrypt，即php的自动化解密项目，写了下文档&lt;/li&gt;
   &lt;li&gt;今天第一次给radare2提交了PR，好鸡动^_^&lt;/li&gt;
   &lt;li&gt;学习了一下git rebase的用法，差点出了大丑&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.</summary></entry><entry><title type="html">高校战役easyheap</title><link href="http://localhost:4000/blog/easyheap" rel="alternate" type="text/html" title="高校战役easyheap" /><published>2020-04-06T00:00:00+08:00</published><updated>2020-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/easyheap</id><content type="html" xml:base="http://localhost:4000/blog/easyheap">&lt;p&gt;  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。&lt;/p&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;2020-529&quot;&gt;2020 5.29&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;今天跑路来扬州找女朋友，挺开心的～&lt;/li&gt;
+  &lt;li&gt;明天见父母警告，现在慌的一批，我就是个憨憨&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.</summary></entry><entry><title type="html">高校战役easyheap</title><link href="http://localhost:4000/blog/easyheap" rel="alternate" type="text/html" title="高校战役easyheap" /><published>2020-04-06T00:00:00+08:00</published><updated>2020-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/easyheap</id><content type="html" xml:base="http://localhost:4000/blog/easyheap">&lt;p&gt;  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。&lt;/p&gt;
 
 &lt;h3 id=&quot;二进制分析&quot;&gt;二进制分析&lt;/h3&gt;
 
