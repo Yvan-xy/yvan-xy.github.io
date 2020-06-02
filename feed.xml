@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-06-01T11:06:15+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">帆帆日记</title><link href="http://localhost:4000/blog/diary" rel="alternate" type="text/html" title="帆帆日记" /><published>2020-05-28T00:00:00+08:00</published><updated>2020-05-28T00:00:00+08:00</updated><id>http://localhost:4000/blog/diary</id><content type="html" xml:base="http://localhost:4000/blog/diary">&lt;p&gt;记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-06-02T09:55:06+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">帆帆日记</title><link href="http://localhost:4000/blog/diary" rel="alternate" type="text/html" title="帆帆日记" /><published>2020-05-28T00:00:00+08:00</published><updated>2020-05-28T00:00:00+08:00</updated><id>http://localhost:4000/blog/diary</id><content type="html" xml:base="http://localhost:4000/blog/diary">&lt;p&gt;记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.&lt;/p&gt;
 
 &lt;h4 id=&quot;2020-528&quot;&gt;2020 5.28&lt;/h4&gt;
 
@@ -20,7 +20,15 @@
 &lt;ul&gt;
   &lt;li&gt;这两天去了扬州东关街，南京老门东，秦淮河，夫子庙，主要是和小张同学一起玩耍，超级开心嘿嘿&lt;/li&gt;
   &lt;li&gt;和小张同学的爸爸妈妈一起出去玩，妈耶好紧张，这就是传说中的见家长嘛&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.</summary></entry><entry><title type="html">高校战役easyheap</title><link href="http://localhost:4000/blog/easyheap" rel="alternate" type="text/html" title="高校战役easyheap" /><published>2020-04-06T00:00:00+08:00</published><updated>2020-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/easyheap</id><content type="html" xml:base="http://localhost:4000/blog/easyheap">&lt;p&gt;  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。&lt;/p&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;2020-61&quot;&gt;2020 6.1&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;做了道pwn题，pwnable上的hacknote&lt;/li&gt;
+  &lt;li&gt;写了下数据结构的作业&lt;/li&gt;
+  &lt;li&gt;复习了一下马原&lt;/li&gt;
+&lt;/ol&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.</summary></entry><entry><title type="html">高校战役easyheap</title><link href="http://localhost:4000/blog/easyheap" rel="alternate" type="text/html" title="高校战役easyheap" /><published>2020-04-06T00:00:00+08:00</published><updated>2020-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/easyheap</id><content type="html" xml:base="http://localhost:4000/blog/easyheap">&lt;p&gt;  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。&lt;/p&gt;
 
 &lt;h3 id=&quot;二进制分析&quot;&gt;二进制分析&lt;/h3&gt;
 
