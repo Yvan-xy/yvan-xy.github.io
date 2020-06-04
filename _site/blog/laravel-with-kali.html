@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>Laravel with kali</b></h1>
+
+<p class="post-metadata text-muted">
+  12 December 2018 -  
+  <b>less than 1 min read time</b>
+
+  <br>Tags: 
+    
+    <a class="text-decoration-none no-underline" href="/blog/tags#tutorial">
+      <span class="tag badge badge-pill text-primary border border-primary">tutorial</span>
+    </a>
+    </p>
+
+<h3 id="记录一下在kali下如可搭建laravel环境">记录一下在Kali下如可搭建Laravel环境</h3>
+<hr />
+
+<p>  我的天呐,<strong>Kali</strong>安装个<strong>Laravel</strong>是真的难,不是权限问题就是依赖问题,统一记录一下吧.
+  首先要新建一个普通用户</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>useradd <span class="nt">-m</span> dyf <span class="nt">-s</span> zsh <span class="nt">-d</span> /home/dyf 
+passwd  dyf                                             //然后就输入密码
+usermod                                                 //可修改用户状态
+userdel                                                 //可删除用户
+visudoers 将用户加入sudoers
+</code></pre></div></div>
+<p>  关于<strong>useradd</strong>的参数用法:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">-c</span> comment 指定一段注释性描述。
+<span class="nt">-d</span> 目录 指定用户主目录，如果此目录不存在，则同时使用-m选项，可以创建主目录。
+<span class="nt">-g</span> 用户组 指定用户所属的用户组。
+<span class="nt">-G</span> 用户组，用户组 指定用户所属的附加组。
+<span class="nt">-s</span> Shell文件 指定用户的登录Shell。
+<span class="nt">-u</span> 用户号 指定用户的用户号，如果同时有-o选项，则可以重复使用其他用户的标识号。
+</code></pre></div></div>
+<p>  接着是最恶心的部分,安装<strong>php</strong>依赖:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get <span class="nb">install</span> <span class="nt">-y</span> libapache2-mod-php7.0
+<span class="nb">sudo </span>apt-get <span class="nb">install</span> <span class="nt">-y</span> php7.0-mysql
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>php7.2-zip
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>php-common php-mbstring php-xml php-zip php-json php-mcrypt
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>php-mbstring
+<span class="nb">sudo </span>apt <span class="nb">install </span>libapache2-mod-php
+</code></pre></div></div>
+<p>  弄完了这么一堆恶心的东西之后,心态差了许多.<br />
+  现在开始我们已经可以真正开始了.第一步是安装<strong>php</strong>的包管理<strong>composer</strong>:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt update
+suod apt upgrade
+<span class="nb">sudo </span>apt <span class="nb">install</span> <span class="nt">-y</span> composer
+composer                       //此时有参数选项则安装成功
+<span class="nb">sudo chmod </span>777 /home/dyf                                  //增加写入权限
+composer config <span class="nt">-g</span> repo.packagist composer https://packagist.laravel-china.org   //更换composer源
+</code></pre></div></div>
+<p>  此时<strong>composer</strong>已经安装完毕,下面开始正式安装Laravel:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>composer global require <span class="s2">"laravel/installer"</span>
+<span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/home/dyf/.config/composer/vendor/bin        //修改为全局变量
+</code></pre></div></div>
+<p>到这里已经差多完了,缺啥东西自己去<strong>stackoverflow</strong>上面查吧,心力憔悴.<br />
+然后嘞,你需要去修改<code class="highlighter-rouge">/etc/apache2/sites-aviliable/000-default.conf</code>把默认路径改一下.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>composer create-project <span class="nt">--prefer-dist</span> laravel/laravel
+<span class="nb">chmod</span> <span class="nt">-R</span> 777 public storage bootstrap                             //给权限
+vim /etc/apache2/apache2.conf                  //找到<span class="s1">'/var/www'</span>将AllowOverride改为all
+<span class="nb">sudo </span>a2enmod rewrite                           //开启重写模式
+composer <span class="nb">install
+</span>composer update
+</code></pre></div></div>
+<p>  接着为新项目建立一个新的mysql账户,一定要安装php7.x-mysqli的包,否则 mysqliconnect() 将无法使用.安装php-curl</p>
+
+<p>  开始干活吧.</p>
+<h6 id="ps我不小心重装了系统结果又蹦了首先是apache接着是php版本冲突要用a2enmod-php7修改">ps:我不小心重装了系统，结果又蹦了，首先是apache，接着是php版本冲突要用a2enmod php7.*修改。</h6>
+
+<h5 id="我又双重装了系统这次提供的node版本是110根本不支持之前的版本踏马只能用-npm-rebuild-node-sass-force-回滚原先的版本">我又双重装了系统，这次提供的node版本是11.0,根本不支持之前的版本，踏马只能用 <strong>npm rebuild node-sass –force</strong> 回滚原先的版本。</h5>
+
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>

