@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-06-04T21:43:21+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">帆帆日记</title><link href="http://localhost:4000/blog/diary" rel="alternate" type="text/html" title="帆帆日记" /><published>2020-05-28T00:00:00+08:00</published><updated>2020-05-28T00:00:00+08:00</updated><id>http://localhost:4000/blog/diary</id><content type="html" xml:base="http://localhost:4000/blog/diary">&lt;p&gt;记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-06-06T23:36:56+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">帆帆日记</title><link href="http://localhost:4000/blog/diary" rel="alternate" type="text/html" title="帆帆日记" /><published>2020-05-28T00:00:00+08:00</published><updated>2020-05-28T00:00:00+08:00</updated><id>http://localhost:4000/blog/diary</id><content type="html" xml:base="http://localhost:4000/blog/diary">&lt;p&gt;记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.&lt;/p&gt;
 
 &lt;h4 id=&quot;2020-528&quot;&gt;2020 5.28&lt;/h4&gt;
 
@@ -37,6 +37,14 @@
   &lt;li&gt;写完了ELFSign的文档，还差Kui的文档&lt;/li&gt;
   &lt;li&gt;稍微优化了一下php-decrypt的代码，最近师傅没管我，有点慌&lt;/li&gt;
   &lt;li&gt;随便看了点blog，感受一下前辈的心路历程，崇拜sakura，希望也能成为二进制高手&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;2020-65---66&quot;&gt;2020 6.5 - 6.6&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;学习了李樾老师的课程&lt;/li&gt;
+  &lt;li&gt;搞完了人工智障的作业&lt;/li&gt;
+  &lt;li&gt;做了到pwn题，pwnable.tw的applestore&lt;/li&gt;
 &lt;/ol&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">记录一下日常工作，不然老实感觉很慌，觉得啥也没干时间就没了.</summary></entry><entry><title type="html">高校战役easyheap</title><link href="http://localhost:4000/blog/easyheap" rel="alternate" type="text/html" title="高校战役easyheap" /><published>2020-04-06T00:00:00+08:00</published><updated>2020-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/easyheap</id><content type="html" xml:base="http://localhost:4000/blog/easyheap">&lt;p&gt;  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。&lt;/p&gt;
 
 &lt;h3 id=&quot;二进制分析&quot;&gt;二进制分析&lt;/h3&gt;
