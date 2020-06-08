@@ -1,14 +1,6 @@
 [
   
     {
-      "title"    : "帆帆日记",
-      "category" : "",
-      "tags"     : "solo",
-      "url"      : "/blog/diary",
-      "date"     : "2020-05-28 00:00:00 +0800"
-    } ,
-  
-    {
       "title"    : "高校战役easyheap",
       "category" : "",
       "tags"     : "pwn, HeapExploit",
