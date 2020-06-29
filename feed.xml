@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-06-29T23:54:28+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">最近干了啥</title><link href="http://localhost:4000/blog/summary" rel="alternate" type="text/html" title="最近干了啥" /><published>2020-06-29T00:00:00+08:00</published><updated>2020-06-29T00:00:00+08:00</updated><id>http://localhost:4000/blog/summary</id><content type="html" xml:base="http://localhost:4000/blog/summary">&lt;p&gt;  大二下稀里糊涂就在家混过去了，总感觉啥也没干，心里有些过意不去。总的来说技术方面的进步速度十分之缓慢，应该是在家里比较怠堕，主要干了一下事情：&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-06-30T00:19:09+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">最近干了啥</title><link href="http://localhost:4000/blog/summary" rel="alternate" type="text/html" title="最近干了啥" /><published>2020-06-29T00:00:00+08:00</published><updated>2020-06-29T00:00:00+08:00</updated><id>http://localhost:4000/blog/summary</id><content type="html" xml:base="http://localhost:4000/blog/summary">&lt;p&gt;  大二下稀里糊涂就在家混过去了，总感觉啥也没干，心里有些过意不去。总的来说技术方面的进步速度十分之缓慢，应该是在家里比较怠堕，主要干了一下事情：&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;写了ELFSign和Kui这个项目，实际上之花了两周时间，效果还可以&lt;/li&gt;
@@ -10,18 +10,24 @@
 
 &lt;p&gt;  现在是6月29,前天收到了上交的offer，暑假要去他们的实验室打工了，我主要是想换一个环境，不知道为啥在家总是效率很低，心里还是很愧疚的。比较明显的感受就是，我在学校的时候，看书效率很高，我能看一天都停不下来，现在在家读书20分钟就开始走神，应该还是一个氛围问题。这对我来说是相当要命的，尤其是在我学编译原理的时候，我低估了这部分知识的难度和广度，依然追求快速的学习。显然我失败了，尤其是前面parser的部分，我个人认为甚至应该先跳过去，那些无聊的自动机知识和语法分析的算法真的让我提不起兴趣，我感觉MaxXing说的很对，前端能写递归下降就行了，真正好玩的比如优化，程序分析，代码生成啥的都在后面。&lt;/p&gt;
 
-&lt;p&gt;  关于编译原理的学习，我遇到了很大的阻力，有时候一段伪代码我要看好久，而且有些东西我不知道怎么用代码写，比如在代码优化的部分，可以根据分支的频率来设置“落空分支”的位置，就很迷惑这个频率是咋统计的。比如循环展开，看起来挺容易的，但是怎么去判断循环边界。这种细节问题或许我不必纠结，但是不写代码总感觉没学会。不过幸运的是MaxXing给我们讲了一下&lt;a href=&quot;https://github.com/MaxXSoft/YuLang&quot;&gt;YuLang&lt;/a&gt;的具体实现，YuLang后端用的LLVM,所以MaxXing手写了前端和中端，前端我基本能狗出来，但是中端的IR我还没有仔细想怎么具体实现，比如应该用什么结构存储IR（需要存储吗？还是直接生成），这些书上没具体讲，还是得去看代码，或许鲸书里会有讲解？MaxXing给我们讲了一下现代编译器的pass部分，我觉得这种设计真的挺神奇的，豁然开朗。中端的部分主要介绍了一些IR的种类，比如图IR，线性IR，SSA这种。比较有意思的是由IR建立cfg的部分，我恰巧在李樾老师的《软件分析》里学过了，我要是直接读伪代码肯定看不懂，然后在第8章讲变量可达性分析的算法我又时在李樾老师那里学的哈哈哈。这本书中端部分占了很大比重，优化算法基本都是伪代码，我看着有些费劲，但是程序分析的内容讲的倒是挺多的，我接下来要面临的挑战就是实现mem2reg，把现有的IR弄成真正的SSA，然后才能进一步做优化。希望能学到心里去吧。&lt;/p&gt;
+&lt;p&gt;  关于编译原理的学习，我遇到了很大的阻力，有时候一段伪代码我要看好久，而且有些东西我不知道怎么用代码写，比如在代码优化的部分，可以根据分支的频率来设置“落空分支”的位置，就很迷惑这个频率是咋统计的。比如循环展开，看起来挺容易的，但是怎么去判断循环边界。这种细节问题或许我不必纠结，但是不写代码总感觉没学会。不过幸运的是MaxXing给我们讲了一下&lt;a href=&quot;https://github.com/MaxXSoft/YuLang&quot;&gt;YuLang&lt;/a&gt;的具体实现，YuLang后端用的LLVM,所以MaxXing手写了前端和中端，前端我基本能狗出来，但是中端的IR我还没有仔细想怎么具体实现，比如应该用什么结构存储IR（需要存储吗？还是直接生成），这些书上没具体讲，还是得去看代码，或许鲸书里会有讲解？MaxXing给我们讲了一下现代编译器的pass部分，我觉得这种设计真的挺神奇的，豁然开朗。中端的部分主要介绍了一些IR的种类，比如图IR，线性IR，SSA这种。比较有意思的是由IR建立cfg的部分，我恰巧在李樾老师的《软件分析》里学过了，我要是直接读伪代码肯定看不懂，然后在第8章讲变量可达性分析的算法我又时在李樾老师那里学的哈哈哈。这本书中端部分占了很大比重，优化算法基本都是伪代码，我看着有些费劲，但是程序分析的内容讲的倒是挺多的，我接下来要面临的挑战就是实现mem2reg，把现有的IR弄成真正的SSA，然后才能进一步做优化。我上面的一些困惑或许不久之后就会解答，回头来看或许会觉得可笑，因为我学得还太少，估计把后面几章读完能有个更好的理解，希望能学到心里去吧。真心感谢MaxXing学长，改变了我的大学生活轨迹。&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;我去咨询了一下大我一届的学长，发现我校的编译原理只将parser部分…好吧，我已经不打算听课了。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;TODO：&lt;/p&gt;
+&lt;p&gt;  之前学习的时候为了贪图知识量，囫囵吞枣般的读了很多书，感觉很多东西都是似懂非懂的。希望接下来看书要细细的去看，看一会儿思考一会儿，多去想想各个知识点之间的联系，可能会扎实一点，比如把编译原理和体系结构联系起来，又会有新的思考;比如其实反汇编器的原理和cpu是一样的。&lt;/p&gt;
+
+&lt;p&gt;  如果您读到了这里，不知道您是否和我一样，犯了同样的错误？学习，切勿贪快呀，练得扎实的基础才是王道。&lt;/p&gt;
+
+&lt;p&gt;暑期 TODO List：&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;锻炼，最好能跑步&lt;/li&gt;
   &lt;li&gt;看书，宁愿速度慢一点，也要认真弄懂&lt;/li&gt;
-  &lt;li&gt;&lt;/li&gt;
+  &lt;li&gt;整英语，我被自己的拖延症整服了。。。&lt;/li&gt;
+  &lt;li&gt;操作系统，希望自己能趁暑假学一下，我估计没时间了，因为可能要看编译原理&lt;/li&gt;
+  &lt;li&gt;切割时间，按计划行事，往往能保护我的娱乐时间，拒绝拖延&lt;/li&gt;
 &lt;/ol&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">  大二下稀里糊涂就在家混过去了，总感觉啥也没干，心里有些过意不去。总的来说技术方面的进步速度十分之缓慢，应该是在家里比较怠堕，主要干了一下事情：</summary></entry><entry><title type="html">高校战役easyheap</title><link href="http://localhost:4000/blog/easyheap" rel="alternate" type="text/html" title="高校战役easyheap" /><published>2020-04-06T00:00:00+08:00</published><updated>2020-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/easyheap</id><content type="html" xml:base="http://localhost:4000/blog/easyheap">&lt;p&gt;  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。&lt;/p&gt;
 
 &lt;h3 id=&quot;二进制分析&quot;&gt;二进制分析&lt;/h3&gt;
