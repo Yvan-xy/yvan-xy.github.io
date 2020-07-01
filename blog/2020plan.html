@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,19 +64,19 @@
   <h1><b>大二下的TODO List</b></h1>
 
 <p class="post-metadata text-muted">
-  15 February 2020 -  
+  15 February 2020 -
   <b>less than 1 min read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#plan">
-      <span class="tag badge badge-pill text-primary border border-primary">plan</span>
-    </a>
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#life">
-      <span class="tag badge badge-pill text-primary border border-primary">life</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#plan">
+    <span class="tag badge badge-pill text-primary border border-primary">plan</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#life">
+    <span class="tag badge badge-pill text-primary border border-primary">life</span>
+  </a>
+  </p>
 
 <h3 id="过去一年">过去一年</h3>
 <hr />
@@ -124,6 +127,25 @@
   <p>作为一个长期从事逆向，在各大CTF赛事砍下过许多奇怪的高分逆向题目，同时目睹身边0ops几大逆向机以及蓝莲花两大逆向机在各类逆向上砍瓜切菜的科研喵，表示以我所见所闻，所有人肉逆向机的特点，都是扎实到不能再扎实的四大基本功（操作系统，编译原理，程序设计语言和计算机体系结构），有了内功加持，看一切汇编代码，脑中自会有高抽象的模型浮现（而这正是大部分非科班出身逆向分析人员最薄弱的一环），这是胜过一切反编译器的智慧的体现。实际上，我所见的逆向机们从未说专门靠学什么特别的“逆向材料”得以突飞猛进，以我自己的经验，多年的逆向分析可能只会让你在两方面有所加强，一是使用工具的熟练，二是猜出某些特定的程序风格。但是回到最开始的问题，要想学习Linux逆向其实是个伪命题，扎扎实实把你要逆向的领域的开发知识弄得滚瓜烂熟，自然就水到渠成了</p>
 </blockquote>
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/2020plan class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

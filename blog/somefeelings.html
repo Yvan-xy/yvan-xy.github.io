@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,15 +64,15 @@
   <h1><b>一些杂念</b></h1>
 
 <p class="post-metadata text-muted">
-  05 April 2020 -  
+  05 April 2020 -
   <b>less than 1 min read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#feelings">
-      <span class="tag badge badge-pill text-primary border border-primary">feelings</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#feelings">
+    <span class="tag badge badge-pill text-primary border border-primary">feelings</span>
+  </a>
+  </p>
 
 <p>  最近一段时间仿佛做梦一般，姥姥突然检查出骨髓瘤，晚期且时无多日，姥爷在得知消息后变的几乎不再说话，一天能抽一包烟。妈妈为了照顾姥姥去了郑州肿瘤医院，日夜无法入眠。我心里想着这一切或许能尽快好起来。<br />
   今天是周末，我实在想休息一天，于是上午看了一会儿生活大爆炸后决定自己做炸鸡。下午去了万达买了一听可乐和3个鸡腿，晚上刚刚吃完饭得知了一个消息。妈妈的右耳听不见了，需要立刻住院。<br />
@@ -82,6 +85,25 @@
   <strong>少年啊，你要用较少的时间走完别人走了很久的路，所以你要跑起来，要飞快地跑起来</strong>。</p>
 
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/somefeelings class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

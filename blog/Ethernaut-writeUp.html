@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,19 +64,19 @@
   <h1><b>Ethernaut WriteUp</b></h1>
 
 <p class="post-metadata text-muted">
-  26 March 2019 -  
+  26 March 2019 -
   <b>13 mins read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#solidiry">
-      <span class="tag badge badge-pill text-primary border border-primary">solidiry</span>
-    </a>
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#security">
-      <span class="tag badge badge-pill text-primary border border-primary">security</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#solidiry">
+    <span class="tag badge badge-pill text-primary border border-primary">solidiry</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#security">
+    <span class="tag badge badge-pill text-primary border border-primary">security</span>
+  </a>
+  </p>
 
 <h3 id="很好玩的合约游戏">很好玩的合约游戏</h3>
 
@@ -611,6 +614,25 @@ await contract.transferFrom(player,instance,1000000*(10**18));</p>
 <hr />
 
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/Ethernaut-writeUp class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

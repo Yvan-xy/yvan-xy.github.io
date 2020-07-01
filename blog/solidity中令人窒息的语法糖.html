@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,15 +64,15 @@
   <h1><b>solidity中令人窒息的语法糖</b></h1>
 
 <p class="post-metadata text-muted">
-  18 March 2019 -  
+  18 March 2019 -
   <b>less than 1 min read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#tutorial">
-      <span class="tag badge badge-pill text-primary border border-primary">tutorial</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#tutorial">
+    <span class="tag badge badge-pill text-primary border border-primary">tutorial</span>
+  </a>
+  </p>
 
 <h3 id="solidity函数的困惑">Solidity函数的困惑</h3>
 
@@ -225,6 +228,25 @@ contract test{
 <p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/toutu.jpg?raw=true" alt="toutu" /></p>
 
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/solidity%E4%B8%AD%E4%BB%A4%E4%BA%BA%E7%AA%92%E6%81%AF%E7%9A%84%E8%AF%AD%E6%B3%95%E7%B3%96 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

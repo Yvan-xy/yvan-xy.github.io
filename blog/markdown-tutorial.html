@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,19 +64,19 @@
   <h1><b>markdown-tutorial</b></h1>
 
 <p class="post-metadata text-muted">
-  02 December 2018 -  
+  02 December 2018 -
   <b>less than 1 min read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#markdown">
-      <span class="tag badge badge-pill text-primary border border-primary">markdown</span>
-    </a>
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#thinking">
-      <span class="tag badge badge-pill text-primary border border-primary">thinking</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#markdown">
+    <span class="tag badge badge-pill text-primary border border-primary">markdown</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#thinking">
+    <span class="tag badge badge-pill text-primary border border-primary">thinking</span>
+  </a>
+  </p>
 
 <h3 id="记录一下markdown的语法">记录一下markdown的语法</h3>
 
@@ -318,6 +321,25 @@
 <p>Ps：写道插入图片的时候我在听canon，这是世界上最好听的曲子，突然想起了和我一起去稻城亚丁的两个傻子。</p>
 
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/markdown-tutorial class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

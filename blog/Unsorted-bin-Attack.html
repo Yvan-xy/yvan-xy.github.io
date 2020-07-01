@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,19 +64,19 @@
   <h1><b>Unsorted-bin Attack</b></h1>
 
 <p class="post-metadata text-muted">
-  18 January 2020 -  
+  18 January 2020 -
   <b>less than 1 min read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#heapexploit">
-      <span class="tag badge badge-pill text-primary border border-primary">HeapExploit</span>
-    </a>
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#thinking">
-      <span class="tag badge badge-pill text-primary border border-primary">thinking</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#heapexploit">
+    <span class="tag badge badge-pill text-primary border border-primary">HeapExploit</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#thinking">
+    <span class="tag badge badge-pill text-primary border border-primary">thinking</span>
+  </a>
+  </p>
 
 <h2 id="前言">前言</h2>
 <p>  这两天学习Unsorted-bin Attack的过程中遇到了一些令我十分困惑的细节，我只好一边读glibc源码一边排查问题，记录一下我的心路历程，免得下次遇到又忘了。</p>
@@ -112,6 +115,25 @@
 		             <span class="n">bck</span><span class="o">-&gt;</span><span class="n">fd</span> <span class="o">=</span> <span class="n">unsorted_chunks</span> <span class="p">(</span><span class="n">av</span><span class="p">);</span>
 </code></pre></div></div>
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/Unsorted-bin-Attack class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

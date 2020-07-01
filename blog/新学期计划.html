@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,15 +64,15 @@
   <h1><b>大二上的flag</b></h1>
 
 <p class="post-metadata text-muted">
-  26 August 2019 -  
+  26 August 2019 -
   <b>less than 1 min read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#solo">
-      <span class="tag badge badge-pill text-primary border border-primary">solo</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#solo">
+    <span class="tag badge badge-pill text-primary border border-primary">solo</span>
+  </a>
+  </p>
 
 <h5 id="2019826">2019.8.26</h5>
 
@@ -100,6 +103,25 @@
 
 <p><strong>加油!</strong></p>
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/%E6%96%B0%E5%AD%A6%E6%9C%9F%E8%AE%A1%E5%88%92 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

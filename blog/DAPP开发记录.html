@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,15 +64,15 @@
   <h1><b>DAPP开发记录</b></h1>
 
 <p class="post-metadata text-muted">
-  19 March 2019 -  
+  19 March 2019 -
   <b>6 mins read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#solidity">
-      <span class="tag badge badge-pill text-primary border border-primary">solidity</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#solidity">
+    <span class="tag badge badge-pill text-primary border border-primary">solidity</span>
+  </a>
+  </p>
 
 <h3 id="dapp的简单原理">DAPP的简单原理</h3>
 
@@ -331,6 +334,25 @@ contract human{
 
 <p>  到这里，一个极端简单的DAPP已经开发完成，但是区块链神奇的思想可见一斑，由此看来我们还是要好好学设计模式和数学才能更加深刻的理解这个神奇的生态环境。</p>
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/DAPP%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

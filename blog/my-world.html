@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,15 +64,15 @@
   <h1><b>my world</b></h1>
 
 <p class="post-metadata text-muted">
-  02 October 2018 -  
+  02 October 2018 -
   <b>less than 1 min read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#solo">
-      <span class="tag badge badge-pill text-primary border border-primary">solo</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#solo">
+    <span class="tag badge badge-pill text-primary border border-primary">solo</span>
+  </a>
+  </p>
 
 <h3 id="公元-20181024---116">公元 2018.10.24   1:16</h3>
 <hr />
@@ -77,6 +80,25 @@
 <p><strong>从现在开始,我要记录这精彩的世界</strong></p>
 
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/my-world class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

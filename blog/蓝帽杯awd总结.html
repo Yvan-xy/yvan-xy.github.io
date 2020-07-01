@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,15 +64,15 @@
   <h1><b>蓝帽杯awd总结</b></h1>
 
 <p class="post-metadata text-muted">
-  23 August 2019 -  
+  23 August 2019 -
   <b>8 mins read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#awd">
-      <span class="tag badge badge-pill text-primary border border-primary">awd</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#awd">
+    <span class="tag badge badge-pill text-primary border border-primary">awd</span>
+  </a>
+  </p>
 
 <p>  最近沉迷于学习verilog以及计算机底层的相关知识,已经很久没有搞安全了.突然有机会打一场向往已久的AWD令我很是期待.终于我和朴淳 国峰 兴致冲冲的来到了国家会议中心,好生气派.</p>
 
@@ -413,6 +416,25 @@ socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr
 <p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/blue_hat3.jpg?raw=true" alt="404" /></p>
 
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/%E8%93%9D%E5%B8%BD%E6%9D%AFawd%E6%80%BB%E7%BB%93 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

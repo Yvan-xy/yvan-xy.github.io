@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,19 +64,19 @@
   <h1><b>Chunk Overlapping</b></h1>
 
 <p class="post-metadata text-muted">
-  10 February 2020 -  
+  10 February 2020 -
   <b>14 mins read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#heapexploit">
-      <span class="tag badge badge-pill text-primary border border-primary">HeapExploit</span>
-    </a>
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#pwn">
-      <span class="tag badge badge-pill text-primary border border-primary">pwn</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#heapexploit">
+    <span class="tag badge badge-pill text-primary border border-primary">HeapExploit</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#pwn">
+    <span class="tag badge badge-pill text-primary border border-primary">pwn</span>
+  </a>
+  </p>
 
 <p>chunk extend 是一种很好理解的利用手法，可以通过修改size或prev_size字段来实现extend，进而越界控制chunk，利用的条件如下：</p>
 
@@ -613,6 +616,25 @@ pwndbg&gt; x/20xg 0x603290
 <p>这里的content是0x30个字节，因此，是可以覆盖到addr的位置的，所以我们把addr修改成free@got，然后泄漏free_addr进而计算offset，然后将其覆盖为system。然后delete掉chunk1直接getshell。<br />
 这里比较巧的一个应用是，fastbin被free后进栈，所以addr的chunk会在content下面，这里是十分有意思的一个细节。到此漏洞利用已经基本就完成了。</p>
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/Chunk-Overlapping class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,15 +64,15 @@
   <h1><b>chaitin面试经历</b></h1>
 
 <p class="post-metadata text-muted">
-  12 December 2019 -  
+  12 December 2019 -
   <b>20 mins read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#review">
-      <span class="tag badge badge-pill text-primary border border-primary">review</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#review">
+    <span class="tag badge badge-pill text-primary border border-primary">review</span>
+  </a>
+  </p>
 
 <h4 id="背景">背景</h4>
 
@@ -1074,6 +1077,25 @@ substring()和substr()无法使用时：</p>
 
 <p><a href="http://drops.xmd5.com/static/drops/tips-7840.html">参考文章</a></p>
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/chaitin%E9%9D%A2%E8%AF%95%E7%BB%8F%E5%8E%86 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>

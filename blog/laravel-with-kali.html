@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
 </head>
 
 
@@ -61,15 +64,15 @@
   <h1><b>Laravel with kali</b></h1>
 
 <p class="post-metadata text-muted">
-  12 December 2018 -  
+  12 December 2018 -
   <b>less than 1 min read time</b>
 
-  <br>Tags: 
-    
-    <a class="text-decoration-none no-underline" href="/blog/tags#tutorial">
-      <span class="tag badge badge-pill text-primary border border-primary">tutorial</span>
-    </a>
-    </p>
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#tutorial">
+    <span class="tag badge badge-pill text-primary border border-primary">tutorial</span>
+  </a>
+  </p>
 
 <h3 id="记录一下在kali下如可搭建laravel环境">记录一下在Kali下如可搭建Laravel环境</h3>
 <hr />
@@ -127,6 +130,25 @@ composer <span class="nb">install
 
 <h5 id="我又双重装了系统这次提供的node版本是110根本不支持之前的版本踏马只能用-npm-rebuild-node-sass-force-回滚原先的版本">我又双重装了系统，这次提供的node版本是11.0,根本不支持之前的版本，踏马只能用 <strong>npm rebuild node-sass –force</strong> 回滚原先的版本。</h5>
 
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/laravel-with-kali class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
 
 </div>
   </main>
