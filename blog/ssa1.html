@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>SSA相关知识(1)--Dominator Frontier</b></h1>
+
+<p class="post-metadata text-muted">
+  09 July 2020 -
+  <b>2 mins read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#compiler">
+    <span class="tag badge badge-pill text-primary border border-primary">compiler</span>
+  </a>
+  </p>
+
+<p>  和好哥们一起参加了毕昇杯编译系统大赛，要手撕一个编译器，邢神带我们搞，按照llvm的结构进行设计，并且把<a href="https://github.com/MaxXSoft/YuLang">YuLang</a>的部分代码直接迁移了过来，我目前的感受是，这个项目的扩展性真的好。我主要负责平台无关优化，由于存在PassManager这种结构，所以我只需要写相关的pass即可完成优化，不得不说这种设计是真的神奇。</p>
+
+<p>  由于前端直接生成SSA较为复杂，因此yulang的变量分配并不是纯SSA，使用alloc/store的方式来规避phi节点等其他问题，这也是llvm所支持的IR(如下代码)。因为LLVM本身具有一个<a href="https://github.com/llvm-mirror/llvm/blob/master/lib/Transforms/Utils/Mem2Reg.cpp">mem2reg</a>的pass来实现将alloc转为寄存器变量。我接下来也要实现这个pass然后才能进一步优化。</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">b</span><span class="o">()</span><span class="k">:</span><span class="kt">i32</span> <span class="o">{</span>
+    <span class="kt">var</span> <span class="kt">a</span> <span class="kt">:</span> <span class="kt">i32</span><span class="o">[</span><span class="err">3</span><span class="o">]</span>
+    <span class="kt">a</span><span class="o">[</span><span class="err">1</span><span class="o">]</span> <span class="k">=</span> <span class="mi">2</span>
+    <span class="mi">0</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>对应的IR：</p>
+
+<pre><code class="language-ir">define internal $0f$i32 @_$b_ {
+@args:
+  %1 = alloca $pi32
+  jump %0
+@func_exit: ; preds: %0
+  %2 = load i32, $pi32 %1
+  return i32 %2
+%0: ; preds: @args
+  %3 = alloca $p$3ai32
+  %4 = access elem $p$3ai32 %3, constant i32 1
+  store i32 constant i32 2, $pi32 %4
+  store i32 constant i32 0, $pi32 %1
+  jump @func_exit
+}
+</code></pre>
+
+<h3 id="ssa简介">SSA简介</h3>
+
+<hr />
+
+<p>  SSA（static single assignment form）即静态单赋值，之所以称之为单赋值，是因为每个名字在SSA中仅被赋值一次。他的好处主要体现在：其 <strong>Use-Define chain</strong> 相当明确，而且每个仅包含单一元素。关于Use-Define可以看这几个<a href="https://www.zhihu.com/question/41999500">知乎回答</a>。举例来说：</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">y</span> <span class="o">:=</span> <span class="mi">1</span>
+ <span class="n">y</span> <span class="o">:=</span> <span class="mi">2</span>
+ <span class="n">x</span> <span class="o">:=</span> <span class="n">y</span>
+</code></pre></div></div>
+
+<p>  从上面的描述所知，第一行赋值行为是不需要的，因为y在第二行被二度赋值，y的数值在第三行被使用，一个程式通常会进行定义可达性分析（reaching definition analysis）来测定它。在SSA下，将会变成下列的形式：</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">y1</span> <span class="o">:=</span> <span class="mi">1</span>
+ <span class="n">y2</span> <span class="o">:=</span> <span class="mi">2</span>
+ <span class="n">x1</span> <span class="o">:=</span> <span class="n">y2</span>
+</code></pre></div></div>
+
+<p>  基于这种形式的IR，我们再做常量传播、dec等优化就会变得更加简单。我这最近一直在读《Engineering a Compiler》这本书，在第9章<strong>数据流分析</strong>部分才讲了SSA的构造方式，我之前看第5章IR部分的时候没学会，一直以为是智力问题…后来才知道那只是个概念介绍。</p>
+
+<h3 id="ssa构造算法">SSA构造算法</h3>
+
+<hr />
+
+<h4 id="0x01-经典构造法">0x01 经典构造法</h4>
+<p>本书中介绍的算法是相当经典的算法，感兴趣的可以看论文《Efficiently computing static single assignment form and the control dependence graph》，大概就是：</p>
+
+<ol>
+  <li>遍历 IR 构造 CFG</li>
+  <li>计算支配边界</li>
+  <li>确定 Phi(Φ) 函数位置</li>
+  <li>变量重命名</li>
+</ol>
+
+<p>关于<strong>CFG</strong>的构造算法，大致如下：</p>
+
+<p><em>Basic Block</em>构造算法：</p>
+
+<ol>
+  <li>找基本块入口源代码的首行或者转移代码（有条件和无条件）或者转移代码的下一行</li>
+  <li>基本块构造：通过入口点开始，将其组成各自的基本块。基本块语句序列的特征：从不包含它本身的进入点到其他进入点或者到某条转移语句或者到某条停止语句</li>
+  <li>如果有语句不在任一基本块中，那么它为 ”死代码“，删除</li>
+</ol>
+
+<p>当确定Basic Block后，紧接着构造 CFG:</p>
+
+<p>如果在一个有序代码中，基本块 B2 跟在 B1 后，那么产生一个由 B1 到 B2 的有向边。</p>
+
+<ol>
+  <li>有跳转点。这个点从 B1 的结束点跳到 B2 的开始点</li>
+  <li>无跳转点（有序代码中），B2 跟在 B1 后，且 B1 的结束点不是无条件跳转语句</li>
+</ol>
+
+<p>这里推荐去听b站李樾老师的《软件分析》课程，讲的非常好。</p>
+
+<p>接下来是计算支配边界，在生成SSA的时候，需要计算在何处插入正确的 Φ (phi-function)。例如：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">a</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">a</span><span class="o">--</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>此时形成的IR应该是这样的：</p>
+
+<pre><code class="language-ir">  branch %b0, %1, %2
+@if_end: ; preds: %1, %2
+  b1 = phi(a1, a2)
+  store i32 constant i32 0, $pi32 %3
+  jump @func_exit
+%1: ; preds: %0
+  a1 = a0 + 1
+  jump @if_end
+%2: ; preds: %0
+  a2 = a0 - 1
+  jump @if_end
+</code></pre>
+
+<p>cfg大致如下：
+<img src="http://pic.dyf.ink/1-2020-7-09.png" alt="cfg" /></p>
+
+<p>  这里可以发现一个问题，<code class="highlighter-rouge">b = a</code>赋值的时候，我们需要确定到底是选择a1还是a2,因此需要插入一个phi函数。计算在何处插入正确的 Φ ，一种方法是在所有有多个前驱的Basic Block的开头插入 Φ-node，但是这种方法会插入很多的无用的 Φ-node ，有很多 Φ-node 的参数都是相同的一个定义。</p>
+
+<p>  这样得到的 SSA 形式的 IR，占用过多的内存，增加了计算的开销。任何使用该SSA进行代码分析或者优化的过程都会浪费很多计算资源。为了减少 Φ-function 的数量，首先想到的方法就是确定插入 Φ-function 的精确位置。</p>
+
+<h3 id="0x02-支配性dominance">0x02 支配性(Dominance)</h3>
+
+<hr />
+
+<p>  在入口结点为b0的流图中，当且进当bi位于从b0到bj的每条路径上时，结点bi支配bj，写作 <strong><em>bi dom bj</em></strong>。根据定义，<strong><em>bi dom bi</em></strong>。</p>
+
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/ssa1 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>

@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "SSA相关知识(1)--Dominator Frontier",
+      "category" : "",
+      "tags"     : "compiler",
+      "url"      : "/blog/ssa1",
+      "date"     : "2020-07-09 00:00:00 +0800"
+    } ,
+  
+    {
       "title"    : "最近干了啥",
       "category" : "",
       "tags"     : "solo",
