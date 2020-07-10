@@ -30,6 +30,9 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
 
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
   <!-- comment system -->
   <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
 
@@ -52,6 +55,8 @@
 
       <a class="nav-item nav-link active" href="/blog/">Blog</a>
 
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
       <a class="nav-item nav-link " href="/about/">About</a>
 
       
@@ -65,7 +70,7 @@
 
 <p class="post-metadata text-muted">
   09 July 2020 -
-  <b>2 mins read time</b>
+  <b>4 mins read time</b>
 
   <br>Tags:
   
@@ -123,11 +128,11 @@
 
 <p>  基于这种形式的IR，我们再做常量传播、dec等优化就会变得更加简单。我这最近一直在读《Engineering a Compiler》这本书，在第9章<strong>数据流分析</strong>部分才讲了SSA的构造方式，我之前看第5章IR部分的时候没学会，一直以为是智力问题…后来才知道那只是个概念介绍。</p>
 
-<h3 id="ssa构造算法">SSA构造算法</h3>
+<h3 id="0x01-ssa构造算法">0x01 SSA构造算法</h3>
 
 <hr />
 
-<h4 id="0x01-经典构造法">0x01 经典构造法</h4>
+<h4 id="经典构造法">经典构造法</h4>
 <p>本书中介绍的算法是相当经典的算法，感兴趣的可以看论文《Efficiently computing static single assignment form and the control dependence graph》，大概就是：</p>
 
 <ol>
@@ -196,6 +201,178 @@
 
 <p>  在入口结点为b0的流图中，当且进当bi位于从b0到bj的每条路径上时，结点bi支配bj，写作 <strong><em>bi dom bj</em></strong>。根据定义，<strong><em>bi dom bi</em></strong>。</p>
 
+<p>举个例子：</p>
+
+<p><img src="http://pic.dyf.ink/2-2020-7-09.jpeg" alt="graph" /></p>
+
+<p>  在这张图中结点1支配所有的节点，因为他是入口结点，所以到达每个结点都必须经过它。结点2只支配他自己，因为没有结点必须经过2。</p>
+
+<p>  另外一个比较重要的概念就是 <strong><em>strictly dominates</em></strong>（严格支配），如果 <strong>d != n</strong> 且 <strong>d dom n</strong>， 那么 <strong>d sdom m</strong>，例如上图中 4 sdom 5。说白了就是<strong>不是自己支配自己</strong>。n的严格支配集记做 <strong><em>SDom(n)</em></strong>，该集合中，与n最近的结点称为n的<strong>直接支配结点</strong> <em>(immediate node)</em>，记做 <strong><em>IDom(n)</em></strong>。cfg的entry没有直接支配结点。例如5的直接支配结点是4,7的直接支配结点也是4.</p>
+
+<script type="math/tex; mode=display">SDom(n) = Dom(n)-\{n\}</script>
+
+<p>  那么如何计算支配域Dom(n)呢，参考《Engineering a Compiler》这本书中的不懂点算法，下面给出介绍，非常刺激，核心就一句话，如下：</p>
+
+<script type="math/tex; mode=display">Dom(n) = \{n\}\cup(\mathop{\cap}\limits_{m \in preds(n)} Dom(m))</script>
+
+<p>其实上面这个公式的意思就是，求n的前趋的支配域的交集然后并上{n}，具体的迭代算法过程为：</p>
+
+<p><img src="http://pic.dyf.ink/4-2020-7-09.png" alt="iter" /></p>
+
+<p>  一直迭代CFG的Dom集合，直到不发生变化，即到达fixed point，至于这个迭代算法为什么能停下来我这里就不证明了，</p>
+
+<h3 id="0x03-支配者树dominator-tree">0x03 支配者树(Dominator Tree)</h3>
+
+<hr />
+
+<p>  这个概念比较好理解，根据cfg的支配信息，建立一个支配树，如下图所示：</p>
+
+<p><img src="http://pic.dyf.ink/3-2020-7-09.png" alt="dominator_tree" /></p>
+
+<p>  该树的边使用一种简单的方式编码了IDom集合。若m为IDom(n),则支配者树中必然有一条边从m指向n，即n为m的子结点。比如3,4,6都是2的子结点，尽管6并不是2的直接后继。</p>
+
+<p>因此根据上面的算法计算出的Dom信息，我们可以很容易的建立Dominator Tree,这里给出树上的数据展示：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>B0</th>
+      <th>B1</th>
+      <th>B2</th>
+      <th>B3</th>
+      <th>B4</th>
+      <th>B5</th>
+      <th>B6</th>
+      <th>B7</th>
+      <th>B8</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Dom</td>
+      <td>{0}</td>
+      <td>{0,1}</td>
+      <td>{0,1,2}</td>
+      <td>{0,1,3}</td>
+      <td>{0,1,3,4}</td>
+      <td>{0,1,5}</td>
+      <td>{0,1,5,6}</td>
+      <td>{0,1,5,7}</td>
+      <td>{0,1,5,8}</td>
+    </tr>
+    <tr>
+      <td>IDom</td>
+      <td>N</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>5</td>
+      <td>5</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>然后根据Dom值计算出IDom值，实际上IDom值就是其父结点，然后根据IDom值构造Dominator Tree即可。</p>
+
+<p><img src="http://pic.dyf.ink/7-2020-7-09.png" alt="cfg" /></p>
+
+<h3 id="0x04-支配边界dominator-frontier">0x04 支配边界(Dominator Frontier)</h3>
+
+<hr />
+
+<p>  在构造SSA的过程中，若考虑使用最大静态单复制会导入大量的phi-function，比如，假如CFG中结点n中的一个定义，该值到达某结点m时，若 <em>n Dom m</em> 则该值并不需要phi-function，因为该定义只用一种情况才能导致无法传播到m，就是在n、m之间重新定义了该值。</p>
+
+<p>因此只有在n的支配域外的汇合点，才需要引入phi-function，这就是支配边界，即：</p>
+
+<ol>
+  <li>n支配m的一个前趋</li>
+  <li>n并不严格支配m</li>
+</ol>
+
+<p>有这种性质的节点m集合称为n的支配边界，记做DF(n)，例如上图中 <em>DF(2) = 7</em></p>
+
+<script type="math/tex; mode=display">DF(n) = \{m\mid q \in preds(m), n \in Dom(q)\}</script>
+
+<p>说人话就是，所有最近不能被n严格支配的节点的集合就是DF(n)，即支配边界。如下图，<code class="highlighter-rouge">DF(5) = {4, 5, 12, 13}</code></p>
+
+<p><img src="http://pic.dyf.ink/5-2020-7-09.png" alt="df" /></p>
+
+<p>可是支配边界的作用是什么呢？我们上面已经解释过了，只有在到达结点 n 的支配边界的时候，才需要考虑其他路径是否有对 n 结点中某值的定义并且插入适当的 Φ-function。</p>
+
+<p><img src="http://pic.dyf.ink/6-2020-7-09.png" alt="df1" /></p>
+
+<p>  虽然从结点1的角度来看，它支配结点（例如9，10，11）可能会用到x:3，但并不意味着这些节点里不需要插入ϕ\phiϕ-function的。</p>
+
+<p>  结点 5 定义了值 x := 4，结点 5 没有支配结点并且结点 9 就是结点 5 的支配边界，在这里需要考虑从从其他路径传播到此的对变量 x 的其他定义，也就是结点 1 中的定义 x := 3。所以在结点 9 需要插入一个关于变量 x 的 Φ-function。同理在结点 10 的开头也需要插入一个 Φ-function，另外由于 Φ-function 会产生新的定义，所以也需要在结点 9 的支配边界结点 11 的开头插入 Φ-function。</p>
+
+<p>但是如果要确定支配边界的话，需要先构造出支配者树，然后借助于支配者树来得出支配边界。</p>
+
+<h3 id="0x05-求支配边界">0x05 求支配边界</h3>
+
+<p>这里直接给出算法伪代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="nb">all</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">CFG</span>
+    <span class="n">DF</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">Null</span>
+
+<span class="k">for</span> <span class="nb">all</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">CFG</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="n">has</span> <span class="n">multiple</span> <span class="n">predecessors</span> <span class="n">then</span>
+        <span class="k">for</span> <span class="n">each</span> <span class="n">predecessor</span> <span class="n">p</span> <span class="n">of</span> <span class="n">n</span>
+            <span class="n">runner</span> <span class="o">&lt;-</span> <span class="n">p</span>
+            <span class="k">while</span> <span class="n">runner</span> <span class="o">!=</span> <span class="n">IDom</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                <span class="n">DF</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="n">DF</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span> <span class="o">+</span> <span class="p">{</span><span class="n">n</span><span class="p">}</span>
+                <span class="n">runner</span> <span class="o">&lt;-</span> <span class="n">IDom</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>  该算法会定位到CFG中的各个汇合点就。接下来，对j的每个前趋p，从p开始沿着支配者树向上走，直到找到一个直接支配j的结点。按照下图举个例子：</p>
+
+<p><img src="http://pic.dyf.ink/7-2020-7-09.png" alt="df2" /></p>
+
+<ol>
+  <li>B1 对于其在CFG中的前趋B0，发现B0是IDom(B1)，因此不进入while循环。对于其前趋B3,此时将B1添加到DF(B3)中，接下来进入B1，将B1添加到DF(B1)中，然后前进到B0，然后停止。</li>
+  <li>B3 对于其在CFG中的前趋B2，发现B2不是IDom(B3)，此时将B3添加到DF(B2)中，接下来前进到B1，而B1是IDom(B3)故停止while循环。对于其前趋结点B7，发现B7不是IDom(B3)，此时将B3添加到DF(B7)中，然后前进到B5，将B3添加到DF(B5)中，然后前进到B1停止。</li>
+  <li>B7 对于其在CFG中的前趋B6，发现不是IDom(B7)，将B7添加到DF(B6)中，接下来前进到B5，停止while循环。对于其前趋节点B8，将B7添加到DF(B8)，然后前进到B5，然后停止。</li>
+</ol>
+
+<p>于是得到支配边界如下：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>B0</th>
+      <th>B1</th>
+      <th>B2</th>
+      <th>B3</th>
+      <th>B4</th>
+      <th>B5</th>
+      <th>B6</th>
+      <th>B7</th>
+      <th>B8</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DF</td>
+      <td>Null</td>
+      <td>{B1}</td>
+      <td>{B3}</td>
+      <td>{B1}</td>
+      <td>Null</td>
+      <td>{B3}</td>
+      <td>{B7}</td>
+      <td>{B3}</td>
+      <td>{B7}</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="0x05-总结">0x05 总结</h3>
+
+<p>  到这里差不多就结束了，这几个算法比较有趣的点在于，数据流分析的大部分算法都是不动点算法，然而为啥能到达不动点属实是一个需要我们思考的问题，事实上如果一个集合只进行并的运算，那么对其进行迭代往往可以达到fixed point，你想一想是不是;)</p>
 
 
 <div id="vcomments"></div>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-07-09T23:20:05+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">SSA相关知识(1)–Dominator Frontier</title><link href="http://localhost:4000/blog/ssa1" rel="alternate" type="text/html" title="SSA相关知识(1)--Dominator Frontier" /><published>2020-07-09T00:00:00+08:00</published><updated>2020-07-09T00:00:00+08:00</updated><id>http://localhost:4000/blog/ssa1</id><content type="html" xml:base="http://localhost:4000/blog/ssa1">&lt;p&gt;  和好哥们一起参加了毕昇杯编译系统大赛，要手撕一个编译器，邢神带我们搞，按照llvm的结构进行设计，并且把&lt;a href=&quot;https://github.com/MaxXSoft/YuLang&quot;&gt;YuLang&lt;/a&gt;的部分代码直接迁移了过来，我目前的感受是，这个项目的扩展性真的好。我主要负责平台无关优化，由于存在PassManager这种结构，所以我只需要写相关的pass即可完成优化，不得不说这种设计是真的神奇。&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-07-10T23:12:11+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">SSA相关知识(1)–Dominator Frontier</title><link href="http://localhost:4000/blog/ssa1" rel="alternate" type="text/html" title="SSA相关知识(1)--Dominator Frontier" /><published>2020-07-09T00:00:00+08:00</published><updated>2020-07-09T00:00:00+08:00</updated><id>http://localhost:4000/blog/ssa1</id><content type="html" xml:base="http://localhost:4000/blog/ssa1">&lt;p&gt;  和好哥们一起参加了毕昇杯编译系统大赛，要手撕一个编译器，邢神带我们搞，按照llvm的结构进行设计，并且把&lt;a href=&quot;https://github.com/MaxXSoft/YuLang&quot;&gt;YuLang&lt;/a&gt;的部分代码直接迁移了过来，我目前的感受是，这个项目的扩展性真的好。我主要负责平台无关优化，由于存在PassManager这种结构，所以我只需要写相关的pass即可完成优化，不得不说这种设计是真的神奇。&lt;/p&gt;
 
 &lt;p&gt;  由于前端直接生成SSA较为复杂，因此yulang的变量分配并不是纯SSA，使用alloc/store的方式来规避phi节点等其他问题，这也是llvm所支持的IR(如下代码)。因为LLVM本身具有一个&lt;a href=&quot;https://github.com/llvm-mirror/llvm/blob/master/lib/Transforms/Utils/Mem2Reg.cpp&quot;&gt;mem2reg&lt;/a&gt;的pass来实现将alloc转为寄存器变量。我接下来也要实现这个pass然后才能进一步优化。&lt;/p&gt;
 
@@ -47,11 +47,11 @@
 
 &lt;p&gt;  基于这种形式的IR，我们再做常量传播、dec等优化就会变得更加简单。我这最近一直在读《Engineering a Compiler》这本书，在第9章&lt;strong&gt;数据流分析&lt;/strong&gt;部分才讲了SSA的构造方式，我之前看第5章IR部分的时候没学会，一直以为是智力问题…后来才知道那只是个概念介绍。&lt;/p&gt;
 
-&lt;h3 id=&quot;ssa构造算法&quot;&gt;SSA构造算法&lt;/h3&gt;
+&lt;h3 id=&quot;0x01-ssa构造算法&quot;&gt;0x01 SSA构造算法&lt;/h3&gt;
 
 &lt;hr /&gt;
 
-&lt;h4 id=&quot;0x01-经典构造法&quot;&gt;0x01 经典构造法&lt;/h4&gt;
+&lt;h4 id=&quot;经典构造法&quot;&gt;经典构造法&lt;/h4&gt;
 &lt;p&gt;本书中介绍的算法是相当经典的算法，感兴趣的可以看论文《Efficiently computing static single assignment form and the control dependence graph》，大概就是：&lt;/p&gt;
 
 &lt;ol&gt;
@@ -118,7 +118,180 @@
 
 &lt;hr /&gt;
 
-&lt;p&gt;  在入口结点为b0的流图中，当且进当bi位于从b0到bj的每条路径上时，结点bi支配bj，写作 &lt;strong&gt;&lt;em&gt;bi dom bj&lt;/em&gt;&lt;/strong&gt;。根据定义，&lt;strong&gt;&lt;em&gt;bi dom bi&lt;/em&gt;&lt;/strong&gt;。&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="compiler" /><summary type="html">  和好哥们一起参加了毕昇杯编译系统大赛，要手撕一个编译器，邢神带我们搞，按照llvm的结构进行设计，并且把YuLang的部分代码直接迁移了过来，我目前的感受是，这个项目的扩展性真的好。我主要负责平台无关优化，由于存在PassManager这种结构，所以我只需要写相关的pass即可完成优化，不得不说这种设计是真的神奇。</summary></entry><entry><title type="html">最近干了啥</title><link href="http://localhost:4000/blog/summary" rel="alternate" type="text/html" title="最近干了啥" /><published>2020-06-29T00:00:00+08:00</published><updated>2020-06-29T00:00:00+08:00</updated><id>http://localhost:4000/blog/summary</id><content type="html" xml:base="http://localhost:4000/blog/summary">&lt;p&gt;  大二下稀里糊涂就在家混过去了，总感觉啥也没干，心里有些过意不去。总的来说技术方面的进步速度十分之缓慢，应该是在家里比较怠堕，主要干了一下事情：&lt;/p&gt;
+&lt;p&gt;  在入口结点为b0的流图中，当且进当bi位于从b0到bj的每条路径上时，结点bi支配bj，写作 &lt;strong&gt;&lt;em&gt;bi dom bj&lt;/em&gt;&lt;/strong&gt;。根据定义，&lt;strong&gt;&lt;em&gt;bi dom bi&lt;/em&gt;&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;举个例子：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/2-2020-7-09.jpeg&quot; alt=&quot;graph&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;  在这张图中结点1支配所有的节点，因为他是入口结点，所以到达每个结点都必须经过它。结点2只支配他自己，因为没有结点必须经过2。&lt;/p&gt;
+
+&lt;p&gt;  另外一个比较重要的概念就是 &lt;strong&gt;&lt;em&gt;strictly dominates&lt;/em&gt;&lt;/strong&gt;（严格支配），如果 &lt;strong&gt;d != n&lt;/strong&gt; 且 &lt;strong&gt;d dom n&lt;/strong&gt;， 那么 &lt;strong&gt;d sdom m&lt;/strong&gt;，例如上图中 4 sdom 5。说白了就是&lt;strong&gt;不是自己支配自己&lt;/strong&gt;。n的严格支配集记做 &lt;strong&gt;&lt;em&gt;SDom(n)&lt;/em&gt;&lt;/strong&gt;，该集合中，与n最近的结点称为n的&lt;strong&gt;直接支配结点&lt;/strong&gt; &lt;em&gt;(immediate node)&lt;/em&gt;，记做 &lt;strong&gt;&lt;em&gt;IDom(n)&lt;/em&gt;&lt;/strong&gt;。cfg的entry没有直接支配结点。例如5的直接支配结点是4,7的直接支配结点也是4.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;SDom(n) = Dom(n)-\{n\}&lt;/script&gt;
+
+&lt;p&gt;  那么如何计算支配域Dom(n)呢，参考《Engineering a Compiler》这本书中的不懂点算法，下面给出介绍，非常刺激，核心就一句话，如下：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;Dom(n) = \{n\}\cup(\mathop{\cap}\limits_{m \in preds(n)} Dom(m))&lt;/script&gt;
+
+&lt;p&gt;其实上面这个公式的意思就是，求n的前趋的支配域的交集然后并上{n}，具体的迭代算法过程为：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/4-2020-7-09.png&quot; alt=&quot;iter&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;  一直迭代CFG的Dom集合，直到不发生变化，即到达fixed point，至于这个迭代算法为什么能停下来我这里就不证明了，&lt;/p&gt;
+
+&lt;h3 id=&quot;0x03-支配者树dominator-tree&quot;&gt;0x03 支配者树(Dominator Tree)&lt;/h3&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;  这个概念比较好理解，根据cfg的支配信息，建立一个支配树，如下图所示：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/3-2020-7-09.png&quot; alt=&quot;dominator_tree&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;  该树的边使用一种简单的方式编码了IDom集合。若m为IDom(n),则支配者树中必然有一条边从m指向n，即n为m的子结点。比如3,4,6都是2的子结点，尽管6并不是2的直接后继。&lt;/p&gt;
+
+&lt;p&gt;因此根据上面的算法计算出的Dom信息，我们可以很容易的建立Dominator Tree,这里给出树上的数据展示：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt; &lt;/th&gt;
+      &lt;th&gt;B0&lt;/th&gt;
+      &lt;th&gt;B1&lt;/th&gt;
+      &lt;th&gt;B2&lt;/th&gt;
+      &lt;th&gt;B3&lt;/th&gt;
+      &lt;th&gt;B4&lt;/th&gt;
+      &lt;th&gt;B5&lt;/th&gt;
+      &lt;th&gt;B6&lt;/th&gt;
+      &lt;th&gt;B7&lt;/th&gt;
+      &lt;th&gt;B8&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Dom&lt;/td&gt;
+      &lt;td&gt;{0}&lt;/td&gt;
+      &lt;td&gt;{0,1}&lt;/td&gt;
+      &lt;td&gt;{0,1,2}&lt;/td&gt;
+      &lt;td&gt;{0,1,3}&lt;/td&gt;
+      &lt;td&gt;{0,1,3,4}&lt;/td&gt;
+      &lt;td&gt;{0,1,5}&lt;/td&gt;
+      &lt;td&gt;{0,1,5,6}&lt;/td&gt;
+      &lt;td&gt;{0,1,5,7}&lt;/td&gt;
+      &lt;td&gt;{0,1,5,8}&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;IDom&lt;/td&gt;
+      &lt;td&gt;N&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;5&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;然后根据Dom值计算出IDom值，实际上IDom值就是其父结点，然后根据IDom值构造Dominator Tree即可。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/7-2020-7-09.png&quot; alt=&quot;cfg&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;0x04-支配边界dominator-frontier&quot;&gt;0x04 支配边界(Dominator Frontier)&lt;/h3&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;  在构造SSA的过程中，若考虑使用最大静态单复制会导入大量的phi-function，比如，假如CFG中结点n中的一个定义，该值到达某结点m时，若 &lt;em&gt;n Dom m&lt;/em&gt; 则该值并不需要phi-function，因为该定义只用一种情况才能导致无法传播到m，就是在n、m之间重新定义了该值。&lt;/p&gt;
+
+&lt;p&gt;因此只有在n的支配域外的汇合点，才需要引入phi-function，这就是支配边界，即：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;n支配m的一个前趋&lt;/li&gt;
+  &lt;li&gt;n并不严格支配m&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;有这种性质的节点m集合称为n的支配边界，记做DF(n)，例如上图中 &lt;em&gt;DF(2) = 7&lt;/em&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;DF(n) = \{m\mid q \in preds(m), n \in Dom(q)\}&lt;/script&gt;
+
+&lt;p&gt;说人话就是，所有最近不能被n严格支配的节点的集合就是DF(n)，即支配边界。如下图，&lt;code class=&quot;highlighter-rouge&quot;&gt;DF(5) = {4, 5, 12, 13}&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/5-2020-7-09.png&quot; alt=&quot;df&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可是支配边界的作用是什么呢？我们上面已经解释过了，只有在到达结点 n 的支配边界的时候，才需要考虑其他路径是否有对 n 结点中某值的定义并且插入适当的 Φ-function。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/6-2020-7-09.png&quot; alt=&quot;df1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;  虽然从结点1的角度来看，它支配结点（例如9，10，11）可能会用到x:3，但并不意味着这些节点里不需要插入ϕ\phiϕ-function的。&lt;/p&gt;
+
+&lt;p&gt;  结点 5 定义了值 x := 4，结点 5 没有支配结点并且结点 9 就是结点 5 的支配边界，在这里需要考虑从从其他路径传播到此的对变量 x 的其他定义，也就是结点 1 中的定义 x := 3。所以在结点 9 需要插入一个关于变量 x 的 Φ-function。同理在结点 10 的开头也需要插入一个 Φ-function，另外由于 Φ-function 会产生新的定义，所以也需要在结点 9 的支配边界结点 11 的开头插入 Φ-function。&lt;/p&gt;
+
+&lt;p&gt;但是如果要确定支配边界的话，需要先构造出支配者树，然后借助于支配者树来得出支配边界。&lt;/p&gt;
+
+&lt;h3 id=&quot;0x05-求支配边界&quot;&gt;0x05 求支配边界&lt;/h3&gt;
+
+&lt;p&gt;这里直接给出算法伪代码：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;all&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nodes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;the&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CFG&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;DF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Null&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;all&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nodes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;the&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CFG&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;multiple&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;predecessors&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;each&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;predecessor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;of&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;runner&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;runner&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IDom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;DF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;runner&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;runner&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;runner&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IDom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;runner&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  该算法会定位到CFG中的各个汇合点就。接下来，对j的每个前趋p，从p开始沿着支配者树向上走，直到找到一个直接支配j的结点。按照下图举个例子：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/7-2020-7-09.png&quot; alt=&quot;df2&quot; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;B1 对于其在CFG中的前趋B0，发现B0是IDom(B1)，因此不进入while循环。对于其前趋B3,此时将B1添加到DF(B3)中，接下来进入B1，将B1添加到DF(B1)中，然后前进到B0，然后停止。&lt;/li&gt;
+  &lt;li&gt;B3 对于其在CFG中的前趋B2，发现B2不是IDom(B3)，此时将B3添加到DF(B2)中，接下来前进到B1，而B1是IDom(B3)故停止while循环。对于其前趋结点B7，发现B7不是IDom(B3)，此时将B3添加到DF(B7)中，然后前进到B5，将B3添加到DF(B5)中，然后前进到B1停止。&lt;/li&gt;
+  &lt;li&gt;B7 对于其在CFG中的前趋B6，发现不是IDom(B7)，将B7添加到DF(B6)中，接下来前进到B5，停止while循环。对于其前趋节点B8，将B7添加到DF(B8)，然后前进到B5，然后停止。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;于是得到支配边界如下：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt; &lt;/th&gt;
+      &lt;th&gt;B0&lt;/th&gt;
+      &lt;th&gt;B1&lt;/th&gt;
+      &lt;th&gt;B2&lt;/th&gt;
+      &lt;th&gt;B3&lt;/th&gt;
+      &lt;th&gt;B4&lt;/th&gt;
+      &lt;th&gt;B5&lt;/th&gt;
+      &lt;th&gt;B6&lt;/th&gt;
+      &lt;th&gt;B7&lt;/th&gt;
+      &lt;th&gt;B8&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;DF&lt;/td&gt;
+      &lt;td&gt;Null&lt;/td&gt;
+      &lt;td&gt;{B1}&lt;/td&gt;
+      &lt;td&gt;{B3}&lt;/td&gt;
+      &lt;td&gt;{B1}&lt;/td&gt;
+      &lt;td&gt;Null&lt;/td&gt;
+      &lt;td&gt;{B3}&lt;/td&gt;
+      &lt;td&gt;{B7}&lt;/td&gt;
+      &lt;td&gt;{B3}&lt;/td&gt;
+      &lt;td&gt;{B7}&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&quot;0x05-总结&quot;&gt;0x05 总结&lt;/h3&gt;
+
+&lt;p&gt;  到这里差不多就结束了，这几个算法比较有趣的点在于，数据流分析的大部分算法都是不动点算法，然而为啥能到达不动点属实是一个需要我们思考的问题，事实上如果一个集合只进行并的运算，那么对其进行迭代往往可以达到fixed point，你想一想是不是;)&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="compiler" /><summary type="html">  和好哥们一起参加了毕昇杯编译系统大赛，要手撕一个编译器，邢神带我们搞，按照llvm的结构进行设计，并且把YuLang的部分代码直接迁移了过来，我目前的感受是，这个项目的扩展性真的好。我主要负责平台无关优化，由于存在PassManager这种结构，所以我只需要写相关的pass即可完成优化，不得不说这种设计是真的神奇。</summary></entry><entry><title type="html">最近干了啥</title><link href="http://localhost:4000/blog/summary" rel="alternate" type="text/html" title="最近干了啥" /><published>2020-06-29T00:00:00+08:00</published><updated>2020-06-29T00:00:00+08:00</updated><id>http://localhost:4000/blog/summary</id><content type="html" xml:base="http://localhost:4000/blog/summary">&lt;p&gt;  大二下稀里糊涂就在家混过去了，总感觉啥也没干，心里有些过意不去。总的来说技术方面的进步速度十分之缓慢，应该是在家里比较怠堕，主要干了一下事情：&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;写了ELFSign和Kui这个项目，实际上之花了两周时间，效果还可以&lt;/li&gt;
@@ -148,7 +321,458 @@
   &lt;li&gt;整英语，我被自己的拖延症整服了。。。&lt;/li&gt;
   &lt;li&gt;操作系统，希望自己能趁暑假学一下，我估计没时间了，因为可能要看编译原理&lt;/li&gt;
   &lt;li&gt;切割时间，按计划行事，往往能保护我的娱乐时间，拒绝拖延&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">  大二下稀里糊涂就在家混过去了，总感觉啥也没干，心里有些过意不去。总的来说技术方面的进步速度十分之缓慢，应该是在家里比较怠堕，主要干了一下事情：</summary></entry><entry><title type="html">高校战役easyheap</title><link href="http://localhost:4000/blog/easyheap" rel="alternate" type="text/html" title="高校战役easyheap" /><published>2020-04-06T00:00:00+08:00</published><updated>2020-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/easyheap</id><content type="html" xml:base="http://localhost:4000/blog/easyheap">&lt;p&gt;  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。&lt;/p&gt;
+&lt;/ol&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="solo" /><summary type="html">  大二下稀里糊涂就在家混过去了，总感觉啥也没干，心里有些过意不去。总的来说技术方面的进步速度十分之缓慢，应该是在家里比较怠堕，主要干了一下事情：</summary></entry><entry><title type="html">ELFSign 设计文档</title><link href="http://localhost:4000/blog/ELFSign" rel="alternate" type="text/html" title="ELFSign 设计文档" /><published>2020-05-10T00:00:00+08:00</published><updated>2020-05-10T00:00:00+08:00</updated><id>http://localhost:4000/blog/ELFSign</id><content type="html" xml:base="http://localhost:4000/blog/ELFSign">&lt;h2 id=&quot;0x01-项目简介&quot;&gt;0x01 项目简介&lt;/h2&gt;
+
+&lt;p&gt;  本项目名为&lt;a href=&quot;https://github.com/Explainaur/ELFSign&quot;&gt;ELFSign&lt;/a&gt;，已在Github开源。可对任意ELF 32/64 位文件进行签名并验证。签名后可通过&lt;code class=&quot;highlighter-rouge&quot;&gt;readelf&lt;/code&gt;与&lt;code class=&quot;highlighter-rouge&quot;&gt;objdump&lt;/code&gt;等工具的检测，且不影响正常运行。与本项目配套的另一工程为&lt;a href=&quot;https://github.com/Explainaur/Kui&quot;&gt;Kui&lt;/a&gt;,该项目为Linux Kernel Module，以Hook系统调用&lt;code class=&quot;highlighter-rouge&quot;&gt;execve&lt;/code&gt;的方式，在ELF执行前对其进行签名校验，详细请见相关文档，该项目也已在Github开源，欢迎star。&lt;/p&gt;
+
+&lt;h2 id=&quot;0x02-功能介绍&quot;&gt;0x02 功能介绍&lt;/h2&gt;
+
+&lt;p&gt;ELFSign的基本功能有以下3个：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;生成公私钥对或X509证书&lt;/li&gt;
+  &lt;li&gt;对ELF文件进行签名，并在ELF文件中新建一个&lt;code class=&quot;highlighter-rouge&quot;&gt;.sign&lt;/code&gt; section,然后将签名储存到该section中&lt;/li&gt;
+  &lt;li&gt;对签名后的文件进行校验，若校验通过则可执行&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;安装方式&quot;&gt;安装方式&lt;/h3&gt;
+
+&lt;p&gt;  该项目依赖&lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;，debian类系统使用记得安装&lt;code class=&quot;highlighter-rouge&quot;&gt;libssl&lt;/code&gt;相关的开发库进行编译。&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/Explainaur/ELFSign
+&lt;span class=&quot;nb&quot;&gt;mkdir &lt;/span&gt;build
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;build
+cmake ..
+make &lt;span class=&quot;nt&quot;&gt;-j8&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;具体的的Usage如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;USAGE: ./ELFSign &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;options] file...
+Options:
+        &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt;, &lt;span class=&quot;nt&quot;&gt;--check&lt;/span&gt; Check ELF file and execute it
+        &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt;, &lt;span class=&quot;nt&quot;&gt;--check-X509&lt;/span&gt; Check ELF file with X509 and execute it
+        &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt;, &lt;span class=&quot;nt&quot;&gt;--sign&lt;/span&gt; Sign a ELF file
+        &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt;, &lt;span class=&quot;nt&quot;&gt;--argument&lt;/span&gt; Set arguments of ELF file to execute
+        &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt;, &lt;span class=&quot;nt&quot;&gt;--generate&lt;/span&gt; Generate public and private key pair
+        &lt;span class=&quot;nt&quot;&gt;-x&lt;/span&gt;, &lt;span class=&quot;nt&quot;&gt;--create-X509&lt;/span&gt; Generate X509 certificate
+        &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt;, &lt;span class=&quot;nt&quot;&gt;--path&lt;/span&gt; Set the path of public/private key
+        &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt;, &lt;span class=&quot;nt&quot;&gt;--elf&lt;/span&gt; Set the path of ELF file
+
+Example:
+         ./ELFSign &lt;span class=&quot;nt&quot;&gt;--sign&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; ./prikey.pem &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; hello.out
+         ./ELFSign &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; ./pubkey.pem &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; hello.out
+         ./ELFSign &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; ./ELFSign.pem &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; /usr/bin/cat &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; a.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;0x03-设计原理&quot;&gt;0x03 设计原理&lt;/h2&gt;
+
+&lt;p&gt;该项目大致可以分为一下几个模块，我会一一详细介绍各个module的原理：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;ELF文件解析模块&lt;/li&gt;
+  &lt;li&gt;ELF文件的读写Section模块&lt;/li&gt;
+  &lt;li&gt;RSA相关的签名算法模块&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;elf文件解析模块&quot;&gt;ELF文件解析模块&lt;/h3&gt;
+&lt;p&gt;  该模块主要功能为：从指定的ELF文件中加载&lt;strong&gt;所有的Load Segment&lt;/strong&gt;.事实上所有对ELF读写相关的核心操作几乎都在对ELF Header与Program Header Table以及Section Header Table的解析上，我们首先来简单介绍一下ELF文件的格式。&lt;/p&gt;
+
+&lt;p&gt;ELF文件的宏观结构大概如下图所示：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/object_file_format.png&quot; alt=&quot;object_file_format.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;  ELF文件有两种视图，一种是链接版，一种是执行版。链接版主要由section构成，运行版则主要有segment构成。那么section和segment的区别是什么？ 实际上segment由section构成，在映射到虚拟内存中后，就是我们常说的data segment，code segment之类的。所以这里我们主要关心section相关的结构。&lt;/p&gt;
+
+&lt;p&gt;  首先，我们可以看到，ELF文件由ELF Header，Program Header Table，section，Section Header Table构成。当然链接视图中，program header table是可选的，因为他主要用于告诉系统如何创建进程。用于生成进程的目标文件必须具有程序头部表，但是重定位文件不需要这个表。下面给一个比较形象的图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/elf-layout.png&quot; alt=&quot;elf-layout.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;  可以看到Program Header Table主要和segment有关，section header table则存储了每个section相关的表项。而ELF header则存储了ELF的相关信息，比如代码段入口，section的数目，section header的offset之类的。&lt;/p&gt;
+
+&lt;p&gt;  那么第一步，我们需要读取所有的Load Segment，上面我们已经分析了，与segment有关的信息都在Program Header Table这个struct数组里，因此我们首先应该去解析&lt;code class=&quot;highlighter-rouge&quot;&gt;Elf32_Phdr&lt;/code&gt;这个结构体：&lt;/p&gt;
+
+&lt;p&gt;  &lt;strong&gt;Program Header Table&lt;/strong&gt; 是一个结构体数组，每一个元素的类型是 &lt;code class=&quot;highlighter-rouge&quot;&gt;Elf32_Phdr&lt;/code&gt;，描述了一个段或者其它系统在准备程序执行时所需要的信息。其中，ELF 头中的 &lt;code class=&quot;highlighter-rouge&quot;&gt;e_phentsize&lt;/code&gt; 和 &lt;code class=&quot;highlighter-rouge&quot;&gt;e_phnum&lt;/code&gt; 指定了该数组每个元素的大小以及元素个数。一个目标文件的段包含一个或者多个节。程序的头部只有对于可执行文件和共享目标文件有意义。&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Elf32_Word&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;p_type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;			&lt;span class=&quot;cm&quot;&gt;/* Segment type */&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Elf32_Off&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;p_offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;		&lt;span class=&quot;cm&quot;&gt;/* Segment file offset */&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Elf32_Addr&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;p_vaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;		&lt;span class=&quot;cm&quot;&gt;/* Segment virtual address */&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Elf32_Addr&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;p_paddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;		&lt;span class=&quot;cm&quot;&gt;/* Segment physical address */&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Elf32_Word&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;p_filesz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;		&lt;span class=&quot;cm&quot;&gt;/* Segment size in file */&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Elf32_Word&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;p_memsz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;		&lt;span class=&quot;cm&quot;&gt;/* Segment size in memory */&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Elf32_Word&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;p_flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;		&lt;span class=&quot;cm&quot;&gt;/* Segment flags */&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Elf32_Word&lt;/span&gt;	&lt;span class=&quot;n&quot;&gt;p_align&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;		&lt;span class=&quot;cm&quot;&gt;/* Segment alignment */&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Elf32_Phdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;每个字段的说明如下:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;字段&lt;/th&gt;
+      &lt;th&gt;说明&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;p_type&lt;/td&gt;
+      &lt;td&gt;该字段为段的类型，或者表明了该结构的相关信息。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;p_offset&lt;/td&gt;
+      &lt;td&gt;该字段给出了从文件开始到该段开头的第一个字节的偏移。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;p_vaddr&lt;/td&gt;
+      &lt;td&gt;该字段给出了该段第一个字节在内存中的虚拟地址。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;p_paddr&lt;/td&gt;
+      &lt;td&gt;该字段仅用于物理地址寻址相关的系统中， 由于”System V” 忽略了应用程序的物理寻址，可执行文件和共享目标文件的该项内容并未被限定。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;p_filesz&lt;/td&gt;
+      &lt;td&gt;该字段给出了文件镜像中该段的大小，可能为 0。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;p_memsz&lt;/td&gt;
+      &lt;td&gt;该字段给出了内存镜像中该段的大小，可能为 0。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;p_flags&lt;/td&gt;
+      &lt;td&gt;该字段给出了与段相关的标记。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;p_align&lt;/td&gt;
+      &lt;td&gt;可加载的程序的段的 p_vaddr 以及 p_offset 的大小必须是 page 的整数倍。该成员给出了段在文件以及内存中的对齐方式。如果该值为 0 或 1 的话，表示不需要对齐。除此之外，p_align 应该是 2 的整数指数次方，并且 p_vaddr 与 p_offset 在模 p_align 的意义下，应该相等。&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;然而我们需要得出这个Segment是不是可以加载的(Loadable)，因此我们需要继续分析&lt;code class=&quot;highlighter-rouge&quot;&gt;p_type&lt;/code&gt;字段，细节如下：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;名字&lt;/th&gt;
+      &lt;th&gt;取值&lt;/th&gt;
+      &lt;th&gt;说明&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;PT_NULL&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;表明段未使用，其结构中其他成员都是未定义的。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;PT_LOAD&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;此类型段为一个可加载的段，大小由 p_filesz 和 p_memsz 描述。文件中的字节被映射到相应内存段开始处。如果 p_memsz 大于 p_filesz，“剩余” 的字节都要被置为 0。p_filesz 不能大于 p_memsz。可加载的段在程序头部中按照 p_vaddr 的升序排列。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;PT_DYNAMIC&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;此类型段给出动态链接信息。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;PT_INTERP&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;此类型段给出了一个以 NULL 结尾的字符串的位置和长度，该字符串将被当作解释器调用。这种段类型仅对可执行文件有意义（也可能出现在共享目标文件中）。此外，这种段在一个文件中最多出现一次。而且这种类型的段存在的话，它必须在所有可加载段项的前面。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;PT_NOTE&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;此类型段给出附加信息的位置和大小。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;PT_SHLIB&lt;/td&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;该段类型被保留，不过语义未指定。而且，包含这种类型的段的程序不符合 ABI 标准。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;PT_PHDR&lt;/td&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;该段类型的数组元素如果存在的话，则给出了程序头部表自身的大小和位置，既包括在文件中也包括在内存中的信息。此类型的段在文件中最多出现一次。此外，只有程序头部表是程序的内存映像的一部分时，它才会出现。如果此类型段存在，则必须在所有可加载段项目的前面。&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;PT_LOPROC~PT_HIPROC&lt;/td&gt;
+      &lt;td&gt;0x70000000 ~0x7fffffff&lt;/td&gt;
+      &lt;td&gt;此范围的类型保留给处理器专用语义。&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;  这里可以看到，当&lt;code class=&quot;highlighter-rouge&quot;&gt;p_type&lt;/code&gt;字段的值为&lt;code class=&quot;highlighter-rouge&quot;&gt;PT_LOAD&lt;/code&gt;时，该segment是可加载的，我们也可以通过&lt;code class=&quot;highlighter-rouge&quot;&gt;readelf -Wl ./ls&lt;/code&gt;这个命令来查看相关的信息，我这里截取ls的相关信息以做演示：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@Aurora:/home/code/solo/rubbish/ELFsign/build&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;master⚡&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# readelf -Wl ls&lt;/span&gt;
+
+Elf 文件类型为 DYN &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;共享目标文件&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Entry point 0x6130
+There are 11 program headers, starting at offset 64
+
+程序头：
+  Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align
+  PHDR           0x000040 0x0000000000000040 0x0000000000000040 0x000268 0x000268 R   0x8
+  INTERP         0x0002a8 0x00000000000002a8 0x00000000000002a8 0x00001c 0x00001c R   0x1
+      &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]
+  LOAD           0x000000 0x0000000000000000 0x0000000000000000 0x003438 0x003438 R   0x1000
+  LOAD           0x004000 0x0000000000004000 0x0000000000004000 0x012c49 0x012c49 R E 0x1000
+  LOAD           0x017000 0x0000000000017000 0x0000000000017000 0x008910 0x008910 R   0x1000
+  LOAD           0x020390 0x0000000000021390 0x0000000000021390 0x001258 0x002548 RW  0x1000
+  DYNAMIC        0x020dd8 0x0000000000021dd8 0x0000000000021dd8 0x0001f0 0x0001f0 RW  0x8
+  NOTE           0x0002c4 0x00000000000002c4 0x00000000000002c4 0x000044 0x000044 R   0x4
+  GNU_EH_FRAME   0x01c12c 0x000000000001c12c 0x000000000001c12c 0x0008fc 0x0008fc R   0x4
+  GNU_STACK      0x000000 0x0000000000000000 0x0000000000000000 0x000000 0x000000 RW  0x10
+  GNU_RELRO      0x020390 0x0000000000021390 0x0000000000021390 0x000c70 0x000c70 R   0x1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  可以看到一共有4个&lt;code class=&quot;highlighter-rouge&quot;&gt;LOAD SEGMENT&lt;/code&gt;，那么接下来我们需要将对应的segment内容读出来即可，这里的方法也很简单：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;p_offset&lt;/code&gt;字段代表该segment的偏移地址，&lt;code class=&quot;highlighter-rouge&quot;&gt;p_filesz&lt;/code&gt;字段代表该segment的大小，可以对照上面的readelf的信息看，即&lt;em&gt;Offset&lt;/em&gt;与&lt;em&gt;FileSiz&lt;/em&gt;。&lt;/li&gt;
+  &lt;li&gt;将fd指针设置到&lt;code class=&quot;highlighter-rouge&quot;&gt;p_offset&lt;/code&gt;对应的偏移处，读取&lt;code class=&quot;highlighter-rouge&quot;&gt;p_filesz&lt;/code&gt;大小的内容即可。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;具体的实现大致如下,我这里读出内容之后直接就做了Hash,代码在&lt;a href=&quot;https://github.com/Explainaur/ELFSign/blob/master/src/elf32.c#L245&quot;&gt;src/elf32.c&lt;/a&gt;：&lt;/p&gt;
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;fseek&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;programHeaderTable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SEEK_SET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ehdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e_phnum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fread&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Elf32_Phdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Elf32_Phdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;err_msg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Read Program Header failed&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/* Judge if Load Segment */&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p_type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PT_LOAD&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p_offset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;continue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+	&lt;span class=&quot;cm&quot;&gt;/* Read Load Segment content */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GetLoadSegment32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;SHA1_Update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p_filesz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+	&lt;span class=&quot;cm&quot;&gt;/* Free content memory */&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;free&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  到这里我们已经将所有的Load Segment读入并做了Hash。接下来我们就需要进行最重要的一步，完成section的添加和读写模块。&lt;/p&gt;
+
+&lt;h3 id=&quot;elf文件的读写模块&quot;&gt;ELF文件的读写模块&lt;/h3&gt;
+
+&lt;p&gt;该模块应当有两个功能：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;可读任意section的内容&lt;/li&gt;
+  &lt;li&gt;可新建一个section用来存放签名&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;关于section的解析，我们主要需要分析 ELF Header 与 Section Header Table。下面我们先来简单介绍一下ELF Header的信息。&lt;/p&gt;
+
+&lt;p&gt;ELF Header 描述了 ELF 文件的概要信息，利用这个数据结构可以索引到 ELF 文件的全部信息，数据结构如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;#define EI_NIDENT   16
+&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;e_ident&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;EI_NIDENT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_machine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_version&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Addr&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Off&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;e_phoff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Off&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;e_shoff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_ehsize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_phentsize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_phnum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_shentsize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_shnum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Half&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;e_shstrndx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Elf32_Ehdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在这里就不深入的介绍每个字段代表的详细意义，只简单介绍一些比较重要的字段。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;e_shoff&lt;br /&gt;
+这一项给出节头表在文件中的字节偏移（ Section Header table OFFset ）如果文件中没有节头表，则为 0&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;e_shentsize&lt;br /&gt;
+这一项给出节头的字节长度（Section Header ENTry SIZE）。一个节头是节头表中的一项；节头表中所有项占据的空间大小相同。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;e_shnum&lt;br /&gt;
+这一项给出节头表中的项数（Section Header NUMber）。因此， e_shnum 与 e_shentsize 的乘积即为节头表的字节长度。如果文件中没有节头表，则该项值为 0。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;e_shstrndx&lt;br /&gt;
+这一项给出节头表中与节名字符串表相关的表项的索引值（Section Header table InDeX related with section name STRing table）。如果文件中没有节名字符串表，则该项值为SHN_UNDEF。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;  我们的目标是向ELF中插入一个section，那么首先要清楚ELF是怎么存储并识别section的，按照开发者的思路，我们很容易想到我们可以把每个section的信息和特征抽象成一个struct，然后把所有的struct存入一个数组，最后把数组的地址放入ELF Header就可以了。这样我们就可以直接通过ELF Header来获得section struct数组，进而间接获得section的信息。其实上面这几个字段的作用便是如此。存储struct的数组就是上面提到的Section Header Table，在ELF文件的末尾。&lt;/p&gt;
+
+&lt;p&gt;  &lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;是一个字符串section，他存储了所有section的名字，ELF Header中的&lt;code class=&quot;highlighter-rouge&quot;&gt;e_shstrndx&lt;/code&gt;便是其在Section Header Table中的索引，因此想要获得&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;的真是偏移我们只需要按如下公式计算:&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;shstrtabOff&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e_shoff&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e_shstrndx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e_shentsize&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;// 基址 + 索引 × 大小&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  那如何获得section name在.shstrtab中的具体偏移？其实section struct的真是名字叫Elf32_Shdr(32位),结构如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;typedef&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_flags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Addr&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Off&lt;/span&gt;       &lt;span class=&quot;n&quot;&gt;sh_offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_link&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_addralign&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ELF32_Word&lt;/span&gt;      &lt;span class=&quot;n&quot;&gt;sh_entsize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Elf32_Shdr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;这个结构提存储了每个section的详细信息，第一个字段sh_name是section name在.shstrtab中的偏移。&lt;/p&gt;
+
+&lt;p&gt;那么我们究竟要怎样才能插入一个section呢？步骤大致如下：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;向Section Header Table中插入new section Header，即插入一个新的结构体&lt;/li&gt;
+  &lt;li&gt;向 &lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt; section中插入new section的section name&lt;/li&gt;
+  &lt;li&gt;修改.shstrtab的sh_size&lt;/li&gt;
+  &lt;li&gt;修改ELF Header中的e_shnum字段&lt;/li&gt;
+  &lt;li&gt;向目标位置写入section内容&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;  那么我们似乎遇到了一些困惑，&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt; section在ELF文件的中间，万一空间不够添加section name了该怎么办？不如我们将new section name直接添加到文件的末尾，然后修改一下&lt;code class=&quot;highlighter-rouge&quot;&gt;sh_name&lt;/code&gt;不就可以了吗。 似乎想法不错，但是这里需要注意的是，我们要记得修改&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;sh_size&lt;/code&gt;,否则还没查到文件末尾就终止了。&lt;/p&gt;
+
+&lt;p&gt;修改后的ELF尾应该长这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-plain&quot;&gt;|------------------------|
+|  section Header Table  |-----&amp;gt;这里已经插入了new section header
+|------------------------|
+|  new  section  name    |
+|------------------------|
+|  section      contain  |
+|------------------------|----&amp;gt; end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里在给出一个宏观的修改厚的ELF结构图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://pic.dyf.ink/ELF_struct.jpg&quot; alt=&quot;elf struct&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;  插入new section Header难点在计算shstrtab的偏移，首先你需要用:&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filesize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shstrtab&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sh_offset&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;  来获得字符串在&lt;code class=&quot;highlighter-rouge&quot;&gt;.shstrtab&lt;/code&gt;中的偏移，至于怎么获得&lt;code class=&quot;highlighter-rouge&quot;&gt;shstrtab.sh_offset&lt;/code&gt;.你需要先根据ELF Header中的相关字段&lt;code class=&quot;highlighter-rouge&quot;&gt;e_shstrndx&lt;/code&gt;，根据这个偏移找到.shstrtab的section Header，获取对应字段就ok了。这里需要注意要将section header的其他字段设置正确。&lt;/p&gt;
+
+&lt;p&gt;  接下来，我们需要修改.shstrtab的sh_size，用filesize - shstrtab.sh_offset就ok了，然后去修改ELF Header里的e_shnum字段，加1即可。最后向文件尾插入对应size的内容就ok了，最后我们看一下程序运行的demo：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  [25] .bss              NOBITS          0000000000004078 003078 000008 00  WA  0   0  1
+  [26] .comment          PROGBITS        0000000000000000 003078 000026 01  MS  0   0  1
+  [27] .symtab           SYMTAB          0000000000000000 0030a0 0006d8 18     28  45  8
+  [28] .strtab           STRTAB          0000000000000000 003778 0002af 00      0   0  1
+  [29] .shstrtab         STRTAB          0000000000000000 003a27 0008cf 00      0   0  1
+  [30] .sign             NOTE            00000000000042f8 0042f8 000100 00   A  0   0  1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;可以看到我们成功多加了一个 &lt;code class=&quot;highlighter-rouge&quot;&gt;.sign&lt;/code&gt; section，再来看看文件尾：&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;mo&quot;&gt;000042&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2e73&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6967&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;6e00&lt;/span&gt; &lt;span class=&quot;mo&quot;&gt;0000&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;24e4&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;639&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a57&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;60&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ec&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sign&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ZW&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;`&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;mo&quot;&gt;00004300&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;aa4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e313&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cb4d&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fb9&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;9177&lt;/span&gt; &lt;span class=&quot;mo&quot;&gt;053&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2551&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a21d&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;.....&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;..&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;mo&quot;&gt;000043&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;be18&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eb1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;25&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;af&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f246&lt;/span&gt;                      &lt;span class=&quot;p&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;F&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;确实符合section name + section contain的结构，看来原理是没问题的，经测试可以通过readelf和objdump的检测。&lt;/p&gt;
+
+&lt;p&gt;再来用objdump来验证一下看看,也没有什么问题：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@Aurora:/home/code/solo/rubbish/ELFsign/build&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;master○&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# objdump -h ls&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt;：     文件格式 elf64-x86-64
+
+节：
+Idx Name          Size      VMA               LMA               File off  Algn
+  0 .interp       0000001c  00000000000002a8  00000000000002a8  000002a8  2&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .note.gnu.build-id 00000024  00000000000002c4  00000000000002c4  000002c4  2&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .note.ABI-tag 00000020  00000000000002e8  00000000000002e8  000002e8  2&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+
+.....
+
+ 24 .data         00000268  0000000000022380  0000000000022380  00021380  2&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;5
+                  CONTENTS, ALLOC, LOAD, DATA
+ 25 .bss          000012d8  0000000000022600  0000000000022600  000215e8  2&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;5
+                  ALLOC
+ 26 .gnu_debuglink 00000034  0000000000000000  0000000000000000  000215e8  2&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;2
+                  CONTENTS, READONLY
+ 27 .sign         00000100  0000000000021eb0  0000000000021eb0  00021eb0  2&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;这部分代码实现在&lt;a href=&quot;https://github.com/Explainaur/ELFSign/blob/master/src/elf32.c&quot;&gt;elf32/elf64.c&lt;/a&gt;,32位与64位的原理基本类似，这里不再赘述。&lt;/p&gt;
+
+&lt;h3 id=&quot;rsa签名及验证模块&quot;&gt;RSA签名及验证模块&lt;/h3&gt;
+
+&lt;p&gt;  这一部分相对比较简单，只是简单的封装了一下openssl的相关api，然后使用私钥签名，公钥或者X509证书进行验证。&lt;/p&gt;
+
+&lt;p&gt;以下代码即位签名的核心函数,具体逻辑请看下面注释，详细的源码在&lt;a href=&quot;https://github.com/Explainaur/ELFSign/blob/master/src/sign32.c&quot;&gt;sign32.c&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SignToELF32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Elf32&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RSA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sign&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;256&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/* Get Hash value of load segment */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashText32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/* Add a new section header to Section Header Table */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AddSectionHeader32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/* Add section name to .shstrtab */&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AddSectionName32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;GetSign&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;digest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sign&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/* Write sign to the .sign section */&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;FILE&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;ab+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;err_msg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Can not open file %s&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elf32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sign&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;256&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;fclose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;256&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;err_msg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Write .text hash failed&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;这里的签名即验证算法32/64位的程序原理类似，在此不再赘述。&lt;/p&gt;
+
+&lt;h2 id=&quot;0x04-总结&quot;&gt;0x04 总结&lt;/h2&gt;
+
+&lt;p&gt;  该项目的实现主要需要熟悉ELF的文件格式，实际上这种新建section的技术被广泛用于软件汉化，因为需要储存中文字符串，所以经常将汉化数据存入so文件的新的section中。我本人勉强算了解逆向工程的相关技术，所以比较熟悉ELF文件的格式。至于内核模块的Hook技术，我之前只尝试过用户态的hook，一般都是使用&lt;code class=&quot;highlighter-rouge&quot;&gt;ptrace&lt;/code&gt;，这次也尝试了一下新的方法，&lt;strong&gt;Kui&lt;/strong&gt;的具体原理请见其相关文档。&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="Project" /><summary type="html">0x01 项目简介</summary></entry><entry><title type="html">高校战役easyheap</title><link href="http://localhost:4000/blog/easyheap" rel="alternate" type="text/html" title="高校战役easyheap" /><published>2020-04-06T00:00:00+08:00</published><updated>2020-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/easyheap</id><content type="html" xml:base="http://localhost:4000/blog/easyheap">&lt;p&gt;  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。&lt;/p&gt;
 
 &lt;h3 id=&quot;二进制分析&quot;&gt;二进制分析&lt;/h3&gt;
 
@@ -350,15 +974,7 @@ empty
   &lt;li&gt;实现任意写不一定老是想着double free啥的构造双链表，只要有双指针好像都可以&lt;/li&gt;
   &lt;li&gt;注意fastbin的LIFO特性，往往后分配的chunk造成的overflow可以overwrite先分配的chunk&lt;/li&gt;
   &lt;li&gt;一定要记得我们的终极目标，无非是任意读和任意写，还是要靠刷题积累套路…&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="pwn" /><category term="HeapExploit" /><summary type="html">  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。</summary></entry><entry><title type="html">一些杂念</title><link href="http://localhost:4000/blog/somefeelings" rel="alternate" type="text/html" title="一些杂念" /><published>2020-04-05T00:00:00+08:00</published><updated>2020-04-05T00:00:00+08:00</updated><id>http://localhost:4000/blog/somefeelings</id><content type="html" xml:base="http://localhost:4000/blog/somefeelings">&lt;p&gt;  最近一段时间仿佛做梦一般，姥姥突然检查出骨髓瘤，晚期且时无多日，姥爷在得知消息后变的几乎不再说话，一天能抽一包烟。妈妈为了照顾姥姥去了郑州肿瘤医院，日夜无法入眠。我心里想着这一切或许能尽快好起来。&lt;br /&gt;
-  今天是周末，我实在想休息一天，于是上午看了一会儿生活大爆炸后决定自己做炸鸡。下午去了万达买了一听可乐和3个鸡腿，晚上刚刚吃完饭得知了一个消息。妈妈的右耳听不见了，需要立刻住院。&lt;br /&gt;
-  我傻了，我从来没想过爸妈会倒下。我总觉得我才20不到，仔细一想爸妈都50多了，早就是老人了，我现在倒是生活不能自理，更别说什么给爹妈养老改善生活。前些日子给妈妈买了个新手机，她嘴上说着我乱花钱败家子，结果见人都要说这是儿子买给她的。每到这个时候我心里总是很酸，我除了这些其实什么也做不了。老爹的头发也白了，重活也不能让他干了，平时一喝酒就话贼多的老爹现在也累的说不出话。&lt;/p&gt;
-
-&lt;p&gt;  我总觉得老一辈人过的就很平淡，年轻人看了太多风花雪月，心中的情感泛滥太多，于他人轻而言爱，反而在生活中对待家人却情感枯竭。姥爷年轻时候受过很好的教育，读过许多书，照片里也是腼腆的书生样子。年轻时这两口子也没怎么炒过架，姥姥给姥爷做饭，姥爷经常带着姥姥出去游山玩水。他们老两口之前经常住在我家，姥爷之前回自己的家的时候总是说 “我回家去了，去给她拿些衣服，打扫打扫卫生”，姥姥病倒后 “我去那边房子去了，给她拿点衣服”。或许，在姥爷心里，姥姥不在，房子就只是房子，没有什么所谓的家了。我一个黄毛小子，估计很难和一个弯着腰坐在地上抽烟的老头感同身受吧。月亮下，烟雾里，你还记得起年轻时候你俩一起唱过的歌吗？希望姥爷下次偷偷擦眼泪的时候别再让我看到了。有些悲伤真的无法感同身受。&lt;/p&gt;
-
-&lt;p&gt;  或许这才是生活真实的样子吧。稍稍想要怠堕的时候，生活就会给你一巴掌，告诉你这些操蛋的事情远没有结束。少洁说：It’s pain to grow up. 日子匆匆的过着，生活总是在逼着你长大。&lt;br /&gt;
-  6月份就要20岁了。 &lt;br /&gt;
-  &lt;strong&gt;少年啊，你要用较少的时间走完别人走了很久的路，所以你要跑起来，要飞快地跑起来&lt;/strong&gt;。&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="feelings" /><summary type="html">  最近一段时间仿佛做梦一般，姥姥突然检查出骨髓瘤，晚期且时无多日，姥爷在得知消息后变的几乎不再说话，一天能抽一包烟。妈妈为了照顾姥姥去了郑州肿瘤医院，日夜无法入眠。我心里想着这一切或许能尽快好起来。   今天是周末，我实在想休息一天，于是上午看了一会儿生活大爆炸后决定自己做炸鸡。下午去了万达买了一听可乐和3个鸡腿，晚上刚刚吃完饭得知了一个消息。妈妈的右耳听不见了，需要立刻住院。   我傻了，我从来没想过爸妈会倒下。我总觉得我才20不到，仔细一想爸妈都50多了，早就是老人了，我现在倒是生活不能自理，更别说什么给爹妈养老改善生活。前些日子给妈妈买了个新手机，她嘴上说着我乱花钱败家子，结果见人都要说这是儿子买给她的。每到这个时候我心里总是很酸，我除了这些其实什么也做不了。老爹的头发也白了，重活也不能让他干了，平时一喝酒就话贼多的老爹现在也累的说不出话。</summary></entry><entry><title type="html">ELF相关知识</title><link href="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93" rel="alternate" type="text/html" title="ELF相关知识" /><published>2020-03-18T00:00:00+08:00</published><updated>2020-03-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93</id><content type="html" xml:base="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93">&lt;p&gt;最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。
+&lt;/ol&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="pwn" /><category term="HeapExploit" /><summary type="html">  刷题过少，导致看起来十分简单的题目当时无从下手。没办法，还是要多刷题找手感。今天想起来上次easyheap没整理，趁机学习一波，看了一下思路，果然没什么新的利用点，就是当时漏洞点没发现。</summary></entry><entry><title type="html">ELF相关知识</title><link href="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93" rel="alternate" type="text/html" title="ELF相关知识" /><published>2020-03-18T00:00:00+08:00</published><updated>2020-03-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93</id><content type="html" xml:base="http://localhost:4000/blog/ELF%E6%80%BB%E7%BB%93">&lt;p&gt;最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。
 然后zxy同学拉我去搞个比赛，要求实现一个对ELF签名的工具，最后要写一个内核模块去hook系统调用，如果签名验证通过就可以执行，否则
 不能执行。我的思路大致是这样的：&lt;/p&gt;
 
@@ -928,10 +1544,9 @@ ccccc...c d
 &lt;/ul&gt;
 
 &lt;p&gt;  我似乎每过一个阶段都会感到迷茫，当初的目标似乎变得有些模糊，我总担心自己成长的太慢，每一天都十分焦虑。我逐渐开始担心，我毕业之后，究竟应该干什么。今年GPA这些东西依旧消耗了我大量精力，我不得不在休息的时间去学大物这种东西。有时候，看着室友们打打游戏，写写作业看看ppt，考前刷刷题突击一下，考出的高高的成绩，似乎远比我这样劳神费力看那些经典大黑书，自己亲手写一遍代码来的更加划算。&lt;br /&gt;
-  我很羡慕，我可不敢。&lt;br /&gt;
-  我是一个计算机爱好者，我有些担心自己辜负了这份骄傲。看着身边的人几乎把所有的热情都投入到了分数上面，家里人也一直给我压力，让我读研，我不禁怀疑，是我错了，还是他们所有人错了。与我而言，计算机科学是一门艺术，我企图了解其中的细节，并以此获得快乐。我常问自己，我想做什么样的人，我的脑子里只有两个字，黑客。&lt;br /&gt;
-  太中二了，现在”黑客”这两个字已经变成了嘲讽那些脚本小子的词汇了。但是每当想到自己在Cyber Space中大杀四方的流氓行为，幻想着自己创造的蠕虫怼爆别人缓冲区的时候，总是激动的浑身发抖。这份热情到底能支撑我多久？我害怕被生活搓平了棱角，迫于生计而去弄一些风口上的”热门”，我害怕因为浮躁而变得沉不下心来读书。当今中国的内卷与失败在于价值观单一，在于绝大部分人都想去做同样的事情，只认可寥寥几种对“成功”的定义和通向“成功”的道路。假如你与众不同，你会被孤立。与我而言，当探索不再带来快乐的时候，那才是真正的失败。忍受寂寞，似乎是一场修行。&lt;br /&gt;
-  于是，我只有一个愿望，愿我能永远爱我所爱，永远热泪盈眶。&lt;br /&gt;
+&lt;!-- &amp;emsp;&amp;emsp;我是一个计算机爱好者，我有些担心自己辜负了这份骄傲。看着身边的人几乎把所有的热情都投入到了分数上面，家里人也一直给我压力，让我读研，我不禁怀疑，是我错了，还是他们所有人错了。   --&gt;
+&lt;!-- &amp;emsp;&amp;emsp;太中二了，现在&quot;黑客&quot;这两个字已经变成了嘲讽那些脚本小子的词汇了。但是每当想到自己在Cyber Space中大杀四方的流氓行为，幻想着自己创造的蠕虫怼爆别人缓冲区的时候，总是激动的浑身发抖。这份热情到底能支撑我多久？我害怕被生活搓平了棱角，迫于生计而去弄一些风口上的&quot;热门&quot;，我害怕因为浮躁而变得沉不下心来读书。当今中国的内卷与失败在于价值观单一，在于绝大部分人都想去做同样的事情，只认可寥寥几种对“成功”的定义和通向“成功”的道路。假如你与众不同，你会被孤立。与我而言，当探索不再带来快乐的时候，那才是真正的失败。忍受寂寞，似乎是一场修行。   --&gt;
+&lt;!-- &amp;emsp;&amp;emsp;于是，我只有一个愿望，愿我能永远爱我所爱，永远热泪盈眶。   --&gt;
   过去的2019,我经历了许多冒险，也收获了爱情，经历过低谷，也获得过肯定，总之它十分精彩。&lt;/p&gt;
 
 &lt;h3 id=&quot;接下来半年&quot;&gt;接下来半年&lt;/h3&gt;
