@@ -1,4 +1,106 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-07-10T23:12:11+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">SSA相关知识(1)–Dominator Frontier</title><link href="http://localhost:4000/blog/ssa1" rel="alternate" type="text/html" title="SSA相关知识(1)--Dominator Frontier" /><published>2020-07-09T00:00:00+08:00</published><updated>2020-07-09T00:00:00+08:00</updated><id>http://localhost:4000/blog/ssa1</id><content type="html" xml:base="http://localhost:4000/blog/ssa1">&lt;p&gt;  和好哥们一起参加了毕昇杯编译系统大赛，要手撕一个编译器，邢神带我们搞，按照llvm的结构进行设计，并且把&lt;a href=&quot;https://github.com/MaxXSoft/YuLang&quot;&gt;YuLang&lt;/a&gt;的部分代码直接迁移了过来，我目前的感受是，这个项目的扩展性真的好。我主要负责平台无关优化，由于存在PassManager这种结构，所以我只需要写相关的pass即可完成优化，不得不说这种设计是真的神奇。&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-07-19T17:58:16+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">Data Flow Analysis – Live variable analysis</title><link href="http://localhost:4000/blog/live-variable-analysis" rel="alternate" type="text/html" title="Data Flow Analysis -- Live variable analysis" /><published>2020-07-17T00:00:00+08:00</published><updated>2020-07-17T00:00:00+08:00</updated><id>http://localhost:4000/blog/live-variable-analysis</id><content type="html" xml:base="http://localhost:4000/blog/live-variable-analysis">&lt;p&gt;  《Engineering a Compiler》中的8.6.1章介绍了一种数据流分析算法，Live variable analysis，即活动变量分析，这种技术可以用来检测未初始化变量的使用。编译器或者代码扫描器可以发现并报告这种漏洞。&lt;/p&gt;
+
+&lt;p&gt;  举个栗子，当从p到某处使用变量v的位置之间的路径，在这之间变量v没有被重新定义，那么我们就说v在p处是活动的。我们通过计算后，我们将基本块b的变量活动信息存储到 &lt;em&gt;LiveOut(b)&lt;/em&gt; 中，该集合包含了从程序块b退出时所有的活动变量。因此，在某个cfg中，我们如果求出entry的 &lt;em&gt;LiveOut(n0)&lt;/em&gt; 集合不是空集，则这些变量存在潜在的为初始化调用。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;缺个图片儿～ 给个demo图&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;不动点法求解liveout集合&quot;&gt;不动点法求解LiveOut集合&lt;/h3&gt;
+
+&lt;p&gt;  对于cfg的每个节点n来说，LiveOut(n)是通过一个方程决定的，该方程使用了n节点的所有后继LiveOut集合，以及 &lt;strong&gt;&lt;em&gt;UEVar(n)&lt;/em&gt;&lt;/strong&gt; 和 &lt;strong&gt;&lt;em&gt;VarKill(n)&lt;/em&gt;&lt;/strong&gt; 集合。定义 LiveOut(n)的方程如下：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;LiveOut(n) = \mathop{\cup}\limits_{m \in succ(n)}(UEVar(m)\cup(LiveOut(m) \cap \overline{VarKill(m)}))&lt;/script&gt;
+
+&lt;p&gt;  &lt;strong&gt;&lt;em&gt;UEVar(m)&lt;/em&gt;&lt;/strong&gt; 包含了m中向上展示的变量，即在m中没有重新定义就使用的变量，这种关系在LLVM中一般对应一种use关系。而 &lt;strong&gt;&lt;em&gt;VarKill(m)&lt;/em&gt;&lt;/strong&gt; 则代表了在m中被重新定义的变量，重新定义即代表原值的生命周期结束，所以被kill掉。上述方程上划线代表了 &lt;em&gt;VarKill(m)&lt;/em&gt; 的逻辑补集，这里的m则是n的某后继节点。&lt;/p&gt;
+
+&lt;p&gt;  究竟怎么样才算变量存活嘞？对于一个基本程序块m来说，一般只有两种情况，某变量v：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;在m中，对v重新定义之前就使用了v，这种情况就是&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;v \in UEVar(m)&lt;/script&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;v在退出程序块m时仍然是存活的，就是v”毫发无损”的穿过了m，因为m中没有对v进行重新定义，在m后的block有对v的use，所以这种情况就是：&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;v \in LiveOut(m) \cap \overline {VarKill(m)}&lt;/script&gt;
+
+&lt;p&gt;于是乎，把这俩集合并起来就是m对对 &lt;em&gt;LiveOut(n)&lt;/em&gt; 的贡献，然后把所有n的后继m的结果并起来就是整个 &lt;em&gt;LiveOut(n)&lt;/em&gt; 的正确结果。&lt;/p&gt;
+
+&lt;p&gt;  关于这部分内容，在李樾老师的《软件分析》第4课中有所介绍，但是迭代方式稍有不同，他给出了另一个公式：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;LiveOut(n) = \mathop{\cup}\limits_{m \in succ(n)}(UEVar(m)\cup(LiveOut(m) - VarKill(m))&lt;/script&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;缺个图片儿～ 给出这两种情况展示图&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;  事实上这两个公式是一个意思，这个方程描述了一个&lt;strong&gt;反向数据流问题&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;反向数据流问题： 信息沿着图的边的反向流动。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;  那么为啥这里要取所有后继节点m的运算结果的并集嘞？因为后继的任何一个Basic Block用到了某变量v都会产生一个use关系，因此都有可能引发变量的未初始化调用。所以这个数据流分析应该属于 &lt;strong&gt;&lt;em&gt;May Analysis&lt;/em&gt;&lt;/strong&gt;, 故应当使用并集运算，而 &lt;strong&gt;&lt;em&gt;Must Analysis&lt;/em&gt;&lt;/strong&gt; 通常使用交集的运算。&lt;/p&gt;
+
+&lt;h3 id=&quot;迭代法求不动点&quot;&gt;迭代法求不动点&lt;/h3&gt;
+
+&lt;p&gt;  数据流分析我们通常使用迭代法来reach fixed point。对于一个过程，我们可以使用如下三步来实现算法：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;构建CFG&lt;/li&gt;
+  &lt;li&gt;收集初始信息 – 通过一个pass来初始化 &lt;em&gt;UEVar&lt;/em&gt; 和 &lt;em&gt;VarKill&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;求不动方程 – 通过多趟pass来迭代，计算LiveOut集合，最后达到不动点。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;具体实现的伪代码如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;收集初始信息&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# assume block b has k operations
+# of form &quot;x = y op z&quot;
+&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# Collect initial info
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UEVar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;null&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VarKill&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;null&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VarKill&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UEVar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;z&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;varKill&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UEVar&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;z&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;VarKill&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# init every block
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;block&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;求解不动方程&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# assume CFG has N blocks
+# numbered 0 to N - 1
+&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GetLiveOutPass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LiveOut&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;null&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;true&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;false&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LiveOut&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LiveOut&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recompute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LiveOut&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="program analysis" /><summary type="html">  《Engineering a Compiler》中的8.6.1章介绍了一种数据流分析算法，Live variable analysis，即活动变量分析，这种技术可以用来检测未初始化变量的使用。编译器或者代码扫描器可以发现并报告这种漏洞。</summary></entry><entry><title type="html">SSA相关知识(1)–Dominator Frontier</title><link href="http://localhost:4000/blog/ssa1" rel="alternate" type="text/html" title="SSA相关知识(1)--Dominator Frontier" /><published>2020-07-09T00:00:00+08:00</published><updated>2020-07-09T00:00:00+08:00</updated><id>http://localhost:4000/blog/ssa1</id><content type="html" xml:base="http://localhost:4000/blog/ssa1">&lt;p&gt;  和好哥们一起参加了毕昇杯编译系统大赛，要手撕一个编译器，邢神带我们搞，按照llvm的结构进行设计，并且把&lt;a href=&quot;https://github.com/MaxXSoft/YuLang&quot;&gt;YuLang&lt;/a&gt;的部分代码直接迁移了过来，我目前的感受是，这个项目的扩展性真的好。我主要负责平台无关优化，由于存在PassManager这种结构，所以我只需要写相关的pass即可完成优化，不得不说这种设计是真的神奇。&lt;/p&gt;
 
 &lt;p&gt;  由于前端直接生成SSA较为复杂，因此yulang的变量分配并不是纯SSA，使用alloc/store的方式来规避phi节点等其他问题，这也是llvm所支持的IR(如下代码)。因为LLVM本身具有一个&lt;a href=&quot;https://github.com/llvm-mirror/llvm/blob/master/lib/Transforms/Utils/Mem2Reg.cpp&quot;&gt;mem2reg&lt;/a&gt;的pass来实现将alloc转为寄存器变量。我接下来也要实现这个pass然后才能进一步优化。&lt;/p&gt;
 
@@ -2756,39 +2858,4 @@ pwndbg&amp;gt; x/20xg 0x603290
 &lt;p&gt;&lt;a href=&quot;https://zh.wikipedia.org/wiki/ElGamal%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95&quot;&gt;维基百科&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://www.anquanke.com/post/id/159893&quot;&gt;安全客&lt;/a&gt;
-&lt;a href=&quot;https://www.cnblogs.com/Kalafinaian/p/7392505.html&quot;&gt;ECC原理解析&lt;/a&gt;&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="crypto" /><category term="ECC" /><summary type="html">前言   近日NSA向微软公布了一个基于ECC加密的漏洞(CVE-2020-0601)，该漏洞出现于Windows CryptoAPI(Crypt32.dll)做签名验证的部分，该漏洞可能导致严重的威胁。下面我们来分析一下这个漏洞</summary></entry><entry><title type="html">Unsorted-bin Attack</title><link href="http://localhost:4000/blog/Unsorted-bin-Attack" rel="alternate" type="text/html" title="Unsorted-bin Attack" /><published>2020-01-18T00:00:00+08:00</published><updated>2020-01-18T00:00:00+08:00</updated><id>http://localhost:4000/blog/Unsorted-bin-Attack</id><content type="html" xml:base="http://localhost:4000/blog/Unsorted-bin-Attack">&lt;h2 id=&quot;前言&quot;&gt;前言&lt;/h2&gt;
-&lt;p&gt;  这两天学习Unsorted-bin Attack的过程中遇到了一些令我十分困惑的细节，我只好一边读glibc源码一边排查问题，记录一下我的心路历程，免得下次遇到又忘了。&lt;/p&gt;
-
-&lt;h2 id=&quot;unsorted-bin-attack&quot;&gt;Unsorted-bin Attack&lt;/h2&gt;
-&lt;p&gt;  Unsorted-bin Attack的主要原理是通过修改unsorted-bin chunk的bk指针，然后可以将某段内存修改为一个很大的数。其实就是修改unsorted bin的front end chunk的bk指针，然后重新请求分配该chunk这个时候会发生一下事情：&lt;/p&gt;
-
-&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;      &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;victim&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unsorted_chunks&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;av&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unsorted_chunks&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;av&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-          &lt;span class=&quot;n&quot;&gt;bck&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;victim&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-          &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;chunksize&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;victim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-          &lt;span class=&quot;n&quot;&gt;mchunkptr&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;chunk_at_offset&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;victim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-          &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__glibc_unlikely&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SIZE_SZ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-              &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__glibc_unlikely&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;av&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;system_mem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;malloc_printerr&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;malloc(): invalid size (unsorted)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-          &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__glibc_unlikely&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chunksize_nomask&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SIZE_SZ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-              &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__glibc_unlikely&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chunksize_nomask&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;av&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;system_mem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;malloc_printerr&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;malloc(): invalid next size (unsorted)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-          &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__glibc_unlikely&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;prev_size&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SIZE_BITS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;malloc_printerr&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;malloc(): mismatching next-&amp;gt;prev_size (unsorted)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-          &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__glibc_unlikely&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bck&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;victim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-              &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__glibc_unlikely&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;victim&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unsorted_chunks&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;av&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;malloc_printerr&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;malloc(): unsorted double linked list corrupted&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-          &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__glibc_unlikely&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;prev_inuse&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;malloc_printerr&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;malloc(): invalid next-&amp;gt;prev_inuse (unsorted)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;cm&quot;&gt;/*
-             If a small request, try to use last remainder if it is the
-             only chunk in unsorted bin.  This helps promote locality for
-             runs of consecutive small requests. This is the only
-             exception to best-fit, and applies only when there is
-             no exact fit for a small chunk.
-           */&lt;/span&gt;
-           &lt;span class=&quot;p&quot;&gt;................&lt;/span&gt;
-                     &lt;span class=&quot;n&quot;&gt;unsorted_chunks&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;av&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bck&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-		             &lt;span class=&quot;n&quot;&gt;bck&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unsorted_chunks&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;av&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="HeapExploit" /><category term="thinking" /><summary type="html">前言   这两天学习Unsorted-bin Attack的过程中遇到了一些令我十分困惑的细节，我只好一边读glibc源码一边排查问题，记录一下我的心路历程，免得下次遇到又忘了。</summary></entry></feed>
+&lt;a href=&quot;https://www.cnblogs.com/Kalafinaian/p/7392505.html&quot;&gt;ECC原理解析&lt;/a&gt;&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="crypto" /><category term="ECC" /><summary type="html">前言   近日NSA向微软公布了一个基于ECC加密的漏洞(CVE-2020-0601)，该漏洞出现于Windows CryptoAPI(Crypt32.dll)做签名验证的部分，该漏洞可能导致严重的威胁。下面我们来分析一下这个漏洞</summary></entry></feed>
