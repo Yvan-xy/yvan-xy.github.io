@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "MayOS诞生记录",
+      "category" : "",
+      "tags"     : "OS",
+      "url"      : "/blog/MayOS",
+      "date"     : "2020-08-13 00:00:00 +0800"
+    } ,
+  
+    {
       "title"    : "Data Flow Analysis -- Live variable analysis",
       "category" : "",
       "tags"     : "program analysis",
