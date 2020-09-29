@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>ELF相关知识</b></h1>
+
+<p class="post-metadata text-muted">
+  18 March 2020 -
+  <b>4 mins read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#elf">
+    <span class="tag badge badge-pill text-primary border border-primary">ELF</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#c">
+    <span class="tag badge badge-pill text-primary border border-primary">C</span>
+  </a>
+  </p>
+
+<p>最近一个月学了一些零散的知识，本来在学习操作系统相关，想对着清华的ucore自己操作一下，结果bootloader没有达到理想的效果。
+然后zxy同学拉我去搞个比赛，要求实现一个对ELF签名的工具，最后要写一个内核模块去hook系统调用，如果签名验证通过就可以执行，否则
+不能执行。我的思路大致是这样的：</p>
+
+<ol>
+  <li>熟悉openssl,实现基本RSA签名</li>
+  <li>完成ELF文件读写模块，能够新建一个section，并将sign插入其中</li>
+  <li>能读.text section,并对其签名</li>
+  <li>完成证书相关的签名</li>
+  <li>内核模块的开发</li>
+</ol>
+
+<p>目前我已经基本完成了第三步，遇到的主要困难有：</p>
+
+<ol>
+  <li>openssl的文档过于垃圾，不知道怎么用</li>
+  <li>ELF文件的解析，需要十分熟悉其结构</li>
+</ol>
+
+<p>当然可以预知内核模块肯定也不好办，我之前都没有接触过。下面主要整理一下ELF相关的知识，以及给ELF文件添加一个section的方法。</p>
+
+<h3 id="elf相关">ELF相关</h3>
+
+<p>首先给一个ELF文件的结构图：</p>
+
+<p><img src="http://pic.dyf.ink/object_file_format.png" alt="object_file_format.png" /></p>
+
+<p>ELF文件有两种视图，一种是链接版，一种是执行版。链接版主要由section构成，运行版则主要有segment构成。那么section和segment的区别是什么？
+实际上segment由section构成，在映射到虚拟内存中后，就是我们常说的data segment，code segment之类的。所以我们主要关心section相关的结构。</p>
+
+<p>首先，我们可以看到，ELF文件由ELF Header，program Header，section，section Header构成。当然链接视图中，program header是可选的，因为他主要用于告诉系统如何创建进程。用于生成进程的目标文件必须具有程序头部表，但是重定位文件不需要这个表。下面给一个比较形象的图：</p>
+
+<p><img src="http://pic.dyf.ink/elf-layout.png" alt="elf-layout.png" /></p>
+
+<p>可以看到program header主要和segment有关，section header则存储了每个section相关的表项。而ELF header则存储了ELF的相关信息，比如代码段入口，section的数目，section header的offset之类的。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define EI_NIDENT   16
+</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span>   <span class="n">e_ident</span><span class="p">[</span><span class="n">EI_NIDENT</span><span class="p">];</span> <span class="c1">// 标志符</span>
+    <span class="n">ELF32_Half</span>      <span class="n">e_type</span><span class="p">;</span> 
+    <span class="n">ELF32_Half</span>      <span class="n">e_machine</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">e_version</span><span class="p">;</span>
+    <span class="n">ELF32_Addr</span>      <span class="n">e_entry</span><span class="p">;</span>
+    <span class="n">ELF32_Off</span>       <span class="n">e_phoff</span><span class="p">;</span>
+    <span class="n">ELF32_Off</span>       <span class="n">e_shoff</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">e_flags</span><span class="p">;</span>
+    <span class="n">ELF32_Half</span>      <span class="n">e_ehsize</span><span class="p">;</span>
+    <span class="n">ELF32_Half</span>      <span class="n">e_phentsize</span><span class="p">;</span>
+    <span class="n">ELF32_Half</span>      <span class="n">e_phnum</span><span class="p">;</span>
+    <span class="n">ELF32_Half</span>      <span class="n">e_shentsize</span><span class="p">;</span>
+    <span class="n">ELF32_Half</span>      <span class="n">e_shnum</span><span class="p">;</span>
+    <span class="n">ELF32_Half</span>      <span class="n">e_shstrndx</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">Elf32_Ehdr</span><span class="p">;</span>
+</code></pre></div></div>
+<p>这个是ELF Header的结构体,这个结构体一般存储了ELF文件的关键信息，通常情况下，我们可以通过<code class="highlighter-rouge">readelf -h a</code>来查看一个ELF文件的头，其实熟悉之后直接<code class="highlighter-rouge">xxd a</code>手撕16进制就行了（逃…那么我们接下来随便举个栗子：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@Aurora:/home/code/solo/rubbish/hardwork/casual<span class="o">(</span>master⚡<span class="o">)</span> <span class="c"># readelf -h a   </span>
+ELF 头：
+  Magic：  7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  类别:                              ELF32
+  数据:                              2 补码，小端序 <span class="o">(</span>little endian<span class="o">)</span>
+  Version:                           1 <span class="o">(</span>current<span class="o">)</span>
+  OS/ABI:                            UNIX - System V
+  ABI 版本:                          0
+  类型:                              DYN <span class="o">(</span>共享目标文件<span class="o">)</span>
+  系统架构:                          Intel 80386
+  版本:                              0x1
+  入口点地址：              0x1060
+  程序头起点：              52 <span class="o">(</span>bytes into file<span class="o">)</span>
+  Start of section headers:          14328 <span class="o">(</span>bytes into file<span class="o">)</span>
+  标志：             0x0
+  Size of this header:               52 <span class="o">(</span>bytes<span class="o">)</span>
+  Size of program headers:           32 <span class="o">(</span>bytes<span class="o">)</span>
+  Number of program headers:         11
+  Size of section headers:           40 <span class="o">(</span>bytes<span class="o">)</span>
+  Number of section headers:         30
+  Section header string table index: 29
+</code></pre></div></div>
+<p>这是一个十分简单的hello world程序，再接下来给出前0x80个字节的hexdump：</p>
+
+<pre><code class="language-hex">00000000: 7f45 4c46 0101 0100 0000 0000 0000 0000  .ELF............
+00000010: 0300 0300 0100 0000 6010 0000 3400 0000  ........`...4...
+00000020: f837 0000 0000 0000 3400 2000 0b00 2800  .7......4. ...(.
+00000030: 1e00 1d00 0600 0000 3400 0000 3400 0000  ........4...4...         // 其实ELF Header到0x33即(1d00)的时候就结束了
+00000040: 3400 0000 6001 0000 6001 0000 0400 0000  4...`...`.......
+00000050: 0400 0000 0300 0000 9401 0000 9401 0000  ................
+00000060: 9401 0000 1300 0000 1300 0000 0400 0000  ................
+00000070: 0100 0000 0100 0000 0000 0000 0000 0000  ................
+00000080: 0000 0000 bc03 0000 bc03 0000 0400 0000  ................
+</code></pre>
+
+<p>这里是<code class="highlighter-rouge">readelf -S -W a</code>的末尾结果：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[24] .data             PROGBITS        00004014 003014 000008 00  WA  0   0  4
+[25] .bss              NOBITS          0000401c 00301c 000004 00  WA  0   0  1
+[26] .comment          PROGBITS        00000000 00301c 000026 01  MS  0   0  1
+[27] .symtab           SYMTAB          00000000 003044 000450 10     28  45  4
+[28] .strtab           STRTAB          00000000 003494 00025c 00      0   0  1
+[29] .shstrtab         STRTAB          00000000 0036f0 000105 00      0   0  1
+</code></pre></div></div>
+
+<p>在这里不想太深入的介绍每个字段代表的详细意义，具体请参考<a href="https://ctf-wiki.github.io/ctf-wiki/executable/elf/elf-structure-zh/">ctf-wiki</a>或者阅读《程序员的自我修养》这本书，内容十分详细，我们这里只带大家复习一些比较重要的字段。</p>
+
+<ul>
+  <li><strong>e_shoff</strong><br />
+  这一项给出节头表在文件中的字节偏移（ Section Header table OFFset ）如果文件中没有节头表，则为 0</li>
+  <li><strong>e_shentsize</strong><br />
+  这一项给出节头的字节长度（Section Header ENTry SIZE）。一个节头是节头表中的一项；节头表中所有项占据的空间大小相同。</li>
+  <li><strong>e_shnum</strong> <br />
+  这一项给出节头表中的项数（Section Header NUMber）。因此， e_shnum 与 e_shentsize 的乘积即为节头表的字节长度。如果文件中没有节头表，则该项值为 0。</li>
+  <li><strong>e_shstrndx</strong> <br />
+  这一项给出节头表中与节名字符串表相关的表项的索引值（Section Header table InDeX related with section name STRing table）。如果文件中没有节名字符串表，则该项值为SHN_UNDEF。</li>
+</ul>
+
+<p>我们的目标是向ELF中插入一个section，那么首先要清楚ELF是怎么存储并识别section的，按照开发者的思路，我们很容易想到我们可以把每个section的信息和特征抽象成一个struct，然后把所有的struct存入一个数组，最后把数组的地址放入ELF Header就可以了。这样我们就可以直接通过ELF Header来获得section struct数组，进而间接获得section的信息。其实上面这几个字段的作用便是如此。存储struct的数组就是上面提到的Section Header Table，在ELF文件的末尾。</p>
+
+<p><code class="highlighter-rouge">.shstrtab</code>是一个字符串section，他存储了所有section的名字，ELF Header中的<code class="highlighter-rouge">e_shstrndx</code>便是其在Section Header Table中的索引，因此想要获得<code class="highlighter-rouge">.shstrtab</code>的真是偏移我们只需要按如下公式计算:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shstrtabOff</span> <span class="o">=</span> <span class="n">e_shoff</span> <span class="o">+</span> <span class="n">e_shstrndx</span> <span class="o">*</span> <span class="n">e_shentsize</span>    <span class="c1">// 基址 + 索引 × 大小</span>
+</code></pre></div></div>
+
+<p>那怎么获得section name在<code class="highlighter-rouge">.shstrtab</code>中的具体偏移呀？其实section struct的真是名字叫Elf32_Shdr(32位)</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">ELF32_Word</span>      <span class="n">sh_name</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">sh_type</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">sh_flags</span><span class="p">;</span>
+    <span class="n">ELF32_Addr</span>      <span class="n">sh_addr</span><span class="p">;</span>
+    <span class="n">ELF32_Off</span>       <span class="n">sh_offset</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">sh_size</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">sh_link</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">sh_info</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">sh_addralign</span><span class="p">;</span>
+    <span class="n">ELF32_Word</span>      <span class="n">sh_entsize</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">Elf32_Shdr</span><span class="p">;</span>
+</code></pre></div></div>
+<p>这个结构提存储了每个section的详细信息，第一个字段<code class="highlighter-rouge">sh_name</code>是section name在<code class="highlighter-rouge">.shstrtab</code>中的偏移。</p>
+
+<p>那么我们究竟要怎样才能插入一个section呢？步骤大致如下：</p>
+
+<ol>
+  <li>想Section Header Table中插入new section Header</li>
+  <li>向<code class="highlighter-rouge">.shstrtab</code>section中插入new section的section name</li>
+  <li>修改<code class="highlighter-rouge">.shstrtab</code>的<code class="highlighter-rouge">sh_size</code></li>
+  <li>修改ELF Header中的<code class="highlighter-rouge">e_shnum</code>字段</li>
+  <li>向目标位置写入section内容</li>
+</ol>
+
+<p>那么我们似乎遇到了一些困惑，<code class="highlighter-rouge">.shstrtab</code>section在ELF文件的中间，万一空间不够添加section name了咋整。不如我们直接添加到文件的末尾吧，然后修改一下sh_name不就可以了吗。
+似乎想法不错，但是这里需要注意的是，我们<strong>要记得修改<code class="highlighter-rouge">.shstrtab</code>的<code class="highlighter-rouge">sh_size</code></strong>,否则还没查到文件末尾就终止了。</p>
+
+<p>修改后的ELF尾应该长这样：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>|------------------------|
+|  section Header Table  |-----&gt;这里已经插入了new section header
+|------------------------|
+|  new  section  name    |
+|------------------------|
+|  section      contain  |
+|------------------------|----&gt; end
+</code></pre></div></div>
+
+<p>插入new section Header难点在计算shstrtab的偏移，首先你需要用<code class="highlighter-rouge">filesize - shstrtab.sh_offset</code>来获得字符串在<code class="highlighter-rouge">.shstrtab</code>中的偏移，至于怎么获得<code class="highlighter-rouge">shstrtab.sh_offset</code>…你需要先根据ELF Header中的相关字段找到<code class="highlighter-rouge">.shstrtab</code>的section Header，获取对应字段就ok了。这里需要注意要将section header的其他字段设置正确就可以了。</p>
+
+<p>接下来，我们需要修改<code class="highlighter-rouge">.shstrtab</code>的<code class="highlighter-rouge">sh_size</code>，用<code class="highlighter-rouge">filesize - shstrtab.sh_offset</code>就ok了，然后去修改ELF Header里的<code class="highlighter-rouge">e_shnum</code>字段，加1即可。最后向文件尾插入对应size的内容就ok了，最后我们看一下程序运行的demo：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  [25] .bss              NOBITS          0000000000004078 003078 000008 00  WA  0   0  1
+  [26] .comment          PROGBITS        0000000000000000 003078 000026 01  MS  0   0  1
+  [27] .symtab           SYMTAB          0000000000000000 0030a0 0006d8 18     28  45  8
+  [28] .strtab           STRTAB          0000000000000000 003778 0002af 00      0   0  1
+  [29] .shstrtab         STRTAB          0000000000000000 003a27 0008cf 00      0   0  1
+  [30] .sign             NOTE            00000000000042f8 0042f8 000100 00   A  0   0  1
+</code></pre></div></div>
+
+<p>可以看到我们成功多加了一个<code class="highlighter-rouge">.sign</code>section，再来看看文件尾：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>000042f0: 2e73 6967 6e00 0000 24e4 639b 5a57 60ec  .sign...$.c.ZW`.
+00004300: 1aa4 e313 cb4d 3fb9 9177 0539 2551 a21d  .....M?..w.9%Q..
+...
+000043f0: be18 7eb1 25af f246                      ..~.%..F
+</code></pre></div></div>
+<p>确实符合section name + section contain的结构，看来原理是没问题的，经测试可以通过readelf和objdump的检测。最后附上源码地址<a href="https://github.com/Explainaur/ELFSign">ELFSign</a>，大家可以自己试一下。</p>
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/ELF%E6%80%BB%E7%BB%93 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>

