@@ -79,13 +79,13 @@
   </a>
   </p>
 
-<p>  It has been a long time since I wrote the last blog, because I was preparing the Toefl and GRE exam 😢 (so hard). I reviewed the data flow analysis algoritms recently by watching the Li Yue’s videos and reading <em>Engineer A Compiler</em>. Here are some ideas.</p>
+<p>It has been a long time since I wrote the last blog, because I was preparing the Toefl and GRE exam 😢 (so hard). I reviewed the data flow analysis algoritms recently by watching the Li Yue’s videos and reading <em>Engineer A Compiler</em>. Here are some ideas.</p>
 
 <h2 id="whats-the-reaching-definition">What’s the Reaching definition</h2>
 
-<p>  In some case the compiler need to know that where the operand has been defined. To find a set of definitions that reach a blocl, the compilers can compute the <em>reaching definitions</em>.</p>
+<p>In some case the compiler need to know that where the operand has been defined. To find a set of definitions that reach a blocl, the compilers can compute the <em>reaching definitions</em>.</p>
 
-<p>  The domain of the <strong>Reaches</strong> is the set of definitions in the procedure. The definition <em>b</em> of some vaiable <em>v</em> reaches operation <em>i</em> if and only if <em>i</em> reads the value of <em>v</em> and there exists a path that from <em>d</em> to <em>i</em> does not redefine <em>v</em>.</p>
+<p>The domain of the <strong>Reaches</strong> is the set of definitions in the procedure. The definition <em>b</em> of some vaiable <em>v</em> reaches operation <em>i</em> if and only if <em>i</em> reads the value of <em>v</em> and there exists a path that from <em>d</em> to <em>i</em> does not redefine <em>v</em>.</p>
 
 <h2 id="whats-the-use-of-reaching-definition">What’s the use of Reaching definition</h2>
 
