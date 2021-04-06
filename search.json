@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "Data Flow Analysis -- Available Expression",
+      "category" : "",
+      "tags"     : "program analysis",
+      "url"      : "/blog/avaliable-expression",
+      "date"     : "2021-04-06 00:00:00 +0800"
+    } ,
+  
+    {
       "title"    : "Data Flow Analysis -- Reaching definition Analysis",
       "category" : "",
       "tags"     : "program analysis",

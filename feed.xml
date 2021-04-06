@@ -1,4 +1,82 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2021-04-06T13:57:21+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">Data Flow Analysis – Reaching definition Analysis</title><link href="http://localhost:4000/blog/reaching-define" rel="alternate" type="text/html" title="Data Flow Analysis -- Reaching definition Analysis" /><published>2021-04-05T00:00:00+08:00</published><updated>2021-04-05T00:00:00+08:00</updated><id>http://localhost:4000/blog/reaching-define</id><content type="html" xml:base="http://localhost:4000/blog/reaching-define">&lt;p&gt;It has been a long time since I wrote the last blog, because I was preparing the Toefl and GRE exam 😢 (so hard). I reviewed the data flow analysis algoritms recently by watching the Li Yue’s videos and reading &lt;em&gt;Engineer A Compiler&lt;/em&gt;. Here are some ideas.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2021-04-06T21:57:29+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">dyf’s blog</title><subtitle>&quot;一只猫～&quot;</subtitle><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><entry><title type="html">Data Flow Analysis – Available Expression</title><link href="http://localhost:4000/blog/avaliable-expression" rel="alternate" type="text/html" title="Data Flow Analysis -- Available Expression" /><published>2021-04-06T00:00:00+08:00</published><updated>2021-04-06T00:00:00+08:00</updated><id>http://localhost:4000/blog/avaliable-expression</id><content type="html" xml:base="http://localhost:4000/blog/avaliable-expression">&lt;h2 id=&quot;what-is-available-expression&quot;&gt;What is available expression&lt;/h2&gt;
+
+&lt;p&gt;An expression &lt;em&gt;e&lt;/em&gt; is &lt;em&gt;avaliable&lt;/em&gt; at point &lt;em&gt;p&lt;/em&gt; in a procedure if and only if on every path from the entry to &lt;em&gt;p&lt;/em&gt;, &lt;em&gt;e&lt;/em&gt; is evaluated and not of its constituent subexpressions is redefined between that evaluation and &lt;em&gt;p&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;The Result of the analysis can be use for Common Expression Elimination.&lt;/p&gt;
+
+&lt;h2 id=&quot;algorithm&quot;&gt;Algorithm&lt;/h2&gt;
+
+&lt;p&gt;This analysis annotate each node &lt;em&gt;n&lt;/em&gt; in the &lt;strong&gt;CFG&lt;/strong&gt; with a set &lt;strong&gt;AvailIn(n)&lt;/strong&gt;, which contains the names of all expressions in the procedure that are available on entry to the block corresponding to &lt;em&gt;n&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;To compute the &lt;strong&gt;AvailIn(n)&lt;/strong&gt;, the compiler initially set:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;AvailIn(n0) = \Phi&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;AvailIn(n) = \{all \,\, expressions \}, \forall n \neq n0&lt;/script&gt;
+
+&lt;p&gt;The last expression means that we should set all bits of the &lt;strong&gt;AvailIn&lt;/strong&gt; (bit-vector) as 1.&lt;/p&gt;
+
+&lt;p&gt;Next, it solves the following equations:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;AvailIn(n) = \mathop{\cap}\limits_{m \in preds(n)} (DEExpr(m) \cup (AvailIn(m) \cap \overline{ExprKill(m)}))&lt;/script&gt;
+
+&lt;p&gt;&lt;strong&gt;DEExpr(n)&lt;/strong&gt; is the set of downward exposed expression in &lt;em&gt;n&lt;/em&gt;. An expression &lt;em&gt;e&lt;/em&gt; in &lt;strong&gt;DEExpr(n)&lt;/strong&gt; if and only if &lt;em&gt;n&lt;/em&gt; evaluate &lt;em&gt;e&lt;/em&gt; and none of &lt;em&gt;e’s&lt;/em&gt; operands is defined between the last evaluation of &lt;em&gt;e&lt;/em&gt; in &lt;em&gt;n&lt;/em&gt; and the end of &lt;em&gt;n&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;ExprKill(n)&lt;/strong&gt; contains all those expression “is killed” by the definitions in &lt;em&gt;n&lt;/em&gt;. A expression is killed if one or more of its operands are redefined in the block.&lt;/p&gt;
+
+&lt;p&gt;An expression &lt;em&gt;e&lt;/em&gt; is available on entry to &lt;em&gt;n&lt;/em&gt; if and only if it is available on exit from each of &lt;em&gt;n&lt;/em&gt;’s predecessors in the &lt;strong&gt;CFG&lt;/strong&gt;. As the equation states, an expression &lt;em&gt;e&lt;/em&gt; is available on exit from block &lt;em&gt;m&lt;/em&gt; if one of two conditions holds: either &lt;em&gt;e&lt;/em&gt; is downward exposed in &lt;em&gt;m&lt;/em&gt;, or it is available on entry to &lt;em&gt;m&lt;/em&gt; and is not killed in &lt;em&gt;m&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;AvailIn&lt;/strong&gt; sets can be used to perform global redundancy elimination, some times called &lt;em&gt;global common subexpression elimination&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;implemention&quot;&gt;Implemention&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Gather initial information and initilize the bit-vector&lt;/li&gt;
+  &lt;li&gt;Perform the iteration to approach the fixed point&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Gather initial information and initilize the bit-vector&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# assume CFG has N blocks
+# numbered 0 to N - 1
+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oprand_to_stmt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;InitBlock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;statements&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AvailIn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# set all bits of the vector to 1
+&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;statements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oprand&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oprands&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;oprand_to_stmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;insert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oprand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DEExpr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Expr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IsDefine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ExprKill&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oprand_to_stmt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DEExpr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DeleteIfExit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oprand_to_stmt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stmt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AvailIn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;InitBlock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Solve the fixed point equations&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# assume CFG has N blocks
+# numbered 0 to N - 1
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GetAvailableExprOut&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;true&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;false&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AvailableExprOut&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AvailableExprOut&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;recompute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cfg&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AvailableExprOut&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;changed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;true&lt;/span&gt;        
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="program analysis" /><summary type="html">What is available expression</summary></entry><entry><title type="html">Data Flow Analysis – Reaching definition Analysis</title><link href="http://localhost:4000/blog/reaching-define" rel="alternate" type="text/html" title="Data Flow Analysis -- Reaching definition Analysis" /><published>2021-04-05T00:00:00+08:00</published><updated>2021-04-05T00:00:00+08:00</updated><id>http://localhost:4000/blog/reaching-define</id><content type="html" xml:base="http://localhost:4000/blog/reaching-define">&lt;p&gt;It has been a long time since I wrote the last blog, because I was preparing the Toefl and GRE exam 😢 (so hard). I reviewed the data flow analysis algoritms recently by watching the Li Yue’s videos and reading &lt;em&gt;Engineer A Compiler&lt;/em&gt;. Here are some ideas.&lt;/p&gt;
 
 &lt;h2 id=&quot;whats-the-reaching-definition&quot;&gt;What’s the Reaching definition&lt;/h2&gt;
 
@@ -28,7 +106,7 @@
 
 &lt;ol&gt;
   &lt;li&gt;Build the cfg&lt;/li&gt;
-  &lt;li&gt;Gather initial information: compute the &lt;strong&gt;Reaches&lt;/strong&gt; and the &lt;strong&gt;DefKill&lt;/strong&gt; and build a map of the name to defination points with a pass&lt;/li&gt;
+  &lt;li&gt;Gather initial information: compute the &lt;strong&gt;DEDef&lt;/strong&gt; and the &lt;strong&gt;DefKill&lt;/strong&gt; and build a map of the name to defination points with a pass&lt;/li&gt;
   &lt;li&gt;Perform the iteration to approach the fixed point&lt;/li&gt;
 &lt;/ol&gt;
 
@@ -37,7 +115,8 @@
   &lt;li&gt;Gather the initial information&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;multi_map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;statement&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;definition_info&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# used to record the oprands and its owners
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;multi_map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;statement&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;definition_info&lt;/span&gt; 
 
 &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Reaches&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;null&lt;/span&gt;
@@ -48,7 +127,7 @@
 &lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DefKill&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                  &lt;span class=&quot;c1&quot;&gt;# build DefKill set
 &lt;/span&gt;        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oprand&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;oprands&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
             &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;oprand&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DefKill&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Reaches&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;              &lt;span class=&quot;c1&quot;&gt;# build Reaches set
+                &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DEDef&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;              &lt;span class=&quot;c1&quot;&gt;# build DEDef set
 &lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
@@ -1726,50 +1805,4 @@ ccccc...c d
 &lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
 &lt;hr /&gt;
 &lt;p&gt;  这个题目很复杂，我们主要用到了uaf，double free，实现了任意写的效果，最后通过覆写malloc_hook来getshell，里面的一些细节需要注意，比如如何根据unsorted-bin计算main_arena进而获得offset。还有循环链表的构造方式，感觉除了刷题很难有手感。&lt;br /&gt;
-  总之今天学到了很多知识。&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="HeapExploit" /><category term="pwn" /><summary type="html">Arbitrary Alloc   这种利用方式就是在目标位置伪造一个chunk，然后overwrite当前fastbin中chunk的fd指针，指向该chunk，进而实现任意写。这种漏洞往往伴随着double free，我们可以通过构造循环链表来控制fd指针。其中，最重要的步骤就是构造fake_chunk的size字段，通常我们可能会覆盖__malloc_hook，于是在其周围伪造fastbin时往往需要错位来满足size，这里可以手算，我比较习惯用find_fake_fast &amp;lt;addr&amp;gt; size来快速查找合适的位置:</summary></entry><entry><title type="html">大二下的TODO List</title><link href="http://localhost:4000/blog/2020plan" rel="alternate" type="text/html" title="大二下的TODO List" /><published>2020-02-15T00:00:00+08:00</published><updated>2020-02-15T00:00:00+08:00</updated><id>http://localhost:4000/blog/2020plan</id><content type="html" xml:base="http://localhost:4000/blog/2020plan">&lt;h3 id=&quot;过去一年&quot;&gt;过去一年&lt;/h3&gt;
-&lt;hr /&gt;
-&lt;p&gt;2020到了，我也没有来得及去年的总结，一直拖到了现在。总的来说2019发生了以下事情：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;在bangcle打工，弄二进制和区块链&lt;/li&gt;
-  &lt;li&gt;去打信安国赛，被大佬们吊起来打&lt;/li&gt;
-  &lt;li&gt;一周刷完了HDLBits，速成了verilog&lt;/li&gt;
-  &lt;li&gt;暑假学习体系结构，撸了一个cpu（感谢刑神的帮助）&lt;/li&gt;
-  &lt;li&gt;和dashjay写了一个verilog的测评机，他去了海大交流&lt;/li&gt;
-  &lt;li&gt;日穿了学校内网，领导受惊，被抓&lt;/li&gt;
-  &lt;li&gt;参加国庆学生游行，站在了天安门前，很自豪&lt;/li&gt;
-  &lt;li&gt;做好几门课的助教，发现没有几个人喜欢底层知识，很失望&lt;/li&gt;
-  &lt;li&gt;经历自我怀疑与否定，在颓废中迷失方向&lt;/li&gt;
-  &lt;li&gt;打算去面试，激励一下自己，没想到chaitin收留了我，找回自信&lt;/li&gt;
-  &lt;li&gt;鼓起勇气，和喜欢的人走在了一起&lt;/li&gt;
-  &lt;li&gt;终于读完了malloc的源码，开启了心心念heap之旅&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;  我似乎每过一个阶段都会感到迷茫，当初的目标似乎变得有些模糊，我总担心自己成长的太慢，每一天都十分焦虑。我逐渐开始担心，我毕业之后，究竟应该干什么。今年GPA这些东西依旧消耗了我大量精力，我不得不在休息的时间去学大物这种东西。有时候，看着室友们打打游戏，写写作业看看ppt，考前刷刷题突击一下，考出的高高的成绩，似乎远比我这样劳神费力看那些经典大黑书，自己亲手写一遍代码来的更加划算。&lt;br /&gt;
-&lt;!-- &amp;emsp;&amp;emsp;我是一个计算机爱好者，我有些担心自己辜负了这份骄傲。看着身边的人几乎把所有的热情都投入到了分数上面，家里人也一直给我压力，让我读研，我不禁怀疑，是我错了，还是他们所有人错了。   --&gt;
-&lt;!-- &amp;emsp;&amp;emsp;太中二了，现在&quot;黑客&quot;这两个字已经变成了嘲讽那些脚本小子的词汇了。但是每当想到自己在Cyber Space中大杀四方的流氓行为，幻想着自己创造的蠕虫怼爆别人缓冲区的时候，总是激动的浑身发抖。这份热情到底能支撑我多久？我害怕被生活搓平了棱角，迫于生计而去弄一些风口上的&quot;热门&quot;，我害怕因为浮躁而变得沉不下心来读书。当今中国的内卷与失败在于价值观单一，在于绝大部分人都想去做同样的事情，只认可寥寥几种对“成功”的定义和通向“成功”的道路。假如你与众不同，你会被孤立。与我而言，当探索不再带来快乐的时候，那才是真正的失败。忍受寂寞，似乎是一场修行。   --&gt;
-&lt;!-- &amp;emsp;&amp;emsp;于是，我只有一个愿望，愿我能永远爱我所爱，永远热泪盈眶。   --&gt;
-  过去的2019,我经历了许多冒险，也收获了爱情，经历过低谷，也获得过肯定，总之它十分精彩。&lt;/p&gt;
-
-&lt;h3 id=&quot;接下来半年&quot;&gt;接下来半年&lt;/h3&gt;
-&lt;hr /&gt;
-&lt;p&gt;我还需要付出更多努力，下学期我需要做的事情：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;沉下心来，务实做事&lt;/li&gt;
-  &lt;li&gt;锻炼身体，保持健康，拒绝熬夜&lt;/li&gt;
-  &lt;li&gt;学习操作系统，过一遍UNIX的api&lt;/li&gt;
-  &lt;li&gt;学习英语，已经几乎不能再拖了&lt;/li&gt;
-  &lt;li&gt;陪女朋友出去玩，不要因为代码而失去了生活&lt;/li&gt;
-  &lt;li&gt;刷算法题，提高硬编程能力&lt;/li&gt;
-  &lt;li&gt;多复现漏洞，向swing大佬看齐&lt;/li&gt;
-  &lt;li&gt;如果有精力，最好学一下计算机网络&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;最后送给自己一句话勉励自己，勿忘初心,脚踏实地：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;如果我感到无从下手，一定是因为我不了解细节&lt;/strong&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;作为一个长期从事逆向，在各大CTF赛事砍下过许多奇怪的高分逆向题目，同时目睹身边0ops几大逆向机以及蓝莲花两大逆向机在各类逆向上砍瓜切菜的科研喵，表示以我所见所闻，所有人肉逆向机的特点，都是扎实到不能再扎实的四大基本功（操作系统，编译原理，程序设计语言和计算机体系结构），有了内功加持，看一切汇编代码，脑中自会有高抽象的模型浮现（而这正是大部分非科班出身逆向分析人员最薄弱的一环），这是胜过一切反编译器的智慧的体现。实际上，我所见的逆向机们从未说专门靠学什么特别的“逆向材料”得以突飞猛进，以我自己的经验，多年的逆向分析可能只会让你在两方面有所加强，一是使用工具的熟练，二是猜出某些特定的程序风格。但是回到最开始的问题，要想学习Linux逆向其实是个伪命题，扎扎实实把你要逆向的领域的开发知识弄得滚瓜烂熟，自然就水到渠成了&lt;/p&gt;
-&lt;/blockquote&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="plan" /><category term="life" /><summary type="html">过去一年 2020到了，我也没有来得及去年的总结，一直拖到了现在。总的来说2019发生了以下事情：</summary></entry></feed>
+  总之今天学到了很多知识。&lt;/p&gt;</content><author><name>dyf</name><email>dyf.auroa@gmail.com</email></author><category term="HeapExploit" /><category term="pwn" /><summary type="html">Arbitrary Alloc   这种利用方式就是在目标位置伪造一个chunk，然后overwrite当前fastbin中chunk的fd指针，指向该chunk，进而实现任意写。这种漏洞往往伴随着double free，我们可以通过构造循环链表来控制fd指针。其中，最重要的步骤就是构造fake_chunk的size字段，通常我们可能会覆盖__malloc_hook，于是在其周围伪造fastbin时往往需要错位来满足size，这里可以手算，我比较习惯用find_fake_fast &amp;lt;addr&amp;gt; size来快速查找合适的位置:</summary></entry></feed>

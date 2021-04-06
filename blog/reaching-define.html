@@ -109,7 +109,7 @@
 
 <ol>
   <li>Build the cfg</li>
-  <li>Gather initial information: compute the <strong>Reaches</strong> and the <strong>DefKill</strong> and build a map of the name to defination points with a pass</li>
+  <li>Gather initial information: compute the <strong>DEDef</strong> and the <strong>DefKill</strong> and build a map of the name to defination points with a pass</li>
   <li>Perform the iteration to approach the fixed point</li>
 </ol>
 
@@ -118,7 +118,8 @@
   <li>Gather the initial information</li>
 </ul>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">multi_map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">statement</span><span class="o">*&gt;</span> <span class="n">definition_info</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># used to record the oprands and its owners
+</span><span class="n">multi_map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">statement</span><span class="o">*&gt;</span> <span class="n">definition_info</span> 
 
 <span class="k">def</span> <span class="nf">Init</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
     <span class="n">b</span><span class="o">.</span><span class="n">Reaches</span> <span class="o">=</span> <span class="n">null</span>
@@ -129,7 +130,7 @@
 </span>            <span class="n">b</span><span class="o">.</span><span class="n">DefKill</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>                  <span class="c1"># build DefKill set
 </span>        <span class="k">for</span> <span class="n">oprand</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">oprands</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">oprand</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">DefKill</span><span class="p">():</span>
-                <span class="n">b</span><span class="o">.</span><span class="n">Reaches</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>              <span class="c1"># build Reaches set
+                <span class="n">b</span><span class="o">.</span><span class="n">DEDef</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>              <span class="c1"># build DEDef set
 </span>
 </code></pre></div></div>
 

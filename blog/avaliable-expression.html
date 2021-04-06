@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>Data Flow Analysis -- Available Expression</b></h1>
+
+<p class="post-metadata text-muted">
+  06 April 2021 -
+  <b>3 mins read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#program-analysis">
+    <span class="tag badge badge-pill text-primary border border-primary">program analysis</span>
+  </a>
+  </p>
+
+<h2 id="what-is-available-expression">What is available expression</h2>
+
+<p>An expression <em>e</em> is <em>avaliable</em> at point <em>p</em> in a procedure if and only if on every path from the entry to <em>p</em>, <em>e</em> is evaluated and not of its constituent subexpressions is redefined between that evaluation and <em>p</em>.</p>
+
+<p>The Result of the analysis can be use for Common Expression Elimination.</p>
+
+<h2 id="algorithm">Algorithm</h2>
+
+<p>This analysis annotate each node <em>n</em> in the <strong>CFG</strong> with a set <strong>AvailIn(n)</strong>, which contains the names of all expressions in the procedure that are available on entry to the block corresponding to <em>n</em>.</p>
+
+<p>To compute the <strong>AvailIn(n)</strong>, the compiler initially set:</p>
+
+<script type="math/tex; mode=display">AvailIn(n0) = \Phi</script>
+
+<script type="math/tex; mode=display">AvailIn(n) = \{all \,\, expressions \}, \forall n \neq n0</script>
+
+<p>The last expression means that we should set all bits of the <strong>AvailIn</strong> (bit-vector) as 1.</p>
+
+<p>Next, it solves the following equations:</p>
+
+<script type="math/tex; mode=display">AvailIn(n) = \mathop{\cap}\limits_{m \in preds(n)} (DEExpr(m) \cup (AvailIn(m) \cap \overline{ExprKill(m)}))</script>
+
+<p><strong>DEExpr(n)</strong> is the set of downward exposed expression in <em>n</em>. An expression <em>e</em> in <strong>DEExpr(n)</strong> if and only if <em>n</em> evaluate <em>e</em> and none of <em>e’s</em> operands is defined between the last evaluation of <em>e</em> in <em>n</em> and the end of <em>n</em>.</p>
+
+<p><strong>ExprKill(n)</strong> contains all those expression “is killed” by the definitions in <em>n</em>. A expression is killed if one or more of its operands are redefined in the block.</p>
+
+<p>An expression <em>e</em> is available on entry to <em>n</em> if and only if it is available on exit from each of <em>n</em>’s predecessors in the <strong>CFG</strong>. As the equation states, an expression <em>e</em> is available on exit from block <em>m</em> if one of two conditions holds: either <em>e</em> is downward exposed in <em>m</em>, or it is available on entry to <em>m</em> and is not killed in <em>m</em>.</p>
+
+<p><strong>AvailIn</strong> sets can be used to perform global redundancy elimination, some times called <em>global common subexpression elimination</em>.</p>
+
+<h2 id="implemention">Implemention</h2>
+
+<ol>
+  <li>Gather initial information and initilize the bit-vector</li>
+  <li>Perform the iteration to approach the fixed point</li>
+</ol>
+
+<ul>
+  <li>Gather initial information and initilize the bit-vector</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># assume CFG has N blocks
+# numbered 0 to N - 1
+</span><span class="nb">map</span> <span class="o">&lt;</span><span class="n">stmt</span><span class="p">,</span> <span class="n">stmt</span><span class="o">&gt;</span> <span class="n">oprand_to_stmt</span><span class="p">;</span>
+
+<span class="k">def</span> <span class="nf">InitBlock</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">statements</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">AvailIn</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># set all bits of the vector to 1
+</span>    <span class="k">for</span> <span class="n">stmt</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">statements</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">oprand</span> <span class="ow">in</span> <span class="n">stmt</span><span class="o">.</span><span class="n">oprands</span><span class="p">():</span>
+            <span class="n">oprand_to_stmt</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span><span class="n">oprand</span><span class="p">,</span> <span class="n">stmt</span><span class="p">})</span>
+
+        <span class="n">b</span><span class="o">.</span><span class="n">DEExpr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">Expr</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">IsDefine</span><span class="p">(</span><span class="n">stmt</span><span class="p">):</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">ExprKill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oprand_to_stmt</span><span class="p">[</span><span class="n">stmt</span><span class="p">])</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">DEExpr</span><span class="o">.</span><span class="n">DeleteIfExit</span><span class="p">(</span><span class="n">oprand_to_stmt</span><span class="p">[</span><span class="n">stmt</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">Init</span><span class="p">():</span>
+    <span class="n">cfg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">AvailIn</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">InitBlock</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>  
+</code></pre></div></div>
+
+<ul>
+  <li>Solve the fixed point equations</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># assume CFG has N blocks
+# numbered 0 to N - 1
+</span><span class="k">def</span> <span class="nf">GetAvailableExprOut</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="n">changed</span> <span class="o">=</span> <span class="n">true</span>
+    <span class="k">while</span> <span class="n">changed</span><span class="p">:</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="n">false</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">AvailableExprOut</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">AvailableExprOut</span><span class="o">.</span><span class="n">recompute</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">AvailableExprOut</span><span class="o">.</span><span class="n">changed</span><span class="p">:</span>
+                <span class="n">changed</span> <span class="o">=</span> <span class="n">true</span>        
+</code></pre></div></div>
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/avaliable-expression class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>
