@@ -108,14 +108,14 @@
 
 <p>首先给一个ELF文件的结构图：</p>
 
-<p><img src="http://pic.dyf.ink/object_file_format.png" alt="object_file_format.png" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/object_file_format.png" alt="object_file_format.png" /></p>
 
 <p>ELF文件有两种视图，一种是链接版，一种是执行版。链接版主要由section构成，运行版则主要有segment构成。那么section和segment的区别是什么？
 实际上segment由section构成，在映射到虚拟内存中后，就是我们常说的data segment，code segment之类的。所以我们主要关心section相关的结构。</p>
 
 <p>首先，我们可以看到，ELF文件由ELF Header，program Header，section，section Header构成。当然链接视图中，program header是可选的，因为他主要用于告诉系统如何创建进程。用于生成进程的目标文件必须具有程序头部表，但是重定位文件不需要这个表。下面给一个比较形象的图：</p>
 
-<p><img src="http://pic.dyf.ink/elf-layout.png" alt="elf-layout.png" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/elf-layout.png" alt="elf-layout.png" /></p>
 
 <p>可以看到program header主要和segment有关，section header则存储了每个section相关的表项。而ELF header则存储了ELF的相关信息，比如代码段入口，section的数目，section header的offset之类的。</p>
 

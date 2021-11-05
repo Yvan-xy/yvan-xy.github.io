@@ -151,7 +151,7 @@
 </code></pre></div></div>
 <p>  在这里,gcc驱动程序读取源程序文件hello.c,并把它翻译成一个可执行的二进制文件,这个翻译过程可分为四个阶段,如下图.这四个阶段的程序(预处理器 编译器 汇编器 链接器)构成了编译系统(Compilation System)</p>
 
-<p><img src="http://pic.dyf.ink/com.png" alt="compilation system" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/com.png" alt="compilation system" /></p>
 
 <ul>
   <li>预处理阶段: 预处理器(cpp)根据一字符#开头的命令修改原始C程序.比如hello.c的第一行<code class="highlighter-rouge">#include&lt;stdio.h&gt;</code>命令告诉预处理器读取系统头文件stdio.h的内容,并把它直接插入文本程序中.结果就的到了另一个C程序,通常以”.i”作为后缀.</li>
@@ -267,7 +267,7 @@ ret
   <li><code class="highlighter-rouge">push</code>: 相信大家应该都用过C++里面的Vector了,应该都比较熟悉push和pop了.push和pop本就是为了栈(Stack)这种数据结构所设计的,<code class="highlighter-rouge">push</code>和<code class="highlighter-rouge">pop</code>分别描述了入栈和出栈的操作.</li>
 </ul>
 
-<p><img src="http://pic.dyf.ink/Data_stack.png" alt="data_stack" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/Data_stack.png" alt="data_stack" /></p>
 
 <p>  push就是将数据推入栈中,pop则是从栈中弹出.看似简单的数据结构是则是为了适应工业要求而诞生的产物.在同学们的印象里stack似乎是为了做算法题才创造出来的,实则不是,上古时期,科学家在研究函数调用时发现,他们需要一种能够保存当前状态的东西,这样才能实现函数的递归调用.这样解释可能还是有些抽象.我们举个例子,相信大家都看过«盗梦空间»这部电影,我们可以在梦里做梦,深入好几层梦境,其实这就类似与函数的递归,但是如果想要进入下一层梦境,你就必须要储存好当前的状态,这样一来,当你每次醒来时,你都处在之前保存好的状态之中.对于函数而言,每次从内层调用中返回,你都要恢复调用之前的状态,例如:</p>
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">A</span><span class="p">(){</span>
@@ -294,7 +294,7 @@ ret
   </blockquote>
 </blockquote>
 
-<p><img src="http://pic.dyf.ink/memory.png" alt="memory" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/memory.png" alt="memory" /></p>
 
 <p>  我们在这里只是简单的介绍一下原理,更多的细节在后面会分析.</p>
 
@@ -314,7 +314,7 @@ ret
 
 <p>  先给大家一张寄存器的图:</p>
 
-<p><img src="http://pic.dyf.ink/register.png" alt="register" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/register.png" alt="register" /></p>
 
 <p>  我们可以看到图中写了一些你根本看不懂的东西(%rax之类的),那就是寄存器的名字,首先这附图的最右边介绍了各种寄存器的作用,比如%rax的作用是储存”Return value”,即储存返回值.接着我们看图的最上面写着几个神秘数字<code class="highlighter-rouge">0 7 8 15 31 63</code>,这一串神秘数字代表了寄存器的大小,你可以清楚的看到,当寄存器的大小不同时,他们的名字似乎不太一样.比如%rax包括了%eax,而%eax包括了%ax,%ax又包括了%ah和%al.为啥好端端的寄存器要分这么细呀?这是由于历史原因造成的.</p>
 
@@ -400,11 +400,11 @@ ret
 
 <p>  基本的指令其实没有几条,上面已经介绍不少了,我们再介绍几个常用的就可以开始实战了,下面我们看个例子:</p>
 
-<p><img src="http://pic.dyf.ink/example.png" alt="example" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/example.png" alt="example" /></p>
 
 <p>  首先可以告诉大家这个程序是有严重漏洞的,可以导致系统被”get shell”(就是说拿到最高控制权限啦).</p>
 
-<p><img src="http://pic.dyf.ink/example1.png" alt="example1" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/example1.png" alt="example1" /></p>
 
 <p>  这是老师课件上的例题,这就是教科书式的漏洞,这段程序与上边的汇编的区别就是输出的方式不同,汇编里用的puts()函数,下面使用了for loop进行输出.其他的基本一致.漏洞就发生在被标红的gets函数那里,我记得这一课讲的是如何把输入的空格读进来,因为cin不行,所以选择了gets()函数.在此强调:</p>
 
@@ -453,7 +453,7 @@ ret
 </blockquote>
 
 <p>  放一下上面那段程序的AT&amp;T代码:
-<img src="http://pic.dyf.ink/example_atnt.png" alt="att" /></p>
+<img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/example_atnt.png" alt="att" /></p>
 
 <p>接下来我们进行重点讲解,函数调用时栈的构造与内存变化及传参方式.</p>
 
@@ -483,7 +483,7 @@ ret
 
 <p>  函数调用栈的典型内存布局如下图所示：</p>
 
-<p><img src="http://pic.dyf.ink/stack_frame1.jpg" alt="stack_frame1" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/stack_frame1.jpg" alt="stack_frame1" /></p>
 
 <p>  图中给出主调函数(caller)和被调函数(callee)的栈帧布局，”m(%ebp)”表示以EBP为基地址、偏移量为m字节的内存空间(中的内容)。该图基于两个假设：第一，函数返回值不是结构体或联合体，否则第一个参数将位于”12(%ebp)” 处；第二，每个参数都是4字节大小(栈的粒度为4字节)。在本文后续章节将就参数的传递和大小问题做进一步的探讨。  此外，函数可以没有参数和局部变量，故图中“Argument(参数)”和“Local Variable(局部变量)”不是函数栈帧结构的必需部分。</p>
 
@@ -499,7 +499,7 @@ ret
 
 <p>  若需在函数中保存被调函数保存寄存器(如ESI、EDI)，则编译器在保存EBP值时进行保存，或延迟保存直到局部变量空间被分配。在栈帧中并未为被调函数保存寄存器的空间指定标准的存储位置。包含寄存器和临时变量的函数调用栈布局可能如下图所示：</p>
 
-<p><img src="http://pic.dyf.ink/stack_frame2.jpg" alt="stack_frame2" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/stack_frame2.jpg" alt="stack_frame2" /></p>
 
 <blockquote>
   <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 在多线程(任务)环境，栈顶指针指向的存储器区域就是当前使用的堆栈。切换线程的一个重要工作，就是将栈顶指针设为当前线程的堆栈栈顶地址。
@@ -563,7 +563,7 @@ ret
 
 <p>  基于以上指令，使用C调用约定的被调函数典型的函数序和函数跋实现如下:</p>
 
-<p><img src="http://pic.dyf.ink/func.png" alt="func" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/func.png" alt="func" /></p>
 
 <blockquote>
   <p>若主调函数和调函数均未使用局部变量寄存器EDI、ESI和EBX，则编译器无须在函数序中对其压栈，以便提高程序的执行效率。</p>
@@ -571,7 +571,7 @@ ret
 
 <p>  参数压栈指令因编译器而异，如下两种压栈方式基本等效：</p>
 
-<p><img src="http://pic.dyf.ink/func1.png" alt="func1" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/func1.png" alt="func1" /></p>
 
 <p>  两种压栈方式均遵循C调用约定，但方式二中主调函数在调用返回后并未显式清理堆栈空间。因为在被调函数序阶段，编译器在栈顶为函数参数预先分配内存空间(sub指令)。函数参数被复制到栈中(而非压入栈中)，并未修改栈顶指针，故调用返回时主调函数也无需修改栈顶指针。gcc3.4(或更高版本)编译器采用该技术将函数参数传递至栈上，相比栈顶指针随每次参数压栈而多次下移，一次性设置好栈顶指针更为高效。设想连续调用多个函数时，方式二仅需预先分配一次参数内存(大小足够容纳参数尺寸和最大的函数即可)，后续调用无需每次都恢复栈顶指针。注意，函数被调用时，两种方式均使栈顶指针指向函数最左边的参数。本文不再区分两种压栈方式，”压栈”或”入栈”所提之处均按相应汇编代码理解，若无汇编则指方式二。</p>
 
@@ -677,7 +677,7 @@ C++为兼容C，仍然支持函数带有可变的参数。但在C++中更好的�
 </ul>
 
 <p>上述调用约定的主要特点如下表所示：
-<img src="http://pic.dyf.ink/feature.png" alt="feature" /></p>
+<img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/feature.png" alt="feature" /></p>
 
 <blockquote>
   <p>关于传参方法:</p>
@@ -691,7 +691,7 @@ C++为兼容C，仍然支持函数带有可变的参数。但在C++中更好的�
   </li>
 </ul>
 
-<p><img src="http://pic.dyf.ink/tail.png" alt="tail" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/tail.png" alt="tail" /></p>
 
 <ul>
   <li>浮点参数的传递:
@@ -701,7 +701,7 @@ C++为兼容C，仍然支持函数带有可变的参数。但在C++中更好的�
   </li>
 </ul>
 
-<p><img src="http://pic.dyf.ink/tail1.png" alt="float" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/tail1.png" alt="float" /></p>
 
 <ul>
   <li>结构体和联合体参数的传递:
@@ -933,7 +933,7 @@ buffer.c:(.text+0x97): 警告：the `gets'</span> <span class="k">function </spa
  8049225:       c3                      ret    
 </code></pre>
 
-<p><img src="http://pic.dyf.ink/a1.png" alt="a1" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/a1.png" alt="a1" /></p>
 
 <p>我猜你开始不想看了,别着急,我们直接看关键处:</p>
 
@@ -1073,7 +1073,7 @@ $
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="nb">whoami</span>
 </code></pre></div></div>
 
-<p><img src="http://pic.dyf.ink/a2.png" alt="a2" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/a2.png" alt="a2" /></p>
 
 <p>  很酷是不是,一下子就获得上帝的权限,root就是linux中的上帝,掌握一切生杀大权,到此为止,你已经拿下了你的第一台主机了.</p>
 
@@ -1218,7 +1218,7 @@ $
 gdb&gt; start
 </code></pre></div></div>
 
-<p><img src="http://pic.dyf.ink/gdb1.png" alt="gdb1" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/gdb1.png" alt="gdb1" /></p>
 
 <p>  你会看到你的gdb跟我的一比简直low爆了…这是因为我装了插件,诸位暂时还是不要安装插件,因为你对gdb还不够熟悉,如果十分想要模仿我的话可以安装peda或者pwndbg.</p>
 
@@ -1332,7 +1332,7 @@ Breakpoint 1, 0x080486ae <span class="k">in </span>main <span class="o">()</span
 
 <p>​												加油,你真棒!</p>
 
-<p><img src="http://pic.dyf.ink/giveup.jpg" alt="giveup" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/giveup.jpg" alt="giveup" /></p>
 
 <p>  </p>
 

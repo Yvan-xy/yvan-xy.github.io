@@ -133,6 +133,7 @@
 <hr />
 
 <h4 id="经典构造法">经典构造法</h4>
+
 <p>本书中介绍的算法是相当经典的算法，感兴趣的可以看论文《Efficiently computing static single assignment form and the control dependence graph》，大概就是：</p>
 
 <ol>
@@ -189,7 +190,7 @@
 </code></pre>
 
 <p>cfg大致如下：
-<img src="http://pic.dyf.ink/1-2020-7-09.png" alt="cfg" /></p>
+<img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/1-2020-7-09.png" alt="cfg" /></p>
 
 <p>  这里可以发现一个问题，<code class="highlighter-rouge">b = a</code>赋值的时候，我们需要确定到底是选择a1还是a2,因此需要插入一个phi函数。计算在何处插入正确的 Φ ，一种方法是在所有有多个前驱的Basic Block的开头插入 Φ-node，但是这种方法会插入很多的无用的 Φ-node ，有很多 Φ-node 的参数都是相同的一个定义。</p>
 
@@ -203,7 +204,7 @@
 
 <p>举个例子：</p>
 
-<p><img src="http://pic.dyf.ink/2-2020-7-09.jpeg" alt="graph" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/2-2020-7-09.jpeg" alt="graph" /></p>
 
 <p>  在这张图中结点1支配所有的节点，因为他是入口结点，所以到达每个结点都必须经过它。结点2只支配他自己，因为没有结点必须经过2。</p>
 
@@ -217,7 +218,7 @@
 
 <p>其实上面这个公式的意思就是，求n的前趋的支配域的交集然后并上{n}，具体的迭代算法过程为：</p>
 
-<p><img src="http://pic.dyf.ink/4-2020-7-09.png" alt="iter" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/4-2020-7-09.png" alt="iter" /></p>
 
 <p>  一直迭代CFG的Dom集合，直到不发生变化，即到达fixed point，至于这个迭代算法为什么能停下来我这里就不证明了，</p>
 
@@ -227,7 +228,7 @@
 
 <p>  这个概念比较好理解，根据cfg的支配信息，建立一个支配树，如下图所示：</p>
 
-<p><img src="http://pic.dyf.ink/3-2020-7-09.png" alt="dominator_tree" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/3-2020-7-09.png" alt="dominator_tree" /></p>
 
 <p>  该树的边使用一种简单的方式编码了IDom集合。若m为IDom(n),则支配者树中必然有一条边从m指向n，即n为m的子结点。比如3,4,6都是2的子结点，尽管6并不是2的直接后继。</p>
 
@@ -278,7 +279,7 @@
 
 <p>然后根据Dom值计算出IDom值，实际上IDom值就是其父结点，然后根据IDom值构造Dominator Tree即可。</p>
 
-<p><img src="http://pic.dyf.ink/7-2020-7-09.png" alt="cfg" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/7-2020-7-09.png" alt="cfg" /></p>
 
 <h3 id="0x04-支配边界dominator-frontier">0x04 支配边界(Dominator Frontier)</h3>
 
@@ -299,11 +300,11 @@
 
 <p>说人话就是，所有最近不能被n严格支配的节点的集合就是DF(n)，即支配边界。如下图，<code class="highlighter-rouge">DF(5) = {4, 5, 12, 13}</code></p>
 
-<p><img src="http://pic.dyf.ink/5-2020-7-09.png" alt="df" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/5-2020-7-09.png" alt="df" /></p>
 
 <p>可是支配边界的作用是什么呢？我们上面已经解释过了，只有在到达结点 n 的支配边界的时候，才需要考虑其他路径是否有对 n 结点中某值的定义并且插入适当的 Φ-function。</p>
 
-<p><img src="http://pic.dyf.ink/6-2020-7-09.png" alt="df1" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/6-2020-7-09.png" alt="df1" /></p>
 
 <p>  虽然从结点1的角度来看，它支配结点（例如9，10，11）可能会用到x:3，但并不意味着这些节点里不需要插入ϕ\phiϕ-function的。</p>
 
@@ -329,7 +330,7 @@
 
 <p>  该算法会定位到CFG中的各个汇合点就。接下来，对j的每个前趋p，从p开始沿着支配者树向上走，直到找到一个直接支配j的结点。按照下图举个例子：</p>
 
-<p><img src="http://pic.dyf.ink/7-2020-7-09.png" alt="df2" /></p>
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/7-2020-7-09.png" alt="df2" /></p>
 
 <ol>
   <li>B1 对于其在CFG中的前趋B0，发现B0是IDom(B1)，因此不进入while循环。对于其前趋B3,此时将B1添加到DF(B3)中，接下来进入B1，将B1添加到DF(B1)中，然后前进到B0，然后停止。</li>
