@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>Data Flow Analysis -- Reaching definition Analysis</b></h1>
+
+<p class="post-metadata text-muted">
+  05 April 2021 -
+  <b>3 mins read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#program-analysis">
+    <span class="tag badge badge-pill text-primary border border-primary">program analysis</span>
+  </a>
+  </p>
+
+<p>It has been a long time since I wrote the last blog, because I was preparing the Toefl and GRE exam 😢 (so hard). I reviewed the data flow analysis algoritms recently by watching the Li Yue’s videos and reading <em>Engineer A Compiler</em>. Here are some ideas.</p>
+
+<h2 id="whats-the-reaching-definition">What’s the Reaching definition</h2>
+
+<p>In some case the compiler need to know that where the operand has been defined. To find a set of definitions that reach a blocl, the compilers can compute the <em>reaching definitions</em>.</p>
+
+<p>The domain of the <strong>Reaches</strong> is the set of definitions in the procedure. The definition <em>b</em> of some vaiable <em>v</em> reaches operation <em>i</em> if and only if <em>i</em> reads the value of <em>v</em> and there exists a path that from <em>d</em> to <em>i</em> does not redefine <em>v</em>.</p>
+
+<h2 id="whats-the-use-of-reaching-definition">What’s the use of Reaching definition</h2>
+
+<p>We can build the define-use chain to perform the further optimization. Also, we can perform some easy checking such as <em>using uninitialized variables</em>. We can add dummy definitions in the entry node. The uninitialized values are used if any dummy definitions reach a program point <em>p</em>.</p>
+
+<h2 id="algorithm">Algorithm</h2>
+
+<p>The compiler annotates each node <em>n</em> in the CFG with a set <strong>REACHES(n)</strong>, computed as the a forward data-flow problem:</p>
+
+<script type="math/tex; mode=display">Reaches(n) = \Phi, \forall n</script>
+
+<script type="math/tex; mode=display">Reaches(n) = \mathop{\cup}\limits_{m \in preds(n)} (DEDef(m) \cup (Reaches(m) \cap \overline{DefKill(m)}))</script>
+
+<p>The <strong>DEDef</strong> is the downward-exposed definitions in <em>m</em>. <strong>DefKill(m)</strong> contains all the definition points that are obscured by a definition of the same name in <em>m</em>; <em>d</em> in <strong>DefKill(m)</strong> if <em>d</em> defines some name <em>v</em> and <em>m</em> contains a definition that also defines <em>v</em>.</p>
+
+<p><strong>DEDef</strong> and <strong>DefKill</strong> are both defined over the set of definition points, but computing each of them requires a mapping from names (variables and compiler-generated temporatries) to definition points.</p>
+
+<h2 id="using-iteration-algorithm-to-approach-the-fixed-point">Using iteration algorithm to approach the fixed point</h2>
+
+<p>Just like the liveness analysis, we can use the iteration method to reach the fixed point. For one procedure, we can implement the algorithm by three steps:</p>
+
+<ol>
+  <li>Build the cfg</li>
+  <li>Gather initial information: compute the <strong>Reaches</strong> and the <strong>DefKill</strong> and build a map of the name to defination points with a pass</li>
+  <li>Perform the iteration to approach the fixed point</li>
+</ol>
+
+<p>The pseudo codes are following:</p>
+<ul>
+  <li>Gather the initial information</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">multi_map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">statement</span><span class="o">*&gt;</span> <span class="n">definition_info</span>
+
+<span class="k">def</span> <span class="nf">Init</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">Reaches</span> <span class="o">=</span> <span class="n">null</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">DefKill</span> <span class="o">=</span> <span class="n">null</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">statements</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">IsDefineStmt</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+            <span class="n">definition_info</span><span class="o">.</span><span class="n">insert</span><span class="p">((</span><span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">))</span>    <span class="c1"># build map
+</span>            <span class="n">b</span><span class="o">.</span><span class="n">DefKill</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>                  <span class="c1"># build DefKill set
+</span>        <span class="k">for</span> <span class="n">oprand</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">oprands</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">oprand</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">DefKill</span><span class="p">():</span>
+                <span class="n">b</span><span class="o">.</span><span class="n">Reaches</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>              <span class="c1"># build Reaches set
+</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Perform the iteration algorithm</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># assume CFG has N blocks
+# numbered 0 to N - 1
+</span>
+<span class="k">def</span> <span class="nf">GetReachingDefinitionOutPass</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
+        <span class="n">bb</span><span class="o">.</span><span class="n">ReachingDefOut</span> <span class="o">=</span> <span class="n">null</span>
+
+    <span class="n">changed</span> <span class="o">=</span> <span class="n">true</span>
+    <span class="k">while</span> <span class="n">changed</span><span class="p">:</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="n">false</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ReachingDefOut</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">ReachingDefOut</span><span class="o">.</span><span class="n">recompute</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ReachingDefOut</span><span class="o">.</span><span class="n">changed</span><span class="p">:</span>
+                <span class="n">changed</span> <span class="o">=</span> <span class="n">true</span>
+</code></pre></div></div>
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/reaching-define class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>

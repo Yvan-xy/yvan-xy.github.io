@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""一只猫～"">
+
+  <title>dyf's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>dyf's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>WHIRL相关笔记(1)</b></h1>
+
+<p class="post-metadata text-muted">
+  26 February 2022 -
+  <b>5 mins read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#compiler">
+    <span class="tag badge badge-pill text-primary border border-primary">Compiler</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#open64">
+    <span class="tag badge badge-pill text-primary border border-primary">Open64</span>
+  </a>
+  </p>
+
+<h2 id="序">序</h2>
+
+<p>最近在公司做一个 RISC-V 的编译器, 要把 <a href="https://github.com/open64-compiler/open64">Open64</a> 的全局标量优化器 WOPT 接到 LLVM 的 Codegen 模块上，让 LLVM 去做 Code Generation 的工作。WOPT的 output 是一个相当经典的 IR，叫做WHIRL。至于为啥要用 Open64，我个人认为 Open64 的循环优化和标量优化比 LLVM 激进许多，优化效果也更好。由于 Open64 的文档十分稀少，我只能边读代码边问赖师傅（逃，写这篇文章记录一下我学到的知识。</p>
+
+<h2 id="whirl简介">WHIRL简介</h2>
+
+<p>WHIRL 是树形结构，并且具有5层抽象的 Muti-Level IR，它负责粘合 Open64 各个模块。作为抽象的 IR，你可以把任何前端接到 WHIRL 上，Open64 本身支持 C/C++、Java、FORTRAN 的前端，目前我们移植了 clang 作为最新的 C/C++ 前端。多层抽象的结构让 WHIRL 保存了足够多的信息来提高优化的结果，比如 WHIRL 收集的 induct variable 和 loop condition 相关的信息可以提高循环相关的优化的效率和结果。这些信息并不像LLVM转成 Low-Level 之后从新计算得到的，此时一些信息已经丢失了，比如循环以及循环嵌套深度之类的，需要重新根据支配性和数据流去计算（Pattern Match）。而 WHIRL 是直接从 Very High Level 保留循环的相关信息，在后续的优化中会把循环 normalize 到 Do-While 的形式，并持续补全必要的数据，最终传递到 Loop-Nest Optimezer(LNO) 中进行优化。</p>
+
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/whirl_struct.png" alt="whirl_struct" /></p>
+
+<p>一提到 IR 大家脑子里第一个反应估计就是三地址码 (Three address code) 或者 LLVM 那种 SSA 的形式。实际上有各种各样的 IR，线形的、树形的、图形的（Eg. <a href="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/sea_of_nodes.pdf">sea-of-nodes</a>）等等。上文提到 WHIRL 是树形的，下图是个简单的例子：</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/whirl_example.png" alt="whirl_example" /></p>
+
+<p>比较关键的点就是：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   I4I4LDID 0 &lt;2,1,a&gt; T&lt;4,.predef_I4,4&gt;         |=== Level 2
+   I4I4LDID 0 &lt;2,2,b&gt; T&lt;4,.predef_I4,4&gt;         |=== Level 2
+  I4ADD                                       |=== Level 1
+ I4RETURN_VAL {line: 1/2}                   &lt;=== Level 0
+</code></pre></div></div>
+
+<p>可能大家对树形的 IR 见的并不多，我第一次见到树形的 IR 是在虎书里，树形 (tree-based) IR 和 抽象语法树 (AST) 非常接近，稍微修饰或者调整一下就可以从 AST 发射到 树形 IR，因此树形 IR 的一个好处就是可以方便的表示高级的或者抽象的结构，例如循环，分支等。你甚至可以将其无损的转换回 AST结构或者源代码,Very High WHIRL可以转换回 FORTRAN。随着编译优化的逐步进行，IR 将一步步的 Lowing 到更加底层的形式，例如将分支循环转换成 <code class="highlighter-rouge">GOTO</code> 语句和基本块的形式。当然树形 IR 并不太适合做数据流分析，在Open64 中 WHIRL 主要用来做粘合剂，标量优化 (Scalar Optimization) 主要在 SSA 上进行，循环相关的优化可以在 WHIRL 上做。</p>
+
+<h2 id="whirl的构成">WHIRL的构成</h2>
+
+<p>IR 通常有三部分组成，控制流 (Control Flow)、指令和符号表 (Symbol Table)。WHIRL 也不例外，指令会被结构化的控制流包装起来，存放在<strong>程序单元</strong>(Program Units)中，类似于 LLVM Module 的概念。</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">f</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">short</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>该函数对应的 WHIRL:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FUNC_ENTRY &lt;1,60,f&gt; {line: 1/1}
+ IDNAME 0 &lt;2,1,a&gt;
+ IDNAME 0 &lt;2,2,b&gt;
+BODY
+ BLOCK {line: 1/1}
+ IF {line: 1/2}
+   I4I4LDID 0 &lt;2,1,a&gt; T&lt;4,.predef_I4,4&gt;
+   I4INTCONST 0 (0x0)
+  I4I4GT
+ THEN
+  BLOCK {line: 0/0}
+    I4I4LDID 0 &lt;2,1,a&gt; T&lt;4,.predef_I4,4&gt;
+    I4I2LDID 0 &lt;2,2,b&gt; T&lt;3,.predef_I2,2&gt;
+   I4ADD
+  I4RETURN_VAL {line: 1/3}
+  END_BLOCK
+ ELSE
+  BLOCK {line: 0/0}
+    I4I4LDID 0 &lt;2,1,a&gt; T&lt;4,.predef_I4,4&gt;
+    I4I2LDID 0 &lt;2,2,b&gt; T&lt;3,.predef_I2,2&gt;
+   I4MPY
+  I4RETURN_VAL {line: 1/5}
+  END_BLOCK
+ END_IF
+ RETURN {line: 1/7}
+ END_BLOCK
+</code></pre></div></div>
+
+<p>里面的 <code class="highlighter-rouge">IF</code> 和 <code class="highlighter-rouge">ELSE</code> 就是控制流相关的结构，。</p>
+
+<h3 id="instruction">Instruction</h3>
+
+<p>首先我们介绍指令，指令在代码中被实现为 <code class="highlighter-rouge">WN</code> 结构体。指令一共分为两种：<strong>Statement</strong> 和 <strong>Expression</strong>，Statement 是指可能有副作用 (Side effects) 的指令，例如 <code class="highlighter-rouge">CALL</code> 和 <code class="highlighter-rouge">ISTORE</code>，Expression 则是指没有副作用的语句，例如 <code class="highlighter-rouge">ADD</code>, <code class="highlighter-rouge">ILOAD</code> 等运算指令。副作用可以简单的理解为不会修改程序的内存。</p>
+
+<p>整个程序就是由 stmt 和 expr 构成一个树的结构，值得注意的是 stmt 的后代只能是 expr，同时 stmt 不可以是 expr 的后代 (在 VH WHIRL 中有例外)，例：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  I4I4LDID  0  &lt;2,1,a&gt;   T&lt;4,.predef_I4,4&gt;                   |=== EXPR: LDID
+I4STID  0  &lt;2,3,c&gt;   T&lt;4,.predef_I4,4&gt; {line: 1/2}        &lt;=== STMT: STID
+   |    |-------|           |
+   |        |               |
+operator  operands    High Level Type
+</code></pre></div></div>
+
+<p>一条指令由<strong>操作符</strong>(Operator)、<strong>返回类型</strong>(rtype) 和<strong>描述符类型</strong>(desc) 组成。操作符就是每条指令前面说明这条指令是做什么的，例如 <code class="highlighter-rouge">ADD</code>。返回类型指的是这条指令返回值的类型，描述符类型指的是操作数 (Operands) 的类型。例如 <code class="highlighter-rouge">I4I2LDID 0 &lt;2,2,b&gt; T&lt;3,.predef_I2,2&gt;</code> 的返回类型就是 <code class="highlighter-rouge">I2</code>，指两个字节的有符号整数，描述符类型则是 <code class="highlighter-rouge">I4</code>，指四个字节的有符号整数。</p>
+
+<blockquote>
+  <p>这里的I4实际上是个指针类型，WHIRL中指针和Int不做区分</p>
+</blockquote>
+
+<p>以上三个属性就限定一条 WHIRL Instruction。</p>
+
+<h3 id="data-types">Data Types</h3>
+
+<p>WHIRL 支持一下这些类型：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B</td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td>I1</td>
+      <td>8-bit signed integer</td>
+    </tr>
+    <tr>
+      <td>I2</td>
+      <td>16-bit signed intege</td>
+    </tr>
+    <tr>
+      <td>I4</td>
+      <td>32-bit signed intege</td>
+    </tr>
+    <tr>
+      <td>I8</td>
+      <td>64-bit signed intege</td>
+    </tr>
+    <tr>
+      <td>U1</td>
+      <td>8-bit unsigned integer</td>
+    </tr>
+    <tr>
+      <td>U2</td>
+      <td>16-bit unsigned integer</td>
+    </tr>
+    <tr>
+      <td>U4</td>
+      <td>32-bit unsigned integer</td>
+    </tr>
+    <tr>
+      <td>U8</td>
+      <td>64-bit unsigned intege</td>
+    </tr>
+    <tr>
+      <td>A4</td>
+      <td>32-bit address (behaves as unsigned)</td>
+    </tr>
+    <tr>
+      <td>A8</td>
+      <td>64-bit address (behaves as unsigned)</td>
+    </tr>
+    <tr>
+      <td>F4</td>
+      <td>32-bit IEEE floating point</td>
+    </tr>
+    <tr>
+      <td>F8</td>
+      <td>64-bit IEEE floating point</td>
+    </tr>
+    <tr>
+      <td>F10</td>
+      <td>80-bit IEEE floating point</td>
+    </tr>
+    <tr>
+      <td>F16</td>
+      <td>128-bit IEEE floating point</td>
+    </tr>
+    <tr>
+      <td>FQ</td>
+      <td>128-bit SGI floating point</td>
+    </tr>
+    <tr>
+      <td>C4</td>
+      <td>32-bit complex (64 bits total)</td>
+    </tr>
+    <tr>
+      <td>C8</td>
+      <td>64-bit complex (128 bits total)</td>
+    </tr>
+    <tr>
+      <td>CQ</td>
+      <td>128-bit complex (256 bits total).</td>
+    </tr>
+    <tr>
+      <td>V</td>
+      <td>Void</td>
+    </tr>
+    <tr>
+      <td>M</td>
+      <td>Struct and Array</td>
+    </tr>
+    <tr>
+      <td>BS</td>
+      <td>bits</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>以上类型被称为 Machine type(Mtype)，机器可以很容易表示的类型，一般写在指令的最前面，如 <code class="highlighter-rouge">I4ADD</code>。而我们注意到指令中还有 <code class="highlighter-rouge">T&lt;3,.predef_I2,2&gt;</code> 这样的类型描述，这个T开头的类型则指出了指令的 High-Level 的类型，比如 struct，array 等，并且 High-Level 的类型会被存放在 WHIRL 的符号表中。</p>
+
+<p>例如，以下 struct 在符号表中的表示：</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">list_data_s</span> <span class="p">{</span>
+    <span class="kt">short</span> <span class="n">data16</span><span class="p">;</span>
+    <span class="kt">short</span> <span class="n">idx</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">list_data</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/struct_in_symtab.png" alt="struct_in_symtab" /></p>
+
+<h3 id="kids-pointer">Kids Pointer</h3>
+
+<p>对于所有非叶子节点的指令，都有一个指其 kids 也就是其 Operands 的指针数组，对于能够确定 kids 数量的指令 kid_count 会指出它有都少操作数，对于 <code class="highlighter-rouge">BLOCK</code> 这种子节点数量不知道的指令，其使用 <code class="highlighter-rouge">first</code> 和 <code class="highlighter-rouge">last</code> 指针来维护一个双向链表。</p>
+
+<h3 id="instruction-layout">Instruction Layout</h3>
+
+<p>如上文提到，每条 Instruction 都是一个 WHIRL node，被表示成 <code class="highlighter-rouge">WN</code> 的结构体形式。<code class="highlighter-rouge">WN</code> 最小是24个字节，有两个操作数。如果超过两个操作数，则在该结构体的末端扩展内存来存放 kid pointers.
+<img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/WN_layout.png" alt="wn_layout" /></p>
+
+<h3 id="structured-control-flow-statements">Structured Control Flow Statements</h3>
+
+<p>WHIRL 中的结构化控制流语句是分层的 (hierarchical)，该结构中的所有 STMT 都是他的子节点。所有控制流语句的 rtype 和 desc 都是 “V”。下面来介绍各种结构化控制流语句。</p>
+
+<ul>
+  <li>FUNC_ENTRY
+    <ul>
+      <li>这个操作符代表函数入口，并且该操作符是每棵树的根节点。Kids 0..n-4 是 <code class="highlighter-rouge">IDNAME</code>，代表函数的形参</li>
+      <li>Kid n-3 和 n-2 都是是一个 <code class="highlighter-rouge">BLOCK</code>，它包含一系列 <code class="highlighter-rouge">PRAGMA</code>，可以理解为c/c++中的 <code class="highlighter-rouge">#pragma</code></li>
+      <li>Kid n-1 是一个 <code class="highlighter-rouge">BLOCK</code>，它代表函数体</li>
+    </ul>
+  </li>
+  <li>BLOCK
+    <ul>
+      <li>它包含任意数量的 STMT，并且维护成双向链表的形式</li>
+    </ul>
+  </li>
+  <li>DO_LOOP
+    <ul>
+      <li>用于表示 FORTRAN 中的 Do-Loop</li>
+    </ul>
+  </li>
+  <li>DO_WHILE
+    <ul>
+      <li>kid 0 是布尔表达式，代表循环条件</li>
+      <li>kid 1 是循环体</li>
+      <li>循环条件将在循环体最后被测试</li>
+    </ul>
+  </li>
+  <li>WHILE_DO
+    <ul>
+      <li>kid 0 是布尔表达式</li>
+      <li>kid 1 是循环体</li>
+      <li>循环条件在最开始被测试</li>
+    </ul>
+  </li>
+  <li>IF
+    <ul>
+      <li>用于表示程序中的 if 语句</li>
+      <li>kid 0 是条件表达式</li>
+      <li>kid 1 是 then-block</li>
+      <li>kid 2 是 else-block</li>
+    </ul>
+  </li>
+</ul>
+
+<p>DO_LOOP, DO_WHILE, WHILE_DO 和 IF只表示正常的 (well-formed) 高级控制流结构，不允许从外部直接 goto 到这些块，如果前端存在非法的控制流块，在第一个优化阶段，将筛选出此类非法的高级控制结构，并将其转换为普通控制流结构。</p>
+
+<h3 id="other-control-flow-statements">Other Control Flow Statements</h3>
+
+<p>其余的控制流语句都不是分层的。他们存在于所有level 的 WHIRL 中。</p>
+
+<ul>
+  <li>GOTO
+    <ul>
+      <li>无条件跳转</li>
+    </ul>
+  </li>
+  <li>GOTO_OUTER_BLOCK
+    <ul>
+      <li>从嵌套过程到父过程中标签的无条件跳转。它涉及过程调用堆栈的展开。</li>
+    </ul>
+  </li>
+  <li>SWITCH
+    <ul>
+      <li>跟源代码中的 switch 语句很接近</li>
+      <li>number entries 表示它跳转表的数量</li>
+      <li>kid 0 是条件表达式</li>
+      <li>kid 1 是他的跳转表</li>
+      <li>kid 2 是他的 defautl block</li>
+    </ul>
+  </li>
+</ul>
+
+<p>例如：</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">f</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">switch</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span>
+        <span class="k">case</span> <span class="mi">2</span><span class="p">:</span> <span class="k">return</span> <span class="n">b</span> <span class="o">+</span> <span class="mi">3</span><span class="p">;</span>
+        <span class="nl">default:</span> <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>其 switch 语句为：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SWITCH 2 258 {line: 1/3}
+  I4I4LDID 0 &lt;2,3,_temp__switch_index0&gt; T&lt;4,.predef_I4,4&gt;
+  BLOCK {line: 0/0}
+  CASEGOTO L514 1 {line: 1/3}
+  CASEGOTO L770 2 {line: 1/3}
+  END_BLOCK
+  GOTO L1026 {line: 1/6}
+END_SWITCH
+</code></pre></div></div>
+
+<ul>
+  <li>CASEGOTO
+    <ul>
+      <li>只存在于 SWITCH 中，用于表示条件跳转</li>
+      <li><code class="highlighter-rouge">CASEGOTO L514 1</code> 表示 cond 为1就跳到 L514</li>
+    </ul>
+  </li>
+  <li>COMPGOTO
+    <ul>
+      <li>和 SWITCH 很类似，唯一的区别是他的 case 永远从 0 开始，因此它的 <code class="highlighter-rouge">BLOCK</code> 中只有 <code class="highlighter-rouge">GOTO</code></li>
+      <li>该语句通常出现在 M/L WHIRL 中，即 SWITCH 被优化过的结果</li>
+    </ul>
+  </li>
+  <li>TRUEBR
+    <ul>
+      <li>条件跳转指令</li>
+      <li>kid 0 是条件表达式，为 true 则跳转至对应的 BLOCK，常用见 IF 语句被优化之后的结果</li>
+    </ul>
+  </li>
+  <li>FALSEBR
+    <ul>
+      <li>和 TRUEBR 类似</li>
+      <li>kid 0 是条件表达式，为 false 则跳转至对应的 BLOCK，常用见 IF 语句被优化之后的结果</li>
+    </ul>
+  </li>
+  <li>RETURN
+    <ul>
+      <li>无返回值的 return</li>
+    </ul>
+  </li>
+  <li>RETURN_VAL
+    <ul>
+      <li>kid 0 是其返回值</li>
+    </ul>
+  </li>
+  <li>LABEL
+    <ul>
+      <li>代表一个基本块的开始，和 C/C++ 里的 label 一样</li>
+    </ul>
+  </li>
+  <li>LOOP_INFO
+    <ul>
+      <li>不是一个STMT，用于储存循环相关的信息</li>
+    </ul>
+  </li>
+</ul>
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/whirl class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>
