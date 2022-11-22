@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "WHIRL相关笔记(2)",
+      "category" : "",
+      "tags"     : "Compiler, Open64",
+      "url"      : "/blog/whirl2",
+      "date"     : "2022-11-22 00:00:00 +0800"
+    } ,
+  
+    {
       "title"    : "WHIRL相关笔记(1)",
       "category" : "",
       "tags"     : "Compiler, Open64",

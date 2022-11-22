@@ -1,5 +1,5 @@
 function get_tools(repo_name) {
-  fetch(`https://api.github.com/repos/Explainaur/${repo_name}/topics`, {
+  fetch(`https://api.github.com/repos/Yvan-xy/${repo_name}/topics`, {
     headers: {
       Accept: "application/vnd.github.mercy-preview+json"
     }
