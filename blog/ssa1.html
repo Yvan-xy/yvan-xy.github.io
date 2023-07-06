@@ -194,7 +194,7 @@
 <p>cfg大致如下：
 <img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/1-2020-7-09.png" alt="cfg" /></p>
 
-<p>  这里可以发现一个问题，<code class="highlighter-rouge">b = a</code>赋值的时候，我们需要确定到底是选择a1还是a2,因此需要插入一个phi函数。计算在何处插入正确的 Φ ，一种方法是在所有有多个前驱的Basic Block的开头插入 Φ-node，但是这种方法会插入很多的无用的 Φ-node ，有很多 Φ-node 的参数都是相同的一个定义。</p>
+<p>  这里可以发现一个问题，<code class="language-plaintext highlighter-rouge">b = a</code>赋值的时候，我们需要确定到底是选择a1还是a2,因此需要插入一个phi函数。计算在何处插入正确的 Φ ，一种方法是在所有有多个前驱的Basic Block的开头插入 Φ-node，但是这种方法会插入很多的无用的 Φ-node ，有很多 Φ-node 的参数都是相同的一个定义。</p>
 
 <p>  这样得到的 SSA 形式的 IR，占用过多的内存，增加了计算的开销。任何使用该SSA进行代码分析或者优化的过程都会浪费很多计算资源。为了减少 Φ-function 的数量，首先想到的方法就是确定插入 Φ-function 的精确位置。</p>
 
@@ -212,11 +212,11 @@
 
 <p>  另外一个比较重要的概念就是 <strong><em>strictly dominates</em></strong>（严格支配），如果 <strong>d != n</strong> 且 <strong>d dom n</strong>， 那么 <strong>d sdom m</strong>，例如上图中 4 sdom 5。说白了就是<strong>不是自己支配自己</strong>。n的严格支配集记做 <strong><em>SDom(n)</em></strong>，该集合中，与n最近的结点称为n的<strong>直接支配结点</strong> <em>(immediate node)</em>，记做 <strong><em>IDom(n)</em></strong>。cfg的entry没有直接支配结点。例如5的直接支配结点是4,7的直接支配结点也是4.</p>
 
-<script type="math/tex; mode=display">SDom(n) = Dom(n)-\{n\}</script>
+\[SDom(n) = Dom(n)-\{n\}\]
 
 <p>  那么如何计算支配域Dom(n)呢，参考《Engineering a Compiler》这本书中的不懂点算法，下面给出介绍，非常刺激，核心就一句话，如下：</p>
 
-<script type="math/tex; mode=display">Dom(n) = \{n\}\cup(\mathop{\cap}\limits_{m \in preds(n)} Dom(m))</script>
+\[Dom(n) = \{n\}\cup(\mathop{\cap}\limits_{m \in preds(n)} Dom(m))\]
 
 <p>其实上面这个公式的意思就是，求n的前趋的支配域的交集然后并上{n}，具体的迭代算法过程为：</p>
 
@@ -298,9 +298,9 @@
 
 <p>有这种性质的节点m集合称为n的支配边界，记做DF(n)，例如上图中 <em>DF(2) = 7</em></p>
 
-<script type="math/tex; mode=display">DF(n) = \{m\mid q \in preds(m), n \in Dom(q)\}</script>
+\[DF(n) = \{m\mid q \in preds(m), n \in Dom(q)\}\]
 
-<p>说人话就是，所有最近不能被n严格支配的节点的集合就是DF(n)，即支配边界。如下图，<code class="highlighter-rouge">DF(5) = {4, 5, 12, 13}</code></p>
+<p>说人话就是，所有最近不能被n严格支配的节点的集合就是DF(n)，即支配边界。如下图，<code class="language-plaintext highlighter-rouge">DF(5) = {4, 5, 12, 13}</code></p>
 
 <p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/5-2020-7-09.png" alt="df" /></p>
 

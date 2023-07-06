@@ -83,7 +83,7 @@
 
 <h2 id="0x01-项目简介">0x01 项目简介</h2>
 
-<p>  本项目名为<a href="https://github.com/Explainaur/ELFSign">ELFSign</a>，已在Github开源。可对任意ELF 32/64 位文件进行签名并验证。签名后可通过<code class="highlighter-rouge">readelf</code>与<code class="highlighter-rouge">objdump</code>等工具的检测，且不影响正常运行。与本项目配套的另一工程为<a href="https://github.com/Explainaur/Kui">Kui</a>,该项目为Linux Kernel Module，以Hook系统调用<code class="highlighter-rouge">execve</code>的方式，在ELF执行前对其进行签名校验，详细请见相关文档，该项目也已在Github开源，欢迎star。</p>
+<p>  本项目名为<a href="https://github.com/Explainaur/ELFSign">ELFSign</a>，已在Github开源。可对任意ELF 32/64 位文件进行签名并验证。签名后可通过<code class="language-plaintext highlighter-rouge">readelf</code>与<code class="language-plaintext highlighter-rouge">objdump</code>等工具的检测，且不影响正常运行。与本项目配套的另一工程为<a href="https://github.com/Explainaur/Kui">Kui</a>,该项目为Linux Kernel Module，以Hook系统调用<code class="language-plaintext highlighter-rouge">execve</code>的方式，在ELF执行前对其进行签名校验，详细请见相关文档，该项目也已在Github开源，欢迎star。</p>
 
 <h2 id="0x02-功能介绍">0x02 功能介绍</h2>
 
@@ -91,13 +91,13 @@
 
 <ol>
   <li>生成公私钥对或X509证书</li>
-  <li>对ELF文件进行签名，并在ELF文件中新建一个<code class="highlighter-rouge">.sign</code> section,然后将签名储存到该section中</li>
+  <li>对ELF文件进行签名，并在ELF文件中新建一个<code class="language-plaintext highlighter-rouge">.sign</code> section,然后将签名储存到该section中</li>
   <li>对签名后的文件进行校验，若校验通过则可执行</li>
 </ol>
 
 <h3 id="安装方式">安装方式</h3>
 
-<p>  该项目依赖<code class="highlighter-rouge">openssl</code>，debian类系统使用记得安装<code class="highlighter-rouge">libssl</code>相关的开发库进行编译。</p>
+<p>  该项目依赖<code class="language-plaintext highlighter-rouge">openssl</code>，debian类系统使用记得安装<code class="language-plaintext highlighter-rouge">libssl</code>相关的开发库进行编译。</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/Explainaur/ELFSign
 <span class="nb">mkdir </span>build
@@ -150,9 +150,9 @@ Example:
 
 <p>  可以看到Program Header Table主要和segment有关，section header table则存储了每个section相关的表项。而ELF header则存储了ELF的相关信息，比如代码段入口，section的数目，section header的offset之类的。</p>
 
-<p>  那么第一步，我们需要读取所有的Load Segment，上面我们已经分析了，与segment有关的信息都在Program Header Table这个struct数组里，因此我们首先应该去解析<code class="highlighter-rouge">Elf32_Phdr</code>这个结构体：</p>
+<p>  那么第一步，我们需要读取所有的Load Segment，上面我们已经分析了，与segment有关的信息都在Program Header Table这个struct数组里，因此我们首先应该去解析<code class="language-plaintext highlighter-rouge">Elf32_Phdr</code>这个结构体：</p>
 
-<p>  <strong>Program Header Table</strong> 是一个结构体数组，每一个元素的类型是 <code class="highlighter-rouge">Elf32_Phdr</code>，描述了一个段或者其它系统在准备程序执行时所需要的信息。其中，ELF 头中的 <code class="highlighter-rouge">e_phentsize</code> 和 <code class="highlighter-rouge">e_phnum</code> 指定了该数组每个元素的大小以及元素个数。一个目标文件的段包含一个或者多个节。程序的头部只有对于可执行文件和共享目标文件有意义。</p>
+<p>  <strong>Program Header Table</strong> 是一个结构体数组，每一个元素的类型是 <code class="language-plaintext highlighter-rouge">Elf32_Phdr</code>，描述了一个段或者其它系统在准备程序执行时所需要的信息。其中，ELF 头中的 <code class="language-plaintext highlighter-rouge">e_phentsize</code> 和 <code class="language-plaintext highlighter-rouge">e_phnum</code> 指定了该数组每个元素的大小以及元素个数。一个目标文件的段包含一个或者多个节。程序的头部只有对于可执行文件和共享目标文件有意义。</p>
 
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span>
 <span class="p">{</span>
@@ -212,7 +212,7 @@ Example:
   </tbody>
 </table>
 
-<p>然而我们需要得出这个Segment是不是可以加载的(Loadable)，因此我们需要继续分析<code class="highlighter-rouge">p_type</code>字段，细节如下：</p>
+<p>然而我们需要得出这个Segment是不是可以加载的(Loadable)，因此我们需要继续分析<code class="language-plaintext highlighter-rouge">p_type</code>字段，细节如下：</p>
 
 <table>
   <thead>
@@ -266,7 +266,7 @@ Example:
   </tbody>
 </table>
 
-<p>  这里可以看到，当<code class="highlighter-rouge">p_type</code>字段的值为<code class="highlighter-rouge">PT_LOAD</code>时，该segment是可加载的，我们也可以通过<code class="highlighter-rouge">readelf -Wl ./ls</code>这个命令来查看相关的信息，我这里截取ls的相关信息以做演示：</p>
+<p>  这里可以看到，当<code class="language-plaintext highlighter-rouge">p_type</code>字段的值为<code class="language-plaintext highlighter-rouge">PT_LOAD</code>时，该segment是可加载的，我们也可以通过<code class="language-plaintext highlighter-rouge">readelf -Wl ./ls</code>这个命令来查看相关的信息，我这里截取ls的相关信息以做演示：</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@Aurora:/home/code/solo/rubbish/ELFsign/build<span class="o">(</span>master⚡<span class="o">)</span> <span class="c"># readelf -Wl ls</span>
 
@@ -290,11 +290,11 @@ There are 11 program headers, starting at offset 64
   GNU_RELRO      0x020390 0x0000000000021390 0x0000000000021390 0x000c70 0x000c70 R   0x1
 </code></pre></div></div>
 
-<p>  可以看到一共有4个<code class="highlighter-rouge">LOAD SEGMENT</code>，那么接下来我们需要将对应的segment内容读出来即可，这里的方法也很简单：</p>
+<p>  可以看到一共有4个<code class="language-plaintext highlighter-rouge">LOAD SEGMENT</code>，那么接下来我们需要将对应的segment内容读出来即可，这里的方法也很简单：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">p_offset</code>字段代表该segment的偏移地址，<code class="highlighter-rouge">p_filesz</code>字段代表该segment的大小，可以对照上面的readelf的信息看，即<em>Offset</em>与<em>FileSiz</em>。</li>
-  <li>将fd指针设置到<code class="highlighter-rouge">p_offset</code>对应的偏移处，读取<code class="highlighter-rouge">p_filesz</code>大小的内容即可。</li>
+  <li><code class="language-plaintext highlighter-rouge">p_offset</code>字段代表该segment的偏移地址，<code class="language-plaintext highlighter-rouge">p_filesz</code>字段代表该segment的大小，可以对照上面的readelf的信息看，即<em>Offset</em>与<em>FileSiz</em>。</li>
+  <li>将fd指针设置到<code class="language-plaintext highlighter-rouge">p_offset</code>对应的偏移处，读取<code class="language-plaintext highlighter-rouge">p_filesz</code>大小的内容即可。</li>
 </ol>
 
 <p>具体的实现大致如下,我这里读出内容之后直接就做了Hash,代码在<a href="https://github.com/Explainaur/ELFSign/blob/master/src/elf32.c#L245">src/elf32.c</a>：</p>
@@ -382,7 +382,7 @@ There are 11 program headers, starting at offset 64
 
 <p>  我们的目标是向ELF中插入一个section，那么首先要清楚ELF是怎么存储并识别section的，按照开发者的思路，我们很容易想到我们可以把每个section的信息和特征抽象成一个struct，然后把所有的struct存入一个数组，最后把数组的地址放入ELF Header就可以了。这样我们就可以直接通过ELF Header来获得section struct数组，进而间接获得section的信息。其实上面这几个字段的作用便是如此。存储struct的数组就是上面提到的Section Header Table，在ELF文件的末尾。</p>
 
-<p>  <code class="highlighter-rouge">.shstrtab</code>是一个字符串section，他存储了所有section的名字，ELF Header中的<code class="highlighter-rouge">e_shstrndx</code>便是其在Section Header Table中的索引，因此想要获得<code class="highlighter-rouge">.shstrtab</code>的真是偏移我们只需要按如下公式计算:</p>
+<p>  <code class="language-plaintext highlighter-rouge">.shstrtab</code>是一个字符串section，他存储了所有section的名字，ELF Header中的<code class="language-plaintext highlighter-rouge">e_shstrndx</code>便是其在Section Header Table中的索引，因此想要获得<code class="language-plaintext highlighter-rouge">.shstrtab</code>的真是偏移我们只需要按如下公式计算:</p>
 
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shstrtabOff</span> <span class="o">=</span> <span class="n">e_shoff</span> <span class="o">+</span> <span class="n">e_shstrndx</span> <span class="o">*</span> <span class="n">e_shentsize</span>    <span class="c1">// 基址 + 索引 × 大小</span>
 </code></pre></div></div>
@@ -409,13 +409,13 @@ There are 11 program headers, starting at offset 64
 
 <ol>
   <li>向Section Header Table中插入new section Header，即插入一个新的结构体</li>
-  <li>向 <code class="highlighter-rouge">.shstrtab</code> section中插入new section的section name</li>
+  <li>向 <code class="language-plaintext highlighter-rouge">.shstrtab</code> section中插入new section的section name</li>
   <li>修改.shstrtab的sh_size</li>
   <li>修改ELF Header中的e_shnum字段</li>
   <li>向目标位置写入section内容</li>
 </ol>
 
-<p>  那么我们似乎遇到了一些困惑，<code class="highlighter-rouge">.shstrtab</code> section在ELF文件的中间，万一空间不够添加section name了该怎么办？不如我们将new section name直接添加到文件的末尾，然后修改一下<code class="highlighter-rouge">sh_name</code>不就可以了吗。 似乎想法不错，但是这里需要注意的是，我们要记得修改<code class="highlighter-rouge">.shstrtab</code>的<code class="highlighter-rouge">sh_size</code>,否则还没查到文件末尾就终止了。</p>
+<p>  那么我们似乎遇到了一些困惑，<code class="language-plaintext highlighter-rouge">.shstrtab</code> section在ELF文件的中间，万一空间不够添加section name了该怎么办？不如我们将new section name直接添加到文件的末尾，然后修改一下<code class="language-plaintext highlighter-rouge">sh_name</code>不就可以了吗。 似乎想法不错，但是这里需要注意的是，我们要记得修改<code class="language-plaintext highlighter-rouge">.shstrtab</code>的<code class="language-plaintext highlighter-rouge">sh_size</code>,否则还没查到文件末尾就终止了。</p>
 
 <p>修改后的ELF尾应该长这样：</p>
 
@@ -437,11 +437,11 @@ There are 11 program headers, starting at offset 64
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">offset</span> <span class="o">=</span> <span class="n">filesize</span> <span class="o">-</span> <span class="n">shstrtab</span><span class="p">.</span><span class="n">sh_offset</span>
 </code></pre></div></div>
 
-<p>  来获得字符串在<code class="highlighter-rouge">.shstrtab</code>中的偏移，至于怎么获得<code class="highlighter-rouge">shstrtab.sh_offset</code>.你需要先根据ELF Header中的相关字段<code class="highlighter-rouge">e_shstrndx</code>，根据这个偏移找到.shstrtab的section Header，获取对应字段就ok了。这里需要注意要将section header的其他字段设置正确。</p>
+<p>  来获得字符串在<code class="language-plaintext highlighter-rouge">.shstrtab</code>中的偏移，至于怎么获得<code class="language-plaintext highlighter-rouge">shstrtab.sh_offset</code>.你需要先根据ELF Header中的相关字段<code class="language-plaintext highlighter-rouge">e_shstrndx</code>，根据这个偏移找到.shstrtab的section Header，获取对应字段就ok了。这里需要注意要将section header的其他字段设置正确。</p>
 
 <p>  接下来，我们需要修改.shstrtab的sh_size，用filesize - shstrtab.sh_offset就ok了，然后去修改ELF Header里的e_shnum字段，加1即可。最后向文件尾插入对应size的内容就ok了，最后我们看一下程序运行的demo：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  [25] .bss              NOBITS          0000000000004078 003078 000008 00  WA  0   0  1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  [25] .bss              NOBITS          0000000000004078 003078 000008 00  WA  0   0  1
   [26] .comment          PROGBITS        0000000000000000 003078 000026 01  MS  0   0  1
   [27] .symtab           SYMTAB          0000000000000000 0030a0 0006d8 18     28  45  8
   [28] .strtab           STRTAB          0000000000000000 003778 0002af 00      0   0  1
@@ -449,7 +449,7 @@ There are 11 program headers, starting at offset 64
   [30] .sign             NOTE            00000000000042f8 0042f8 000100 00   A  0   0  1
 </code></pre></div></div>
 
-<p>可以看到我们成功多加了一个 <code class="highlighter-rouge">.sign</code> section，再来看看文件尾：</p>
+<p>可以看到我们成功多加了一个 <code class="language-plaintext highlighter-rouge">.sign</code> section，再来看看文件尾：</p>
 
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mo">000042</span><span class="n">f0</span><span class="o">:</span> <span class="mf">2e73</span> <span class="mi">6967</span> <span class="mf">6e00</span> <span class="mo">0000</span> <span class="mf">24e4</span> <span class="mi">639</span><span class="n">b</span> <span class="mi">5</span><span class="n">a57</span> <span class="mi">60</span><span class="n">ec</span>  <span class="p">.</span><span class="n">sign</span><span class="p">...</span><span class="err">$</span><span class="p">.</span><span class="n">c</span><span class="p">.</span><span class="n">ZW</span><span class="err">`</span><span class="p">.</span>
 <span class="mo">00004300</span><span class="o">:</span> <span class="mi">1</span><span class="n">aa4</span> <span class="n">e313</span> <span class="n">cb4d</span> <span class="mi">3</span><span class="n">fb9</span> <span class="mi">9177</span> <span class="mo">053</span><span class="mi">9</span> <span class="mi">2551</span> <span class="n">a21d</span>  <span class="p">.....</span><span class="n">M</span><span class="o">?</span><span class="p">..</span><span class="n">w</span><span class="p">.</span><span class="mi">9</span><span class="o">%</span><span class="n">Q</span><span class="p">..</span>
@@ -532,7 +532,7 @@ Idx Name          Size      VMA               LMA               File off  Algn
 
 <h2 id="0x04-总结">0x04 总结</h2>
 
-<p>  该项目的实现主要需要熟悉ELF的文件格式，实际上这种新建section的技术被广泛用于软件汉化，因为需要储存中文字符串，所以经常将汉化数据存入so文件的新的section中。我本人勉强算了解逆向工程的相关技术，所以比较熟悉ELF文件的格式。至于内核模块的Hook技术，我之前只尝试过用户态的hook，一般都是使用<code class="highlighter-rouge">ptrace</code>，这次也尝试了一下新的方法，<strong>Kui</strong>的具体原理请见其相关文档。</p>
+<p>  该项目的实现主要需要熟悉ELF的文件格式，实际上这种新建section的技术被广泛用于软件汉化，因为需要储存中文字符串，所以经常将汉化数据存入so文件的新的section中。我本人勉强算了解逆向工程的相关技术，所以比较熟悉ELF文件的格式。至于内核模块的Hook技术，我之前只尝试过用户态的hook，一般都是使用<code class="language-plaintext highlighter-rouge">ptrace</code>，这次也尝试了一下新的方法，<strong>Kui</strong>的具体原理请见其相关文档。</p>
 
 
 <div id="vcomments"></div>

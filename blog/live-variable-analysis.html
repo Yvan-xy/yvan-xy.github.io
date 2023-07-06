@@ -72,7 +72,7 @@
 
 <p class="post-metadata text-muted">
   17 July 2020 -
-  <b>2 mins read time</b>
+  <b>less than 1 min read time</b>
 
   <br>Tags:
   
@@ -93,7 +93,7 @@
 
 <p>  对于cfg的每个节点n来说，LiveOut(n)是通过一个方程决定的，该方程使用了n节点的所有后继LiveOut集合，以及 <strong><em>UEVar(n)</em></strong> 和 <strong><em>VarKill(n)</em></strong> 集合。定义 LiveOut(n)的方程如下：</p>
 
-<script type="math/tex; mode=display">LiveOut(n) = \mathop{\cup}\limits_{m \in succ(n)}(UEVar(m)\cup(LiveOut(m) \cap \overline{VarKill(m)}))</script>
+\[LiveOut(n) = \mathop{\cup}\limits_{m \in succ(n)}(UEVar(m)\cup(LiveOut(m) \cap \overline{VarKill(m)}))\]
 
 <p>  <strong><em>UEVar(m)</em></strong> 包含了m中向上展示的变量，即在m中没有重新定义就使用的变量，这种关系在LLVM中一般对应一种use关系。而 <strong><em>VarKill(m)</em></strong> 则代表了在m中被重新定义的变量，重新定义即代表原值的生命周期结束，所以被kill掉。上述方程上划线代表了 <em>VarKill(m)</em> 的逻辑补集，这里的m则是n的某后继节点。</p>
 
@@ -103,19 +103,19 @@
   <li>在m中，对v重新定义之前就使用了v，这种情况就是</li>
 </ol>
 
-<script type="math/tex; mode=display">v \in UEVar(m)</script>
+\[v \in UEVar(m)\]
 
 <ol>
   <li>v在退出程序块m时仍然是存活的，就是v”毫发无损”的穿过了m，因为m中没有对v进行重新定义，在m后的block有对v的use，所以这种情况就是：</li>
 </ol>
 
-<script type="math/tex; mode=display">v \in LiveOut(m) \cap \overline {VarKill(m)}</script>
+\[v \in LiveOut(m) \cap \overline {VarKill(m)}\]
 
 <p>于是乎，把这俩集合并起来就是m对对 <em>LiveOut(n)</em> 的贡献，然后把所有n的后继m的结果并起来就是整个 <em>LiveOut(n)</em> 的正确结果。</p>
 
 <p>  关于这部分内容，在李樾老师的《软件分析》第4课中有所介绍，但是迭代方式稍有不同，他给出了另一个公式：</p>
 
-<script type="math/tex; mode=display">LiveOut(n) = \mathop{\cup}\limits_{m \in succ(n)}(UEVar(m)\cup(LiveOut(m) - VarKill(m))</script>
+\[LiveOut(n) = \mathop{\cup}\limits_{m \in succ(n)}(UEVar(m)\cup(LiveOut(m) - VarKill(m))\]
 
 <blockquote>
   <p>缺个图片儿～ 给出这两种情况展示图</p>
@@ -150,14 +150,14 @@
 </span>
 <span class="c1"># Collect initial info
 </span><span class="k">def</span> <span class="nf">Init</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
-    <span class="n">b</span><span class="o">.</span><span class="n">UEVar</span> <span class="o">=</span> <span class="n">null</span>
-    <span class="n">b</span><span class="o">.</span><span class="n">VarKill</span> <span class="o">=</span> <span class="n">null</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">UEVar</span> <span class="o">=</span> <span class="n">null</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">VarKill</span> <span class="o">=</span> <span class="n">null</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-        <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">VarKill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">VarKill</span><span class="p">:</span>
-            <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">UEVar</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">z</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">varKill</span><span class="p">:</span>
-            <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">UEVar</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">VarKill</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="p">.</span><span class="n">VarKill</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">UEVar</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">z</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="p">.</span><span class="n">varKill</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">UEVar</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
 
 <span class="c1"># init every block
 </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">block</span><span class="p">:</span>
@@ -174,14 +174,14 @@
 </span>
 <span class="k">def</span> <span class="nf">GetLiveOutPass</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-        <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">LiveOut</span> <span class="o">=</span> <span class="n">null</span>
+        <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">LiveOut</span> <span class="o">=</span> <span class="n">null</span>
 
     <span class="n">changed</span> <span class="o">=</span> <span class="n">true</span>
     <span class="k">while</span><span class="p">(</span><span class="n">changed</span><span class="p">):</span>
         <span class="n">changed</span> <span class="o">=</span> <span class="n">false</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-            <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">LiveOut</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">LiveOut</span><span class="o">.</span><span class="n">recompute</span><span class="p">()</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">LiveOut</span><span class="o">.</span><span class="n">changed</span><span class="p">):</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">LiveOut</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">LiveOut</span><span class="p">.</span><span class="n">recompute</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">LiveOut</span><span class="p">.</span><span class="n">changed</span><span class="p">):</span>
                 <span class="n">changed</span> <span class="o">=</span> <span class="n">true</span>
 </code></pre></div></div>
 

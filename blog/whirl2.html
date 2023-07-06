@@ -193,7 +193,7 @@
 <p>根据上述信息我们可以发现，即使是函数中有多个重名变量也为所谓，因为访问符号表并不是通过符号名或者其哈希值作为访问的key，而是通过唯一的ST_IDX或者ST Entry指针进行访问，符号名仅作为一个信息存储起来。该结构体中的表项不再详细介绍，看名字和描述基本上可以推断出相关信息。值得注意的是，ST表的索引也会被对应的WHIRL指令所保存，用于记录该指令的符号信息。我们通过一个简单的程序举个例子：</p>
 
 <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="kt">int</span> <span class="n">a</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
   <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
   <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
 <span class="p">}</span>
@@ -211,7 +211,7 @@ Symbols:
         Flags:  0x00000000    Flags_ext: 0x02200000 modified used, XLOCAL
 </code></pre></div></div>
 
-<p>SYMTAB的level用于区分是全局表还是本地表，可以看到main的level为2，是本地表，全局表的level应当为1。其中<strong>b &lt;2,1&gt;</strong> 2是level，保存在ST_IDX的低8位中，1则是在当前表中的index，这里的index是ST_IDX的高24bits。紧随其后的是当前符号的类型信息，可以看到变量b的类型为int类型，在WHIRL中表示为 <code class="highlighter-rouge">.predef_I4</code>， 代表预定义的基本类型。这里类型 TY 与上一篇文章介绍的 MTYPE 有所不同，MTYPE用于表示机器类型，即寄存器或者CPU能处理底层类型。而这里的TY则是高级的，保留了前端语意信息的类型，例如struct或者class等等，应当与MTYPE作区分。</p>
+<p>SYMTAB的level用于区分是全局表还是本地表，可以看到main的level为2，是本地表，全局表的level应当为1。其中<strong>b &lt;2,1&gt;</strong> 2是level，保存在ST_IDX的低8位中，1则是在当前表中的index，这里的index是ST_IDX的高24bits。紧随其后的是当前符号的类型信息，可以看到变量b的类型为int类型，在WHIRL中表示为 <code class="language-plaintext highlighter-rouge">.predef_I4</code>， 代表预定义的基本类型。这里类型 TY 与上一篇文章介绍的 MTYPE 有所不同，MTYPE用于表示机器类型，即寄存器或者CPU能处理底层类型。而这里的TY则是高级的，保留了前端语意信息的类型，例如struct或者class等等，应当与MTYPE作区分。</p>
 
 <h3 id="pu_tab">PU_TAB</h3>
 
@@ -219,7 +219,7 @@ Symbols:
 
 <p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/whirl2/4_pu_entry.png" alt="PU" /></p>
 
-<p>由于Open64后来进行了一系列更新，该结构体新增加了一个比较重要的成员 <code class="highlighter-rouge">TY_IDX base_class</code>，当该函数是某个struct/class的成员函数时，base_class 记录其owner的类型。</p>
+<p>由于Open64后来进行了一系列更新，该结构体新增加了一个比较重要的成员 <code class="language-plaintext highlighter-rouge">TY_IDX base_class</code>，当该函数是某个struct/class的成员函数时，base_class 记录其owner的类型。</p>
 
 <h3 id="ty_tab">TY_TAB</h3>
 
@@ -228,10 +228,10 @@ Symbols:
 <p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/whirl2/5_ty_entry.png" alt="TY" /></p>
 
 <p>我们以如下代码为例：</p>
-<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">A</span> <span class="p">{</span>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="nc">A</span> <span class="p">{</span>
   <span class="kt">int</span> <span class="n">num</span><span class="p">;</span>
   <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
-  <span class="k">struct</span> <span class="n">A</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="nc">A</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div></div>
 
@@ -247,7 +247,7 @@ Symbols:
 <span class="o">[</span>68]: anon_ptr. : <span class="o">(</span>f: 0x0000<span class="o">)</span> size 8 U8: -&gt; A <span class="o">(</span><span class="c">#66) align 8</span>
 </code></pre></div></div>
 
-<p>以上信息打印出了struct A的详细类型信息，我们以其第三个成员 <strong>next</strong> 为例，开头的104是该成员与结构体开始地址的偏移，紧随其后的是该成员的name，之后的<code class="highlighter-rouge">anon_ptr. (#68)</code>为当前成员的类型，一个匿名指针类型，该类型在TY_TABLE中的index为68，可以看出该指针的pointee type为 <code class="highlighter-rouge">struct A *</code> 类型。之后的 <code class="highlighter-rouge">align 8</code> 表示该类型8字节对齐。接下来 <code class="highlighter-rouge">fl:0x0080</code> 则记录了该成员的更多详细细节，通过16位的flag记录，本文不再详细介绍flag信息。最后last_field表示当前成员是最后一个field。</p>
+<p>以上信息打印出了struct A的详细类型信息，我们以其第三个成员 <strong>next</strong> 为例，开头的104是该成员与结构体开始地址的偏移，紧随其后的是该成员的name，之后的<code class="language-plaintext highlighter-rouge">anon_ptr. (#68)</code>为当前成员的类型，一个匿名指针类型，该类型在TY_TABLE中的index为68，可以看出该指针的pointee type为 <code class="language-plaintext highlighter-rouge">struct A *</code> 类型。之后的 <code class="language-plaintext highlighter-rouge">align 8</code> 表示该类型8字节对齐。接下来 <code class="language-plaintext highlighter-rouge">fl:0x0080</code> 则记录了该成员的更多详细细节，通过16位的flag记录，本文不再详细介绍flag信息。最后last_field表示当前成员是最后一个field。</p>
 
 <h3 id="fld_tab">FLD_TAB</h3>
 
@@ -255,9 +255,9 @@ Symbols:
 
 <p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/whirl2/6_fld_entry.png" alt="FLD" /></p>
 
-<p>其中 <code class="highlighter-rouge">bsize</code> 和 <code class="highlighter-rouge">bofst</code> 这两个成员记录了bit field的位长和偏移。bit field是C/C++里用的不太多的特性，简单来说就是可以更精确的控制field的位长，例如：</p>
+<p>其中 <code class="language-plaintext highlighter-rouge">bsize</code> 和 <code class="language-plaintext highlighter-rouge">bofst</code> 这两个成员记录了bit field的位长和偏移。bit field是C/C++里用的不太多的特性，简单来说就是可以更精确的控制field的位长，例如：</p>
 
-<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">A</span> <span class="p">{</span>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="nc">A</span> <span class="p">{</span>
  <span class="kt">int</span> <span class="n">a</span> <span class="o">:</span> <span class="mi">4</span><span class="p">;</span>  <span class="c1">// 4 bits</span>
  <span class="kt">char</span> <span class="n">b</span> <span class="o">:</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 1 bits</span>
 <span class="p">};</span>
@@ -292,7 +292,7 @@ Symbols:
 <p>可以看到tc成员记录了初始化值的TCON_IDX，用于在TCON_TAB中获取对应的常数值。而blk成员则用于表示 struct/union 这种复杂的初始化值的聚合，其对应的子INITV节点相当于一颗子树，记录了更多复杂的初始化信息。</p>
 
 <h3 id="str_tab">STR_TAB</h3>
-<p>该表保存了Symbol、types、label等名称的所有字符串。该表可以被视为字符串的存储区域块。STR_IDX是该表的索引，实际上是这个存储块中的偏移量，它给出字符串的开始字符的字节偏移量。所有字符串都以空结尾，并且块的第一个字符总是空的。因此，零STR_IDX表示空字符串。这个表的设计很像ELF文件里的 <code class="highlighter-rouge">.shstrtab</code> 或者 <code class="highlighter-rouge">.strtab</code>，都是通过偏移访问字符串的值。</p>
+<p>该表保存了Symbol、types、label等名称的所有字符串。该表可以被视为字符串的存储区域块。STR_IDX是该表的索引，实际上是这个存储块中的偏移量，它给出字符串的开始字符的字节偏移量。所有字符串都以空结尾，并且块的第一个字符总是空的。因此，零STR_IDX表示空字符串。这个表的设计很像ELF文件里的 <code class="language-plaintext highlighter-rouge">.shstrtab</code> 或者 <code class="language-plaintext highlighter-rouge">.strtab</code>，都是通过偏移访问字符串的值。</p>
 
 <h2 id="总结">总结</h2>
 

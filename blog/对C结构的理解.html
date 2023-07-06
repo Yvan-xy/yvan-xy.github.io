@@ -129,7 +129,7 @@ int  weight[20];
    “高等数学”，
    20
  };</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 
 非指定初始化应当保持初始化项目与结构成员类型一一对应。  
 而指定初始化则类似于数组：  
      
@@ -248,7 +248,7 @@ int  weight[20];
   <span class="err">```</span><span class="n">c</span>  
    <span class="n">m</span> <span class="o">-&gt;</span> <span class="n">value</span><span class="p">.</span><span class="n">name</span> <span class="o">==</span> <span class="p">(</span><span class="o">*</span><span class="n">m</span><span class="p">).</span><span class="n">name</span> <span class="o">==</span> <span class="n">library</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">name</span><span class="p">;</span>  
 </code></pre></div>    </div>
-    <p>注意：<code class="highlighter-rouge">' * '</code> 的运算级大于<code class="highlighter-rouge"> ' . '</code>　使用时注意加()</p>
+    <p>注意：<code class="language-plaintext highlighter-rouge">' * '</code> 的运算级大于<code class="language-plaintext highlighter-rouge"> ' . '</code>　使用时注意加()</p>
   </li>
 </ul>
 
@@ -260,7 +260,7 @@ int  weight[20];
 
 <p>只要结构具有单个值的数据类型，即：int及其相关类型、char、float、double、指针等，就可以把它作为一个参数传递给函数，如：</p>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include&lt;stdio.h&gt;
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span><span class="k">struct</span> <span class="n">name</span><span class="p">{</span>
   <span class="kt">char</span> <span class="n">firstname</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
   <span class="kt">char</span> <span class="n">lastname</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
@@ -304,7 +304,7 @@ int  weight[20];
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span><span class="o">-&gt;</span><span class="n">dyf</span><span class="p">;</span>    <span class="c1">//这仅仅是获得dyf变量的名而不是其地址  等价于(*dyf)  </span>
 </code></pre></div></div>
 
-<p>但<code class="highlighter-rouge">scanf()</code>需要传递给地址，因此我们需要使用&amp;操作符。如果你理解了以上两种寻址方式，那么你对-&gt;的理解算是合格了。但距离用结构和指针实现面向对象还有一定距离。顺便说一句，我们通常用结构和指针实现队列的数据结构，好好理解指针吧。</p>
+<p>但<code class="language-plaintext highlighter-rouge">scanf()</code>需要传递给地址，因此我们需要使用&amp;操作符。如果你理解了以上两种寻址方式，那么你对-&gt;的理解算是合格了。但距离用结构和指针实现面向对象还有一定距离。顺便说一句，我们通常用结构和指针实现队列的数据结构，好好理解指针吧。</p>
 
 <p>当然除了以上这种用指针传递参数的方式，我们还可以直接用结构的名传递参数。</p>
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">yourmark</span> <span class="p">{</span>
@@ -332,7 +332,7 @@ int  weight[20];
   <span class="k">struct</span> <span class="n">yourmark</span> <span class="n">mark</span><span class="p">;</span>
   <span class="n">mark</span> <span class="o">=</span> <span class="n">getmark</span><span class="p">(</span><span class="n">mark</span><span class="p">);</span>   <span class="c1">// 注意，给结构赋值时直接用其名而不是其地址  </span>
 </code></pre></div></div>
-<p>同理，要返回指针只需要<code class="highlighter-rouge">struct yourmark * mark getmark(struct yourmark mark)</code></p>
+<p>同理，要返回指针只需要<code class="language-plaintext highlighter-rouge">struct yourmark * mark getmark(struct yourmark mark)</code></p>
 
 <p>好了到这里，把结构在函数里传来传去已经差不多说完了。</p>
 
@@ -369,7 +369,7 @@ int  weight[20];
   
   <span class="o">-------------------------------------------------------------------</span>  
   
-  <span class="cp">#include &lt;stdio.h&gt;
+  <span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span>  <span class="k">struct</span> <span class="n">mark</span> <span class="p">{</span>
     <span class="kt">int</span> <span class="n">math</span><span class="p">;</span>
     <span class="kt">int</span> <span class="n">English</span><span class="p">;</span>
@@ -399,7 +399,7 @@ int  weight[20];
 <ol>
   <li>伸缩性数组成员必须是最后一个成员</li>
   <li>结构中至少有一个其他成员</li>
-  <li>像普通数组那样声明，只是长度不定，例：<code class="highlighter-rouge">int a[];</code></li>
+  <li>像普通数组那样声明，只是长度不定，例：<code class="language-plaintext highlighter-rouge">int a[];</code></li>
 </ol>
 
 <p>如下：</p>
@@ -416,8 +416,8 @@ int  weight[20];
 </code></pre></div></div>
 <p>这时我们已经有足够的内存来存放一个mark型结构，并且他可以存放一个19个字符的字符串。没错，开辟的内存空间要能存放结构本身和所需大小的数组。</p>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cp">#include &lt;stdio.h&gt;
-</span>    <span class="cp">#include &lt;malloc.h&gt;
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span>    <span class="cp">#include</span> <span class="cpf">&lt;malloc.h&gt;</span><span class="cp">
 </span>    <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">struct</span> <span class="n">flex</span><span class="p">{</span>
             <span class="kt">int</span> <span class="n">age</span><span class="p">;</span>
@@ -434,7 +434,7 @@ int  weight[20];
         <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
     <span class="p">}</span>
 </code></pre></div></div>
-<p>这里我们声明里一个指针name，要注意在C语言中，字符串以数组的形式存储，也就是说其变量名实际是个地址，在我们对其进行声明时计算机已经为他在内存中开辟了空间，所以其地址实际上是个常量，即name是个常量。假如我要进行<code class="highlighter-rouge">name="dyf";</code>操作，编译器将报错。<code class="highlighter-rouge">"dyf"</code>的地址很明显与<code class="highlighter-rouge">name</code>本身冲突，故不能直接赋值。
+<p>这里我们声明里一个指针name，要注意在C语言中，字符串以数组的形式存储，也就是说其变量名实际是个地址，在我们对其进行声明时计算机已经为他在内存中开辟了空间，所以其地址实际上是个常量，即name是个常量。假如我要进行<code class="language-plaintext highlighter-rouge">name="dyf";</code>操作，编译器将报错。<code class="language-plaintext highlighter-rouge">"dyf"</code>的地址很明显与<code class="language-plaintext highlighter-rouge">name</code>本身冲突，故不能直接赋值。
 这里我们看到favonumber能存8个整数，我也不知道为什么，回去查查资料再来修改。</p>
 
 <hr />
@@ -444,7 +444,7 @@ int  weight[20];
 </ul>
 
 <p>结构的整套信息我们称之为记录(record),单个的项目称之为字段(field)，下面，我们来进行讨论。<br />
-第一种方法，也是最笨拙的方法，使用<code class="highlighter-rouge">fprinf()</code>函数，例如：</p>
+第一种方法，也是最笨拙的方法，使用<code class="language-plaintext highlighter-rouge">fprinf()</code>函数，例如：</p>
 
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">struct</span> <span class="n">book</span><span class="p">{</span>
     <span class="kt">char</span> <span class="n">title</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
@@ -455,12 +455,12 @@ int  weight[20];
     <span class="n">fprintf</span><span class="p">(</span><span class="n">books</span><span class="p">,</span> <span class="s">"%9s %9s %7.2d"</span><span class="p">,</span><span class="n">math</span><span class="p">.</span><span class="n">title</span><span class="p">,</span><span class="n">math</span><span class="p">.</span><span class="n">author</span><span class="p">,</span><span class="n">math</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>我们使用<code class="highlighter-rouge">%9s</code>来固定输入格式，以便于下一次读取,这里的books是文件流。</p>
+<p>我们使用<code class="language-plaintext highlighter-rouge">%9s</code>来固定输入格式，以便于下一次读取,这里的books是文件流。</p>
 
 <p>第二种方法，我们可以使用fread()和fwrite()以结构大小为单位来进行读写，例如：</p>
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">fwrite</span><span class="p">(</span><span class="o">&amp;</span><span class="n">math</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">book</span><span class="p">),</span><span class="mi">1</span><span class="p">,</span><span class="n">books</span><span class="p">)</span>
 </code></pre></div></div>
-<p>这时我们将定位到math的地址<code class="highlighter-rouge">sizeof(struct book)</code>将返回一块book结构的大小，<code class="highlighter-rouge">'1'</code>则告诉函数只需复制一块结构，最后将整个record写入<code class="highlighter-rouge">books</code>相关联的文件。同样<code class="highlighter-rouge">fread()</code>将record写入<code class="highlighter-rouge">&amp;math</code>地址。</p>
+<p>这时我们将定位到math的地址<code class="language-plaintext highlighter-rouge">sizeof(struct book)</code>将返回一块book结构的大小，<code class="language-plaintext highlighter-rouge">'1'</code>则告诉函数只需复制一块结构，最后将整个record写入<code class="language-plaintext highlighter-rouge">books</code>相关联的文件。同样<code class="language-plaintext highlighter-rouge">fread()</code>将record写入<code class="language-plaintext highlighter-rouge">&amp;math</code>地址。</p>
 
 <hr />
 
@@ -476,7 +476,7 @@ int  weight[20];
 </code></pre></div></div>
 <p>假如一个物体的id有可能是整数，也有可能是字符串，那么我们可以用以上操作。<br />
 union并不是复合结构,这其中的声明的类型只能同时存在一种，也就是说id可以是字符串类型，也可以是int类型。
-因此，我们可以声明一个union数组来存放不同类型的数据，这样就实现了混合数据类型存储。这种数据类型封装的方法与结构相同，同样支持<code class="highlighter-rouge">. -&gt;</code>等运算符，但是其意义却完全不同。
+因此，我们可以声明一个union数组来存放不同类型的数据，这样就实现了混合数据类型存储。这种数据类型封装的方法与结构相同，同样支持<code class="language-plaintext highlighter-rouge">. -&gt;</code>等运算符，但是其意义却完全不同。
 其次，枚举类型声明如下：</p>
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    
     <span class="k">enum</span> <span class="n">subjects</span> <span class="p">{</span><span class="n">math</span><span class="o">=</span><span class="p">,</span><span class="n">English</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">Chinese</span><span class="p">,</span><span class="n">CS</span><span class="p">};</span>
@@ -486,9 +486,9 @@ union并不是复合结构,这其中的声明的类型只能同时存在一种�
     <span class="p">}</span>
 </code></pre></div></div>
 <p>我们通常用枚举创建符号常量，例如，
-<code class="highlighter-rouge">math，CS</code>是枚举常量，默认为int类型，math是枚举对象的首元素，其默认值为0，这就好比数组的下标，方便我们进行枚举。我们也可以给枚举常量一个指定值，例如上面<code class="highlighter-rouge">English=2</code>，那么，其后面的元素依次从2递增。由于枚举类型是一个整数类型，所以我们常将其用于表达式当中，方便进行逻辑判断或者运算。<br />
+<code class="language-plaintext highlighter-rouge">math，CS</code>是枚举常量，默认为int类型，math是枚举对象的首元素，其默认值为0，这就好比数组的下标，方便我们进行枚举。我们也可以给枚举常量一个指定值，例如上面<code class="language-plaintext highlighter-rouge">English=2</code>，那么，其后面的元素依次从2递增。由于枚举类型是一个整数类型，所以我们常将其用于表达式当中，方便进行逻辑判断或者运算。<br />
 <strong>注：</strong><br />
-C语言支持枚举变量自增，即<code class="highlighter-rouge">my_favo_subject++;</code>但是C++不支持，注意代码兼容性。</p>
+C语言支持枚举变量自增，即<code class="language-plaintext highlighter-rouge">my_favo_subject++;</code>但是C++不支持，注意代码兼容性。</p>
 
 <hr />
 

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by Youssef Raafat
+  Free for personal and commercial use under the MIT license
+  https://github.com/YoussefRaafatNasry/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content=""循此苦旅，以达星辰"">
+
+  <title>Yvan's blog</title>
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css" type="text/css"/>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css" type="text/css">
+
+  <!-- Mathjax for latex -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+  <!-- comment system -->
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+</head>
+
+
+<body class="d-flex flex-column h-100">
+
+  <main class="flex-shrink-0 container mt-5">
+  <nav class="navbar navbar-expand-lg navbar-light">
+
+  <a class="navbar-brand" href="/"><h5><b>Yvan's blog</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link active" href="/blog/">Blog</a>
+
+      <a class="nav-item nav-link " href="/link/">Link</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      <a class="nav-item nav-link " href="/about_en/">AboutEN</a>
+
+      
+
+    </div>
+  </div>
+
+</nav>
+  <div class="col-lg-10 mx-auto mt-5 post">
+  <h1><b>Concurrency Analysis相关概念</b></h1>
+
+<p class="post-metadata text-muted">
+  09 June 2023 -
+  <b>less than 1 min read time</b>
+
+  <br>Tags:
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#program-analysis">
+    <span class="tag badge badge-pill text-primary border border-primary">program analysis</span>
+  </a>
+  
+  <a class="text-decoration-none no-underline" href="/blog/tags#concurrency">
+    <span class="tag badge badge-pill text-primary border border-primary">concurrency</span>
+  </a>
+  </p>
+
+<h2 id="preface">Preface</h2>
+<p>最近开始阅读Concurrency Analysis相关的paper，主要涉及race condition和deadlock这些领域，记录一下学习中遇到的基本概念。</p>
+
+<h2 id="partial-order">Partial Order</h2>
+<p>偏序关系 (Partial Order Relations) 是离散数学中二元关系的一种，主要拥有自反性 (Reflexivity)、反对称性 (<a href="https://en.wikipedia.org/wiki/Antisymmetric_relation">Antisymmetry</a>)和传递性 (Transitivity)。</p>
+
+<ol>
+  <li>Reflexivity: \(a \leq a\) , every element is related to itself</li>
+  <li>Antiseymmetric: if \(a \leq b\) and \(b \leq a\)  then \(a = b\) , no two distinct elements precede each other</li>
+  <li>Transitivity: if \(a \leq b\) and \(b \leq c\) then \(a \leq c\)</li>
+</ol>
+
+<p>满足这三条性质的二元关系就是非严格的偏序关系，也可以被称作<a href="https://en.wikipedia.org/wiki/Preorder">非对称前序关系</a>，如果满足非自反性 (Irreflexivity) 和非对称性 (<a href="https://en.wikipedia.org/wiki/Asymmetric_relation">Asymmetric</a>)，则被称为严格偏序关系：</p>
+
+<ol>
+  <li>Irreflexivity: not \(a &lt; a\)</li>
+  <li>Asymmetric: if \(a &lt; b\) then not \(b &lt; a\)</li>
+  <li>Transitivity: if \(a &lt; b\) and \(b &lt; c\) then \(a &lt; c\)</li>
+</ol>
+
+<p>通过 Irreflexivity 和 Transitivity 的性质可以推出Asymmetric的性质。</p>
+
+<h2 id="vector-clock">Vector Clock</h2>
+<p>Vector Clock用于确定分布式系统中并发事件的偏序关系，最早可以追溯到1988年的<a href="http://www.vs.inf.ethz.ch/publ/papers/VirtTimeGlobStates.pdf">这篇</a>文献，这里的偏序关系是事件发生的先后次序。顾名思义，Vector Clock就是一个Clock的数组，每一个进程拥有一个clock，所有进程的clock组成了全局Vector clock，同时每个进程在本地维护一个全局Vector Clock的副本。其运行原理大概如下：</p>
+
+<p><code class="language-plaintext highlighter-rouge">VC</code> 代表全局Vector Clock，<code class="language-plaintext highlighter-rouge">i</code> 代表一个进程</p>
+<ol>
+  <li>初始化所有的clock为0</li>
+  <li>每当 <code class="language-plaintext highlighter-rouge">i</code> 进程内部发生了事件，则更新本地的逻辑时钟 \(VC_i[i] = VC_i[i] + 1\)</li>
+  <li>每当一个进程发送消息时，它会将自己在向量时钟中的逻辑时钟增加一（与上述提到的方式相同，但对于同一事件不会增加两次），然后在消息中附带自己的向量时钟的副本。</li>
+  <li>每当一个进程接收到消息时，它会将自己在向量时钟中的逻辑时钟增加一，并通过将自己的向量时钟中的每个元素与接收到的消息中的向量进行比较，取其中较大的值来更新自己的向量时钟。例如如果进程 \(P_j\) 从进程 \(P_i\) 收到消息 \(m\), 那么 \(P_j\) 首先会 \(VC_j[j] = VC_j[j] + 1\)，然后根据消息m更新本地的 Vector Clock，\(VC_j[k] \leftarrow max(VC_j[k], VC_i[i]), \forall k\)</li>
+</ol>
+
+<p>以下图为例：
+<img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/090623/Vector_Clock.svg" alt="VC example" />
+从进程C开始发送消息，到最后进程A得到的向量为 \(VC_A = [{4, 5, 5}]\)。</p>
+
+
+<div id="vcomments"></div>
+<script>
+  new Valine({
+    el: '#vcomments',
+    appId: '9PQd0VOdLBtIrk7DuYhbXgo1-gzGzoHsz',
+    appKey: '0tooNX9XI400l94QiuBP0lXm',
+
+    avatar:'robohash',
+    visitor: true, // 阅读量统计
+    enableQQ: true
+  })
+</script>
+
+<!-- id 将作为查询条件 -->
+<span id=/blog/Concurrency-Analysis class="leancloud_visitors" data-flag-title="Your Article Title">
+  <em class="post-meta-item-text">阅读量 </em>
+  <i class="leancloud-visitors-count"></i>
+</span>
+
+</div>
+  </main>
+
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>dyf</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center">
+
+</div><small id="attribution">
+    theme <a href="https://github.com/YoussefRaafatNasry/portfolYOU">portfolYOU</a>
+  </small>
+  
+</footer>
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</body>
+
+</html>

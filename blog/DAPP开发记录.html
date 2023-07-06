@@ -134,23 +134,23 @@
 
 <p><img src="https://github.com/Explainaur/hexo-blog/blob/master/source/pictures/dapp_2.png?raw=true" alt="commit" /></p>
 
-<pre><code class="language-solidity">pragma solidity &gt;= 0.4.0 &lt; 0.6.0;
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span> <span class="mf">0.4</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
 
-contract human{
-    uint age;
-    string name = "dyf";
+<span class="k">contract</span> <span class="n">human</span><span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">age</span><span class="p">;</span>
+    <span class="kt">string</span> <span class="n">name</span> <span class="o">=</span> <span class="s">"dyf"</span><span class="p">;</span>
 
-    function setInfo(uint256 _age, string memory _name) public {
-        age =_age;
-        name = _name;
-    }
+    <span class="k">function</span> <span class="n">setInfo</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_age</span><span class="p">,</span> <span class="kt">string</span> <span class="k">memory</span> <span class="n">_name</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="n">age</span> <span class="o">=</span><span class="n">_age</span><span class="p">;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">_name</span><span class="p">;</span>
+    <span class="p">}</span>
 
-    function getInfo() public view returns(uint256,string memory ){
-        return (age,name);
-    }
+    <span class="k">function</span> <span class="n">getInfo</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">,</span><span class="kt">string</span> <span class="k">memory</span> <span class="p">){</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">age</span><span class="p">,</span><span class="n">name</span><span class="p">);</span>
+    <span class="p">}</span>
 
-}
-</code></pre>
+<span class="p">}</span>
+</code></pre></div></div>
 <p>   <strong>请注意这里函数的view</strong></p>
 
 <p>  以上是我的交易记录，到这里我们的合约已经部署完毕。下一步是在前端引用合约。</p>

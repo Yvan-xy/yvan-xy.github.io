@@ -88,7 +88,7 @@
 
 <p>  在linux下安装是真的顺畅,首先要安装python——wheel的环境，至于这是个啥目前我还不太清楚：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/mwrlabs/drozer/
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/mwrlabs/drozer/
 
 cd drozer
 
@@ -96,27 +96,27 @@ python setup.py bdist_wheel
 </code></pre></div></div>
 <p> 然后就可以pip install了</p>
 <h4 id="注意pip3还是pip取决于python环境">注意，pip3还是pip取决于python环境</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install drozer
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install drozer
 </code></pre></div></div>
 <p>  当然了你也可以直接去github上直接git clone。
   到这里，电脑端的drozer就安装完成了，接下来我们要安装移动测试端的agent.apk<br />
   这里我们要去<a href="https://github.com/mwrlabs/drozer/releases/download/2.3.4/drozer-agent-2.3.4.apk">drozer_agent.apk</a>去下载agent.apk,然后用adb直接安装就好了。</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>adb install drozer-agent-2.x.x.apk
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>adb install drozer-agent-2.x.x.apk
 </code></pre></div></div>
 <p>  好了，到这里安装已经结束了，接下来我们测试以下，首先我们要开启端口转发：</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>adb forward tcp:31415 tcp:31415
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>adb forward tcp:31415 tcp:31415
 </code></pre></div></div>
 <p>  然后，在手机端打开drozer的开关</p>
 
 <p><img src="https://raw.githubusercontent.com/Explainaur/hexo-blog/master/source/pictures/Screenshot_20190117-104036.jpg" alt="agent.apk" /></p>
 
 <p>  接下来我们要通过drozer console 来连接手机：</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>drozer console connect ---server ip_of_your_phone
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>drozer console connect ---server ip_of_your_phone
 
 注意：这里是使用真机测试 所以后面要加上手机的ip做参数，
 </code></pre></div></div>
 <p>  假如你使用的是模拟器，就可以直接:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>drozer console connect
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>drozer console connect
 
 </code></pre></div></div>
 
@@ -130,7 +130,7 @@ python setup.py bdist_wheel
 
 <p>  frida是一个很牛逼的框架，能hook能注入反正就是各种牛逼，我目前还不太熟悉android，所以高级操作我也不会。
   这个东西嘛，反正我在windows下是各种崩，所以直在linux下安装了：</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>首先要安装python3
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>首先要安装python3
 
 pip install frida-tools
 

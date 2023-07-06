@@ -97,9 +97,9 @@
 
 <p>The compiler annotates each node <em>n</em> in the CFG with a set <strong>REACHES(n)</strong>, computed as the a forward data-flow problem:</p>
 
-<script type="math/tex; mode=display">Reaches(n) = \Phi, \forall n</script>
+\[Reaches(n) = \Phi, \forall n\]
 
-<script type="math/tex; mode=display">Reaches(n) = \mathop{\cup}\limits_{m \in preds(n)} (DEDef(m) \cup (Reaches(m) \cap \overline{DefKill(m)}))</script>
+\[Reaches(n) = \mathop{\cup}\limits_{m \in preds(n)} (DEDef(m) \cup (Reaches(m) \cap \overline{DefKill(m)}))\]
 
 <p>The <strong>DEDef</strong> is the downward-exposed definitions in <em>m</em>. <strong>DefKill(m)</strong> contains all the definition points that are obscured by a definition of the same name in <em>m</em>; <em>d</em> in <strong>DefKill(m)</strong> if <em>d</em> defines some name <em>v</em> and <em>m</em> contains a definition that also defines <em>v</em>.</p>
 
@@ -123,15 +123,15 @@
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">multi_map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">statement</span><span class="o">*&gt;</span> <span class="n">definition_info</span>
 
 <span class="k">def</span> <span class="nf">Init</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
-    <span class="n">b</span><span class="o">.</span><span class="n">Reaches</span> <span class="o">=</span> <span class="n">null</span>
-    <span class="n">b</span><span class="o">.</span><span class="n">DefKill</span> <span class="o">=</span> <span class="n">null</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">statements</span><span class="p">:</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">Reaches</span> <span class="o">=</span> <span class="n">null</span>
+    <span class="n">b</span><span class="p">.</span><span class="n">DefKill</span> <span class="o">=</span> <span class="n">null</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">.</span><span class="n">statements</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">IsDefineStmt</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-            <span class="n">definition_info</span><span class="o">.</span><span class="n">insert</span><span class="p">((</span><span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">))</span>    <span class="c1"># build map
-</span>            <span class="n">b</span><span class="o">.</span><span class="n">DefKill</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>                  <span class="c1"># build DefKill set
-</span>        <span class="k">for</span> <span class="n">oprand</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">oprands</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">oprand</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">DefKill</span><span class="p">():</span>
-                <span class="n">b</span><span class="o">.</span><span class="n">Reaches</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>              <span class="c1"># build Reaches set
+            <span class="n">definition_info</span><span class="p">.</span><span class="n">insert</span><span class="p">((</span><span class="n">i</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">))</span>    <span class="c1"># build map
+</span>            <span class="n">b</span><span class="p">.</span><span class="n">DefKill</span><span class="p">().</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>                  <span class="c1"># build DefKill set
+</span>        <span class="k">for</span> <span class="n">oprand</span> <span class="ow">in</span> <span class="n">i</span><span class="p">.</span><span class="n">oprands</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">oprand</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">b</span><span class="p">.</span><span class="n">DefKill</span><span class="p">():</span>
+                <span class="n">b</span><span class="p">.</span><span class="n">Reaches</span><span class="p">().</span><span class="n">append</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">)</span>              <span class="c1"># build Reaches set
 </span>
 </code></pre></div></div>
 
@@ -144,14 +144,14 @@
 </span>
 <span class="k">def</span> <span class="nf">GetReachingDefinitionOutPass</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
-        <span class="n">bb</span><span class="o">.</span><span class="n">ReachingDefOut</span> <span class="o">=</span> <span class="n">null</span>
+        <span class="n">bb</span><span class="p">.</span><span class="n">ReachingDefOut</span> <span class="o">=</span> <span class="n">null</span>
 
     <span class="n">changed</span> <span class="o">=</span> <span class="n">true</span>
     <span class="k">while</span> <span class="n">changed</span><span class="p">:</span>
         <span class="n">changed</span> <span class="o">=</span> <span class="n">false</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-            <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ReachingDefOut</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">ReachingDefOut</span><span class="o">.</span><span class="n">recompute</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ReachingDefOut</span><span class="o">.</span><span class="n">changed</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">ReachingDefOut</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">.</span><span class="n">ReachingDefOut</span><span class="p">.</span><span class="n">recompute</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">ReachingDefOut</span><span class="p">.</span><span class="n">changed</span><span class="p">:</span>
                 <span class="n">changed</span> <span class="o">=</span> <span class="n">true</span>
 </code></pre></div></div>
 

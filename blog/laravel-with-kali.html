@@ -122,7 +122,7 @@ composer config <span class="nt">-g</span> repo.packagist composer https://packa
 <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/home/dyf/.config/composer/vendor/bin        //修改为全局变量
 </code></pre></div></div>
 <p>到这里已经差多完了,缺啥东西自己去<strong>stackoverflow</strong>上面查吧,心力憔悴.<br />
-然后嘞,你需要去修改<code class="highlighter-rouge">/etc/apache2/sites-aviliable/000-default.conf</code>把默认路径改一下.</p>
+然后嘞,你需要去修改<code class="language-plaintext highlighter-rouge">/etc/apache2/sites-aviliable/000-default.conf</code>把默认路径改一下.</p>
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>composer create-project <span class="nt">--prefer-dist</span> laravel/laravel
 <span class="nb">chmod</span> <span class="nt">-R</span> 777 public storage bootstrap                             //给权限
 vim /etc/apache2/apache2.conf                  //找到<span class="s1">'/var/www'</span>将AllowOverride改为all
