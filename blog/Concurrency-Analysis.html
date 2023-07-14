@@ -72,28 +72,69 @@
 
 <p class="post-metadata text-muted">
   09 June 2023 -
-  <b>less than 1 min read time</b>
+  <b>6 mins read time</b>
 
   <br>Tags:
   
-  <a class="text-decoration-none no-underline" href="/blog/tags#program-analysis">
-    <span class="tag badge badge-pill text-primary border border-primary">program analysis</span>
-  </a>
-  
-  <a class="text-decoration-none no-underline" href="/blog/tags#concurrency">
-    <span class="tag badge badge-pill text-primary border border-primary">concurrency</span>
+  <a class="text-decoration-none no-underline" href="/blog/tags#program-analysis-concurrency">
+    <span class="tag badge badge-pill text-primary border border-primary">program analysis，concurrency</span>
   </a>
   </p>
 
 <h2 id="preface">Preface</h2>
 <p>最近开始阅读Concurrency Analysis相关的paper，主要涉及race condition和deadlock这些领域，记录一下学习中遇到的基本概念。</p>
 
+<h2 id="causality-in-distributed-system">Causality in Distributed System</h2>
+<p>对于一个计算系统而言，我们可以把他执行的过程描述成一系列指令或者事件 (Events) 的执行，这个指令或者事件会影响整个系统的状态。例如，我们可以把理想化的CPU抽象成一个有限状态机，每次执行指令都会改变CPU的状态，当然实际的的CPU由于乱序、多发射等优化事实上不是状态机，但是作为一个黑盒来看是没问题的。对于整个分布式系统而言，某个节点中，某个事件的发生可能会影响其他节点的状态，进而影响整个系统，例如：某个节点 <strong><em>a</em></strong> 向节点 <strong><em>b</em></strong> 发送消息，<strong><em>b</em></strong> 收到消息后会将该消息同步给 <strong>c</strong> 节点，同步消息这个事件显然是发送消息导致的。那么从“时间”概念上讲，发送消息应该发生在同步消息之前。这两个事件之间存在因果关系（cause-and-effect relations）。</p>
+
+<blockquote>
+  <p>那么物理上的时间比如几点几分，几月几日能够描述不同节点之间事件的因果关系吗？</p>
+</blockquote>
+
+<p>对于分布式系统而言，两个节点可能物理距离很近，例如运行在同一个CPU上的两个线程；也有可能离得很远，甚至不在同一个大陆。两台机器都不在同一个时区，如果使用物理上的时间先不考虑硬件时钟的误差，仅仅是时区之间的转换就比较复杂，效率很低。而且物理上的时间用整数表示会存在冗余，人类公历已经度过了2000多年，表示成整数是一种冗余的信息，因为我们只关注事情的先后次序，不关心事情发生的具体时间，因此需要引入一种特殊的“时间”来记录计算系统中事件发生的时刻。</p>
+
+<h2 id="happened-before-relation">Happened-before Relation</h2>
+
+<p>1978年，图灵奖大佬 <a href="https://en.wikipedia.org/wiki/Leslie_Lamport">Leslie Lamport</a> 发表了一篇名为 <em>Time, Clocks and the Ordering of Events in a Distributed System</em> \(^1\) 的文章，第一次引入了逻辑时钟和happened-before的概念。Happened-before (计作\(\rightarrow\)) 描述了分布式系统中事件发生的因果联系。当且仅当:</p>
+
+<ol>
+  <li><strong><em>c</em></strong> 和 <strong><em>e</em></strong> 发生在同一节点并且 <strong><em>c</em></strong> 更早发生
+或者</li>
+  <li><strong><em>c</em></strong> 和 <strong><em>e</em></strong> 发生在不同节点，<strong><em>e</em></strong> 可以通过其他节点发送的消息知道 <strong><em>c</em></strong> 已经发生了</li>
+</ol>
+
+<p>那么事件 <strong><em>c</em></strong> 就可以导致事件 <strong><em>e</em></strong> 的发生，也就是 <strong><em>c happened-before e</em></strong>。</p>
+
+<p>如果两个事件彼此不知道对方是否已经发生，那么可以说两个事件是并发的 (Concurrent)。</p>
+
+<p>下图展示了上文中消息同步的例子的 happened-before 关系，该图描述了分布式系统中的三个节点 <strong><em>a b c</em></strong>，事件节点(a1, b1 …)之间的边描述了事件之间的因果关系。我们可以通过这个有向无环图（Directed Acyclic Graph）来描述事件之间的因果关系。</p>
+
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/ccaa/cc_demo1.png" alt="demo1" /></p>
+
+<p>想要知道事件 <strong><em>c</em></strong> 是不是 happened-before 事件 <strong><em>e</em></strong>，我们只需要检查节 <strong><em>c</em></strong> 和 <strong><em>e</em></strong> 之间是不是连通的。例如上图中 \(a1 \rightarrow b2\) 并且 \(b2 \rightarrow c2\)，因此事件 <strong><em>a1 happened-before c2</em></strong>。</p>
+
+<blockquote>
+  <p>Happened-before relation 具有传递性</p>
+</blockquote>
+
+<p>同理我们可以发现 <strong><em>a1</em></strong> 和 <strong>c1</strong> 是不连通的 (\(a1 \nrightarrow c1\) and \(c1 \nrightarrow a1\))，即 <strong><em>a1</em></strong> 和 <strong><em>c1</em></strong> 并行，计作 \(a1 \parallel c1\)。</p>
+
+<p>因此我们可以得出结论，两个事件x，y之间可能存在三种关系：</p>
+
+<ol>
+  <li>如果 \(x \rightarrow y\)， 则事件 x 可能影响 y</li>
+  <li>如果 \(y \rightarrow y\)， 则事件 y 可能影响 x</li>
+  <li>如果x，y之间没有相互影响即 \(x \nrightarrow y\) and \(y \nrightarrow x\)，则x，y是并行发生的 \(x \parallel y\)</li>
+</ol>
+
+<p>从离散数学的角度来看，happened-before关系是一个偏序关系 (Partial Order Relations)，下面简单介绍一下偏序关系。</p>
+
 <h2 id="partial-order">Partial Order</h2>
 <p>偏序关系 (Partial Order Relations) 是离散数学中二元关系的一种，主要拥有自反性 (Reflexivity)、反对称性 (<a href="https://en.wikipedia.org/wiki/Antisymmetric_relation">Antisymmetry</a>)和传递性 (Transitivity)。</p>
 
 <ol>
-  <li>Reflexivity: \(a \leq a\) , every element is related to itself</li>
-  <li>Antiseymmetric: if \(a \leq b\) and \(b \leq a\)  then \(a = b\) , no two distinct elements precede each other</li>
+  <li>Reflexivity: \(a \leq a\) ，every element is related to itself</li>
+  <li>Antiseymmetric: if \(a \leq b\) and \(b \leq a\)  then \(a = b\) ，no two distinct elements precede each other</li>
   <li>Transitivity: if \(a \leq b\) and \(b \leq c\) then \(a \leq c\)</li>
 </ol>
 
@@ -107,20 +148,230 @@
 
 <p>通过 Irreflexivity 和 Transitivity 的性质可以推出Asymmetric的性质。</p>
 
-<h2 id="vector-clock">Vector Clock</h2>
-<p>Vector Clock用于确定分布式系统中并发事件的偏序关系，最早可以追溯到1988年的<a href="http://www.vs.inf.ethz.ch/publ/papers/VirtTimeGlobStates.pdf">这篇</a>文献，这里的偏序关系是事件发生的先后次序。顾名思义，Vector Clock就是一个Clock的数组，每一个进程拥有一个clock，所有进程的clock组成了全局Vector clock，同时每个进程在本地维护一个全局Vector Clock的副本。其运行原理大概如下：</p>
+<h2 id="causal-histories">Causal Histories</h2>
+<p>为了记录事件之间的因果关系，我们可以使用集合来记录事件因果的历史记录。以下图为例，我们给每个事件分配一个唯一的标识符，每个事件的集合取他前驱节点的并集，得到的集合就是该事件的 Causal History。例如事件 <strong><em>b2</em></strong> 的前驱节点有 <strong><em>a1</em></strong> 和 <strong><em>b1</em></strong>，因此 <strong><em>b2</em></strong> 的 Causal History 为 \(H_{b2} = \{a1, b1, b2\}\)。</p>
 
-<p><code class="language-plaintext highlighter-rouge">VC</code> 代表全局Vector Clock，<code class="language-plaintext highlighter-rouge">i</code> 代表一个进程</p>
+<p>当一个节点向另外一个节点发送消息时，会将自己的最新的 Casual History 附带在消息中，其他节点收到消息后，会将收到的 Casual History 集合合并到自己本地的 History 集合。例如 <strong><em>b</em></strong> 向 <strong><em>c</em></strong> 发送消息时，会将自己的 History \(H_{b2} = \{a1, b1, b2\}\) 附带在消息中，<strong><em>c</em></strong> 收到消息后，将自己的 History \(H_{c2} = \{c1, c2\}\) 和收到的 History \(H_{b2} = \{a1, b1, b2\}\) 合并，得到 \(H_{c2} = \{\textbf{a1}, \textbf{b1}, \textbf{b2}, c1, c2\}\)。
+<img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/ccaa/cc_demo2.png" alt="demo2" /></p>
+
+<p>我们可以通过检查事件之间的包涵关系来检查两个事件时候存在Happened-before 关系。当且仅当 \(H_x \subsetneq H_y\) 时，事件 x 可能影响事件 y，即 \(x \rightarrow y\)。这个概念很符合直觉，如果事件 x 影响了事件 y，那么事件 x 的历史记录一定是事件 y 的历史记录的子集。</p>
+
+<p>但是这种集合的表示并不够紧凑，例如上图中的事件 <strong><em>c2</em></strong>，其历史记录为 \(H_{c2} = \{a1, b1, b2, c1, c2\}\)，但是我们可以发现 \(b1 \rightarrow b2\) 并且 \(c1 \rightarrow c2\)，因此 \(H_{c2}\) 中的 \(b1\) 和 \(c1\) 是多余的，考虑到Happened-before的传递性，我们只需要知道每个节点最近发生的事件就足够了，因此我们可以用更加紧凑的方式来表示事件的历史记录。 \(H_{c2} = \{ a\rightarrowtail1, b\rightarrowtail2, c\rightarrowtail2 \}\)</p>
+
+<p>这也就是我们接下来要介绍的Vector Clock。</p>
+
+<h2 id="vector-clock">Vector Clock</h2>
+<p>Vector Clock 用于确定分布式系统中并发事件的偏序关系，最早可以追溯到1988年的<a href="http://www.vs.inf.ethz.ch/publ/papers/VirtTimeGlobStates.pdf">这篇</a>\(^2\)文献。</p>
+
+<p>让我们继续回到上面的例子，\(\{ a\rightarrowtail1, b\rightarrowtail2, c\rightarrowtail2 \}\) 可以被化简为一个简单的向量 [1, 2, 2]，这种紧密的表示已经足以记录每个节点最近的事件。因此我们可以使用这种更加紧凑的向量结构 VectorClock 来取代 Casual History 这种集合的形式。</p>
+
+<p>上文提到我们可以判断两个事件 x、y 的 Casual History 集合是否互为子集来判断是否 \(x \rightarrow y\)。当我们把数据结构换成 VectorClock 后，算法需要做出简单的调整，我们需要检查 \(VC_x\) 是否严格小于 (\(\prec\)) \(VC_y\)，即:</p>
+
+\[\forall i: V_x[i] \leq V_y[i] \land \exists j: V_x[j] &lt; V_y[j]\]
+
+<p>记做:</p>
+
+\[x \rightarrow y \Longleftrightarrow V_x \prec V_y\]
+
+<p>每当某节点 <strong><em>a</em></strong> 发生一个新的事件，我们不再创建一个新的名字，而是将该节点对应的 VectorClock 中的元素加一，例如 <strong><em>a</em></strong> 发生了新的事件，那么 \(V_a = [1, 0, 0]\) 变成 \(V_a = [2, 0, 0]\)。</p>
+
+<p>最后，Casual History 集合的 Union 操作我们变成取两个向量中对应元素的最大值，只管来讲，我们只需要保留每个节点的最新事件作为时钟，即：</p>
+
+\[V_x \cup V_y \Longleftrightarrow \forall i: V[i] = max(V_x[i], V_y[i])\]
+
+<p>这里仍然以上文中的例子为例，如图所示：</p>
+
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/ccaa/cc_demo3.png" alt="demo3" /></p>
+
+<p>此时我们可以发现，当节点 <strong><em>c</em></strong> 获得来自 <strong><em>b</em></strong> 的消息同步时，其当前的 VectorClock 为[1, 2, 2]，远远比 Casual History 这种集合的表示信息密度更大，可以有效节省存储空间，并且 VectorClock 的 Compare 和 Union 操作都是线性的时间复杂度，效率更高。</p>
+
+<h2 id="race-condition-detection">Race Condition Detection</h2>
+
+<p>了解了 VectorClock 和 Happened-before 的概念，我们可以继续介绍如何使用VectorClock 来检测 Race Condition。Race Condition 在计算机系统中非常之常见，从电路的数据冒险 (Data Hazard)，到上层 web 应用的高并发导致的数据竞争，已经数据库、操作系统中常见的脏读脏写等等，广义上都属于 Race Condition。高并发可以极大的提高计算机系统的吞吐量，同时并发也会导致复杂度的增加，程序员就更容易出错，Race Condition 或许就是性能提升带来的代价吧😂。</p>
+
+<p>现在的大公司的服务端程序基本都是极高的并发量，使用 C++ 或者 Golang 开发，Race Condition 的问题就更加严重，并且 Race Condition 在大型系统中<strong>非常非常难以复现</strong>，因此在开发或者测试的过程中，大公司都会通过各种手段来检测 Race Condition，例如静态分析、动态分析、模糊测试等等。</p>
+
+<p>有一个比较常见的 Race Condition 检查器是 Google 开发的 <a href="https://github.com/google/sanitizers/wiki/ThreadSanitizerCppManual">ThreadSanitizer</a>(简称TSan)，现在被集成到了 <a href="https://llvm.org">LLVM</a> 的 compiler-rt 中，作为LLVM的运行时库的一部分，之后我们或许会做更加详细的介绍（挖坑🌚。</p>
+
+<p>我们这里把 Race Condition 的范围缩小一点，只关注多线程之间的竞争，当不同线程读和写(Read-Write/Write-Read)、写和写(Write-Write)并行执行时存在 Race Condition，例如下面这段代码：</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;thread&gt;</span><span class="cp">
+</span><span class="kt">int</span> <span class="n">x</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">thread1</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// race condition</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t1</span><span class="p">(</span><span class="n">thread1</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t2</span><span class="p">(</span><span class="n">thread1</span><span class="p">);</span>
+    <span class="n">t1</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="n">t2</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这段代码中，两个线程同时访问了共享变量x，这就是一个典型的 Write-Write Race Condition。如何检查这个bug呢？</p>
+
+<p>首先我们先思考一下正确的代码应该是什么样的，最简单的方式，我们应该在访问共享变量 x 的时候加锁，例如：</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;thread&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;mutex&gt;</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="n">x</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">mutex</span> <span class="n">mtx</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">thread1</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// acquire lock</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">lock_guard</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">mutex</span><span class="o">&gt;</span> <span class="n">guard</span><span class="p">(</span><span class="n">mtx</span><span class="p">);</span>
+    
+    <span class="c1">// critical section</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="c1">// lock released automatically</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>上述代码是 C++ 使用锁的方式，或者我们也可以将变量 x 声明为 <code class="language-plaintext highlighter-rouge">std::atomic&lt;int&gt; x</code>，这样就可以使用原子操作来保证线程安全。假如使用锁来保护数据的读写，我们可以发现锁就是不同线程之间的同步消息，对于线程 <em>t</em> 而言，锁的获得(Acquire)就是相当于从其他线程收到同步消息，锁的释放(Release)就相当于向其他线程发送同步消息。因此，考虑到上文提到的 VectorClock，我们可以使用 VectorClock 来记录每个线程的同步消息，方法大概如下：</p>
+
 <ol>
-  <li>初始化所有的clock为0</li>
-  <li>每当 <code class="language-plaintext highlighter-rouge">i</code> 进程内部发生了事件，则更新本地的逻辑时钟 \(VC_i[i] = VC_i[i] + 1\)</li>
-  <li>每当一个进程发送消息时，它会将自己在向量时钟中的逻辑时钟增加一（与上述提到的方式相同，但对于同一事件不会增加两次），然后在消息中附带自己的向量时钟的副本。</li>
-  <li>每当一个进程接收到消息时，它会将自己在向量时钟中的逻辑时钟增加一，并通过将自己的向量时钟中的每个元素与接收到的消息中的向量进行比较，取其中较大的值来更新自己的向量时钟。例如如果进程 \(P_j\) 从进程 \(P_i\) 收到消息 \(m\), 那么 \(P_j\) 首先会 \(VC_j[j] = VC_j[j] + 1\)，然后根据消息m更新本地的 Vector Clock，\(VC_j[k] \leftarrow max(VC_j[k], VC_i[i]), \forall k\)</li>
+  <li>每个线程自己维护一个 VectorClock，用于记录自己的事件和收到的同步消息</li>
+  <li>每个锁维护一个 VectorClock，用于记录锁的同步消息</li>
+  <li>线程 <em>t</em> 获得锁的时候执行： \(V_{t} = V_{t} \cup V_{lock}\)</li>
+  <li>线程 <em>t</em> 释放锁的时候执行： \(V_{t}[t] += 1; V_{lock} = V_{t}\)</li>
 </ol>
 
-<p>以下图为例：
-<img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/090623/Vector_Clock.svg" alt="VC example" />
-从进程C开始发送消息，到最后进程A得到的向量为 \(VC_A = [{4, 5, 5}]\)。</p>
+<p>这样以来，每个线程之间的同步在运行时就可以被记录下来，很显然锁的释放和获得构成了 Happened-before 关系。同时程序的执行往往存在以下约束：</p>
+
+<ol>
+  <li>不可以在其他线程释放锁之前再次获得锁</li>
+  <li>单个线程中的指令是顺序执行的（把CPU和编译器的优化作为黑盒）</li>
+</ol>
+
+<p>因此，不同的 Acq 和 Rel 操作之间的读写操作也存在 Happened-before 关系，如下图所示：</p>
+
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/ccaa/cc_demo4.png" alt="demo4" /></p>
+
+<p>我们可以看到 <strong><em>a</em></strong>、<strong><em>b</em></strong> 两个线程分别读写共享变量 <strong><em>x</em></strong>，并通过锁 <strong><em>L</em></strong> 进行消息的同步，我们可以得到以下关系：</p>
+
+\[Acq_b(L) \rightarrow Write(x)\]
+
+\[Write(x) \rightarrow Rel_b(L)\]
+
+\[Rel_b(L) \rightarrow Acq_a(L)\]
+
+\[Acq_a(L) \rightarrow Read(x)\]
+
+<p>由于Happened-before 关系具有传递性，我们可以得到：</p>
+
+\[Write(x) -&gt; Read(x)\]
+
+<p>因此 <strong><em>b</em></strong> 线程的写操作和 <strong><em>a</em></strong> 线程的读操作不是并行的，因此不存在 Race Condition。为了记录所有线程对变量 <strong><em>x</em></strong> 的读写操作的时钟，我们可以在全局分别维护两个 VectorClock \(V_R\) 和 \(V_W\)，分别用于记录读操作和写操作的时钟：</p>
+
+<ol>
+  <li>当线程 <em>t</em> 执行读操作后，执行 \(V_R = V_R \cup V_t\)</li>
+  <li>当线程 <em>t</em> 执行写操作后，执行 \(V_W = V_W \cup V_t\)</li>
+</ol>
+
+<p>那么我们如何在运行时检查是否存在 Race Condition呢？我们设计如下算法：</p>
+
+<ol>
+  <li>当线程 <em>t</em> 在对变量 <strong><em>x</em></strong> 将要执行写操作时，首先检查 \(V_{Rx} \prec V_t; V_{Wx} \prec V_t\) 即其他线程对 <strong><em>x</em></strong> 读写操作是否 Happened-before 当前线程的写操作，如果不是，则说明存在对变量 <strong><em>x</em></strong> 并行的读写行为，属于 Race Condition。</li>
+  <li>当线程 <em>t</em> 在对变量 <strong><em>x</em></strong> 将要执行读操作时，首先检查 \(V_{Rw} \prec V_t\)，由于并行的读操作没有副作用，因此我们在读取变量 <strong><em>x</em></strong> 之前，只需要检查是否存在并行的写(Read-Write)操作即可。</li>
+</ol>
+
+<p>码实现如下，这里需要重载 <code class="language-plaintext highlighter-rouge">&lt;</code> 和 <code class="language-plaintext highlighter-rouge">&amp;</code> 来进行 VectorClock 的比较和合并：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">check_write</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">V_Rx</span> <span class="o">&lt;</span> <span class="n">V_t</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">V_Wx</span> <span class="o">&lt;</span> <span class="n">Vt</span><span class="p">))</span>
+        <span class="n">V_Wx</span> <span class="o">&amp;=</span> <span class="n">V_t</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="n">throw</span> <span class="n">RaceConditionError</span><span class="p">;</span>
+
+<span class="n">check_read</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">V_Rx</span> <span class="o">&lt;</span> <span class="n">V_t</span><span class="p">)</span>
+        <span class="n">V_Rx</span> <span class="o">&amp;=</span> <span class="n">V_t</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="n">throw</span> <span class="n">RaceConditionError</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>当然这里还可以继续优化 \(V_R\) 和 \(V_W\) 的数据结构，2009年的一篇PLDI的<a href="https://users.soe.ucsc.edu/~cormac/papers/pldi09.pdf">paper</a> \(^3\) 将 \(V_R\) 和 \(V_W\) 的数据结构优化为了一个叫做 <em>Epoch</em> 的数据结构，把空间复杂度从 \(O(n)\) 降到了 \(O(1)\)。感兴趣的同学可以自行阅读，这里就不再赘述了。</p>
+
+<h2 id="back-to-tsan">Back to TSan</h2>
+
+<p>简单介绍一下TSan，你可以非常方便的使用TSan来检查自己的C++程序是否存在 Race Condition、Dead Lock等情况，他可以在运行时检查存在的线程相关的问题，具体的使用方式如下：</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// clang -fsanitize=thread -g -O2 test.cpp</span>
+<span class="cp">#include</span> <span class="cpf">&lt;thread&gt;</span><span class="cp">
+</span><span class="kt">int</span> <span class="n">x</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">thread1</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// race condition</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t1</span><span class="p">(</span><span class="n">thread1</span><span class="p">);</span>
+    <span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t2</span><span class="p">(</span><span class="n">thread1</span><span class="p">);</span>
+    <span class="n">t1</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+    <span class="n">t2</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>用上述命令编译并执行该程序，可以看到如下输出：</p>
+
+<p><img src="https://blog-1257148503.cos.ap-nanjing.myqcloud.com/pictures/ccaa/tsan_rpt1.png" alt="tsan report" /></p>
+
+<p>TSan会在编译时对关键函数进行插桩，并在这些关键函数执行的前后更新相关的VectorClock并进行检查，例如:</p>
+
+<ul>
+  <li>pthread_create</li>
+  <li>pthread_join</li>
+  <li>pthread_mutex_lock</li>
+  <li>pthread_mutex_unlock</li>
+  <li>…</li>
+</ul>
+
+<p>以 <code class="language-plaintext highlighter-rouge">pthread_mutex_unlock</code> 为例：</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">TSAN_INTERCEPTOR</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="n">pthread_mutex_unlock</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">SCOPED_TSAN_INTERCEPTOR</span><span class="p">(</span><span class="n">pthread_mutex_unlock</span><span class="p">,</span> <span class="n">m</span><span class="p">);</span>
+  <span class="n">MutexUnlock</span><span class="p">(</span><span class="n">thr</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="p">(</span><span class="n">uptr</span><span class="p">)</span><span class="n">m</span><span class="p">);</span>
+  <span class="kt">int</span> <span class="n">res</span> <span class="o">=</span> <span class="n">REAL</span><span class="p">(</span><span class="n">pthread_mutex_unlock</span><span class="p">)(</span><span class="n">m</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">errno_EINVAL</span><span class="p">)</span>
+    <span class="n">MutexInvalidAccess</span><span class="p">(</span><span class="n">thr</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="p">(</span><span class="n">uptr</span><span class="p">)</span><span class="n">m</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>TSan首先会调用 MutexUnlock 函数来更新对应锁的 VectorClock，然后继续执行被 hook 的 <code class="language-plaintext highlighter-rouge">pthread_mutex_unlock</code> 函数。</p>
+
+<p>这种检查方式属于静态分析和动态分析的结合，工业界似乎称之为IAST（花里胡哨😂，理论上来说IAST是可以做到没有漏报和误报的，但是由于TSan在实现的过程中考虑到性能问题，把不同的线程非配到了固定数量的 <em>vCPU</em> 上，导致不同线程之间可能抢占同一个 VectorClock，因此会存在小概率漏报(TSan的team自己声称小概率…)，但是仍然不存在误报。</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>以上为近期阅读 Concurrency Analysis 相关 paper 的一些总结，发现并发是一个大坑，更多琐碎的细节例如：</p>
+
+<ol>
+  <li>不同硬件的 Memory Model（Arm 的 weak model 和 Intel TSO） 的区别</li>
+  <li>不同编程语言的 Memory Model</li>
+  <li>编译器的优化例如指令调度</li>
+  <li>CPU的优化（cache的同步、多核的同步、乱序执行、多发射等等）</li>
+  <li>…</li>
+</ol>
+
+<p>以上因素对并发程序的正确性和运行效率都存在深远的影响，同时也存在着很多挑战和机会等着我们去探索。</p>
+
+<h2 id="reference">Reference</h2>
+
+<ol>
+  <li><a href="https://www.microsoft.com/en-us/research/publication/time-clocks-ordering-events-distributed-system/?from=https://research.microsoft.com/en-us/um/people/lamport/pubs/time-clocks.pdf&amp;type=exact">Time, Clocks and the Ordering of Events in a Distributed System</a>, by Leslie Lamport</li>
+  <li><a href="http://www.vs.inf.ethz.ch/publ/papers/VirtTimeGlobStates.pdf">Virtual Time and Global States of Distributed Systems</a>, by Friedemann Mattern</li>
+  <li><a href="https://users.soe.ucsc.edu/~cormac/papers/pldi09.pdf">FastTrack: Efficient and Precise Dynamic Race Detection</a>, by Cormac Flanagan, Stephen N. Freund</li>
+  <li><a href="https://queue.acm.org/detail.cfm?id=2917756">Why Logical Clocks are Easy</a>, by Carlos Baquero, Nuno Preguiça</li>
+</ol>
 
 
 <div id="vcomments"></div>
